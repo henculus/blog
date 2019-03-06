@@ -1,15 +1,21 @@
-use diesel::prelude::*;
-use dotenv::dotenv;
-use std::env;
-
 pub mod post;
 pub mod schema;
 pub mod errors;
 
-pub type Id = i32;
+use diesel::prelude::*;
+use dotenv::dotenv;
+use std::env;
+use r2d2::Pool;
+use r2d2_diesel::ConnectionManager;
+use errors::DBConnectionError;
 
-pub fn connection() -> PgConnection {
+pub type Id = i32;
+pub type DBPool = Pool<ConnectionManager<PgConnection>>;
+
+
+pub fn db_pool() -> Result<DBPool, DBConnectionError> {
     dotenv().ok();
     let url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    PgConnection::establish(&url).expect(&format!("Error connecting to {}", url))
+    let manager = ConnectionManager::<PgConnection>::new(url);
+    Ok(Pool::new(manager)?)
 }

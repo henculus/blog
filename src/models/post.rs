@@ -12,41 +12,54 @@ pub struct Post {
     pub body: String,
 }
 
-#[derive(Insertable, Deserialize)]
+#[derive(Insertable, Deserialize, AsChangeset)]
 #[table_name = "posts"]
 pub struct NewPost {
     pub title: String,
     pub body: String,
 }
 
-pub struct PostsTable {
-    connection: PgConnection
+pub struct PostsTable<'a> {
+    connection: &'a PgConnection,
 }
 
-impl PostsTable {
-    pub fn instance(connection: PgConnection) -> Self {
+impl<'a> PostsTable<'a> {
+    pub fn instance(connection: &'a PgConnection) -> Self {
         Self { connection }
     }
 
     pub fn create(&self, post: NewPost) -> Result<Post, CreationError> {
         let result = diesel::insert_into(posts::table)
             .values(&post)
-            .get_result(&self.connection)?;
+            .get_result(self.connection)?;
         Ok(result)
+    }
+
+    pub fn delete(&self, post_id: Id) -> Result<Id, DeleteError> {
+        let result = diesel::delete(posts::table.find(post_id))
+            .execute(self.connection)?;
+        Ok(result as Id)
+    }
+
+    pub fn update(&self, post_id: Id, post: NewPost) -> Result<Id, UpdateError> {
+        let result = diesel::update(posts::table.find(post_id))
+            .set(&post)
+            .execute(self.connection)?;
+        Ok(result as Id)
     }
 
     pub fn get(&self, limit: i64, offset: i64) -> Result<Vec<Post>, SelectionError> {
         let result = posts::table
             .offset(offset)
             .limit(limit)
-            .load::<Post>(&self.connection)?;
+            .load::<Post>(self.connection)?;
         Ok(result)
     }
 
     pub fn get_by_id(&self, post_id: Id) -> Result<Post, SelectionError> {
         let result = posts::table
             .find(post_id)
-            .first::<Post>(&self.connection)?;
+            .first::<Post>(self.connection)?;
         Ok(result)
     }
 }

@@ -4,6 +4,12 @@ version = "0.1.0"
 authors = ["Ilya Kopeshtianski <lupusanay@gmail.com>"]
 edition = "2018"
 
+[dependencies.r2d2]
+version = "0.8.3"
+
+[dependencies.r2d2-diesel]
+version = "1.0.0"
+
 [dependencies.serde]
 version = "1.0.89"
 features = ["derive"]

@@ -1,86 +1,32 @@
-use std::error;
 use std::fmt;
 use std::error::Error;
 
-
-// TODO: Implement all errors in
-pub type UpdateError = CreationError;
-pub type DeleteError = CreationError;
-
 #[derive(Debug)]
-pub struct CreationError(diesel::result::Error);
+pub enum ModelError {
+    OperationError(diesel::result::Error),
+    DBConnectionError(r2d2::Error),
 
-impl fmt::Display for CreationError {
+}
+
+impl Error for ModelError {}
+
+impl fmt::Display for ModelError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Cannot create entity")
+        match self {
+            ModelError::OperationError(_) => write!(f, "Cannot execute operation"),
+            ModelError::DBConnectionError(_) => write!(f, "Cannot connect to the database")
+        }
     }
 }
 
-impl Error for CreationError {
-    fn description(&self) -> &str {
-        self.0.description()
-    }
-
-    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
-        Some(&self.0)
-    }
-}
-
-impl From<diesel::result::Error> for CreationError {
-    fn from(err: diesel::result::Error) -> Self {
-        Self(err)
-    }
-}
-
-
-#[derive(Debug)]
-pub struct SelectionError(diesel::result::Error);
-
-impl fmt::Display for SelectionError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Cannot select entry: {}", self.0.description())
-    }
-}
-
-impl Error for SelectionError {
-    fn description(&self) -> &str {
-        self.0.description()
-    }
-
-    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
-        Some(&self.0)
-    }
-}
-
-impl From<diesel::result::Error> for SelectionError {
-    fn from(err: diesel::result::Error) -> Self {
-        Self(err)
-    }
-}
-
-#[derive(Debug)]
-pub struct DBConnectionError;
-
-impl fmt::Display for DBConnectionError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "Cannot connect to the database")
-    }
-}
-
-impl error::Error for DBConnectionError {
-    fn source(&self) -> Option<&(dyn error::Error + 'static)> {
-        None
-    }
-}
-
-impl From<r2d2::Error> for DBConnectionError {
+impl From<r2d2::Error> for ModelError {
     fn from(err: r2d2::Error) -> Self {
-        Self
+        ModelError::DBConnectionError(err)
     }
 }
 
-impl From<diesel::ConnectionError> for DBConnectionError {
-    fn from(err: diesel::ConnectionError) -> Self {
-        Self
+impl From<diesel::result::Error> for ModelError {
+    fn from(err: diesel::result::Error) -> Self {
+        ModelError::OperationError(err)
     }
 }

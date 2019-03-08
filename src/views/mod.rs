@@ -1,10 +1,10 @@
-mod errors;
+mod error;
 
 use rocket::request::Form;
 use rocket_contrib::json::Json;
 use crate::models::post::*;
 use rocket::{Request, State};
-use crate::views::errors::*;
+use crate::views::error::*;
 use crate::models::{TableManager, Model};
 use crate::models::Id;
 
@@ -27,8 +27,7 @@ pub fn get_posts(cursor: Form<LimitOffset>, table_manager: State<TableManager>) 
     let table: PostsTable = table_manager.get()?;
     table
         .get(cursor.limit.unwrap_or(1), cursor.offset.unwrap_or(0))
-        .map(|posts| Json(posts))
-        .map_err(|err| ViewError::NotFound)
+        .map(|posts| Ok(Json(posts)))?
 }
 
 #[get("/posts/<id>")]
@@ -61,15 +60,21 @@ pub fn delete_post(id: Id, table_manager: State<TableManager>) -> Option<Json<Id
 }
 
 #[catch(503)]
-pub fn service_unavailable(req: &Request) -> Json<ViewError> {
-    Json(
-        ViewError::ServiceUnavailable
-    )
+pub fn service_unavailable(_: &Request) -> Json<ViewError> {
+    let error = ViewError {
+        status: "error".to_string(),
+        kind: ViewErrorKind::ServiceUnavailable,
+        resource: None
+    };
+    Json(error)
 }
 
 #[catch(404)]
 pub fn not_found(req: &Request) -> Json<ViewError> {
-    Json(
-        ViewError::NotFound
-    )
+    let error = ViewError {
+        status: "error".to_string(),
+        kind: ViewErrorKind::NotFound,
+        resource: Some(req.to_string())
+    };
+    Json(error)
 }

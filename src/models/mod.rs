@@ -1,13 +1,13 @@
 pub mod post;
 pub mod schema;
-pub mod errors;
+pub mod error;
 
 use diesel::prelude::*;
 use dotenv::dotenv;
 use std::env;
 use r2d2::{Pool, PooledConnection};
 use r2d2_diesel::ConnectionManager;
-use crate::models::errors::ModelError;
+use crate::models::error::ModelError;
 
 type DBPool = Pool<ConnectionManager<PgConnection>>;
 type DBConnection = PooledConnection<ConnectionManager<PgConnection>>;

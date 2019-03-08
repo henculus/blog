@@ -1,7 +1,7 @@
 use serde::{Serialize, Deserialize};
 use diesel::prelude::*;
 use crate::models::schema::posts;
-use crate::models::errors::*;
+use crate::models::error::*;
 use crate::models::{Model, Id, DBConnection};
 
 #[derive(Queryable, Serialize, Identifiable)]

@@ -1,39 +1,39 @@
 use serde::Serialize;
 use std::fmt;
-use std::error::*;
+use rocket::response::Responder;
+use rocket::{Request, Response};
+use rocket::http::Status;
+use crate::models::errors::ModelError;
 
 #[derive(Debug, Serialize)]
-pub struct NotFoundError {
-    pub code: i16,
-    pub status: String,
-    pub message: String,
-    pub resource_description: Option<String>,
+pub enum ViewError {
+    ServiceUnavailable,
+    NotFound,
 }
 
-impl Default for NotFoundError {
-    fn default() -> Self {
-        Self {
-            code: 404,
-            status: String::from("error"),
-            message: String::from("resource not found"),
-            resource_description: None,
+impl std::fmt::Display for ViewError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            ViewError::ServiceUnavailable => write!(f, "Service unavailable"),
+            ViewError::NotFound => write!(f, "Not found")
         }
     }
 }
 
-impl Error for NotFoundError {
-    fn source(&self) -> Option<&(dyn Error + 'static)> {
-        None
+impl<'a> Responder<'a> for ViewError {
+    fn respond_to(self, request: &Request) -> Result<Response<'a>, Status> {
+        match self {
+            ViewError::NotFound => Err(Status::NotFound),
+            ViewError::ServiceUnavailable => Err(Status { code: 503, reason: "Service unavailable" })
+        }
     }
 }
 
-impl std::fmt::Display for NotFoundError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "Not Found Error \n Status: {} \n Message: {} \n Resource description: {:?}",
-               self.status,
-               self.message,
-               self.resource_description)
+impl From<ModelError> for ViewError {
+    fn from(err: ModelError) -> Self {
+        match err {
+            ModelError::DBConnectionError => ViewError::ServiceUnavailable,
+            ModelError::OperationError(_) => ViewError::NotFound
+        }
     }
 }
-

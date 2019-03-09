@@ -9,7 +9,8 @@ use crate::models::{TableManager, Model};
 use crate::models::Id;
 
 #[post("/posts", format = "application/json", data = "<post>")]
-pub fn new_post(post: Json<NewPost>, table_manager: State<TableManager>) -> Result<Json<Post>, ViewError> {
+pub fn new_post(post: Json<NewPost>,
+                table_manager: State<TableManager>) -> Result<Json<Post>, ViewError> {
     let posts_table: PostsTable = table_manager.get()?;
     posts_table
         .create(post.into_inner())
@@ -23,7 +24,8 @@ pub struct LimitOffset {
 }
 
 #[get("/posts?<cursor..>")]
-pub fn get_posts(cursor: Form<LimitOffset>, table_manager: State<TableManager>) -> Result<Json<Vec<Post>>, ViewError> {
+pub fn get_posts(cursor: Form<LimitOffset>,
+                 table_manager: State<TableManager>) -> Result<Json<Vec<Post>>, ViewError> {
     let table: PostsTable = table_manager.get()?;
     table
         .get(cursor.limit.unwrap_or(1), cursor.offset.unwrap_or(0))
@@ -40,7 +42,8 @@ pub fn get_post(id: Id, table_manager: State<TableManager>) -> Option<Json<Post>
 }
 
 #[put("/posts/<id>", format = "application/json", data = "<post>")]
-pub fn update_post(id: Id, post: Json<NewPost>, table_manager: State<TableManager>) -> Option<Json<Id>> {
+pub fn update_post(id: Id, post: Json<NewPost>,
+                   table_manager: State<TableManager>) -> Option<Json<Id>> {
     let posts_table: PostsTable = table_manager.get().unwrap();
 
     posts_table
@@ -64,7 +67,7 @@ pub fn service_unavailable(_: &Request) -> Json<ViewError> {
     let error = ViewError {
         status: "error".to_string(),
         kind: ViewErrorKind::ServiceUnavailable,
-        resource: None
+        resource: None,
     };
     Json(error)
 }
@@ -74,7 +77,7 @@ pub fn not_found(req: &Request) -> Json<ViewError> {
     let error = ViewError {
         status: "error".to_string(),
         kind: ViewErrorKind::NotFound,
-        resource: Some(req.to_string())
+        resource: Some(req.to_string()),
     };
     Json(error)
 }

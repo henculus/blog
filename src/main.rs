@@ -10,12 +10,18 @@ extern crate serde;
 extern crate dotenv;
 extern crate r2d2;
 
+use rocket::Rocket;
+
 mod models;
 mod views;
+mod tests;
 
-fn main() {
-    let db_pool = models::db_pool().expect("Cannot connect to database");
+fn create_app() -> Rocket {
+    let db_pool = models::db_pool()
+        .expect("Cannot connect to database");
+
     let table_manager = models::TableManager::new(db_pool);
+
     rocket::ignite()
         .manage(table_manager)
         .register(catchers![views::not_found, views::service_unavailable])
@@ -26,5 +32,9 @@ fn main() {
                    views::get_posts,
                    views::delete_post,
                    views::update_post])
-        .launch();
+}
+
+fn main() {
+    let rocket = create_app();
+    rocket.launch();
 }

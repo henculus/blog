@@ -28,18 +28,6 @@ test:
     - rustc --version
     - cargo --version
     - cargo test --verbose
-  cache:
-    paths:
-      - cargo/
-      - target/
-      - apt/
-
-
-cache:
-  paths:
-    - apt/
-    - cargo/
-    - target/
 
 production:
   script:
@@ -47,3 +35,9 @@ production:
     - apt-get install -y ruby-dev
     - gem install dpl
     - dpl --provider=heroku --app=gitlab-ci-python-test-prod --api-key=$HEROKU_PRODUCTION_API_KEY
+
+cache:
+  paths:
+    - apt/
+    - cargo/
+    - target/

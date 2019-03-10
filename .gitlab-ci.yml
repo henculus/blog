@@ -17,7 +17,7 @@ services:
   - postgres:latest
 
 before_script:
-  - cargo install diesel_cli --no-default-features --features postgres
+  - cargo install diesel_cli --force --no-default-features --features postgres
 
 test:
   stage: test

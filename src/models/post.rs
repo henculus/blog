@@ -1,17 +1,18 @@
-use serde::{Serialize, Deserialize};
 use diesel::prelude::*;
-use crate::models::schema::posts;
-use crate::models::error::*;
-use crate::models::{Model, Id, DBConnection};
+use serde::{Deserialize, Serialize};
 
-#[derive(Queryable, Serialize, Identifiable)]
+use crate::models::{DBConnection, Id, Model};
+use crate::models::error::*;
+use crate::models::schema::posts;
+
+#[derive(Queryable, Serialize, Deserialize, Identifiable)]
 pub struct Post {
     pub id: Id,
     pub title: String,
     pub body: String,
 }
 
-#[derive(Insertable, Deserialize, AsChangeset)]
+#[derive(Insertable, Serialize, Deserialize, AsChangeset)]
 #[table_name = "posts"]
 pub struct NewPost {
     pub title: String,

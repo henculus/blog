@@ -1,20 +1,29 @@
-mod error;
-
-use rocket::request::Form;
+use rocket::{
+    Request,
+    request::Form,
+    State,
+};
 use rocket_contrib::json::Json;
-use crate::models::post::*;
-use rocket::{Request, State};
-use crate::views::error::*;
-use crate::models::{TableManager, Model};
-use crate::models::Id;
+
+use crate::{
+    models::{
+        Id,
+        Model,
+        post::*,
+        TableManager,
+    },
+    views::error::*,
+};
+
+mod error;
 
 #[post("/posts", format = "application/json", data = "<post>")]
 pub fn new_post(post: Json<NewPost>,
-                table_manager: State<TableManager>) -> Result<Json<Post>, ViewError> {
+                table_manager: State<TableManager>) -> Result<Json<Id>, ViewError> {
     let posts_table: PostsTable = table_manager.get()?;
     posts_table
         .create(post.into_inner())
-        .map(|post| Ok(Json(post)))?
+        .map(|post| Ok(Json(post.id)))?
 }
 
 #[derive(FromForm)]
@@ -33,33 +42,30 @@ pub fn get_posts(cursor: Form<LimitOffset>,
 }
 
 #[get("/posts/<id>")]
-pub fn get_post(id: Id, table_manager: State<TableManager>) -> Option<Json<Post>> {
-    let posts_table: PostsTable = table_manager.get().unwrap();
+pub fn get_post(id: Id, table_manager: State<TableManager>) -> Result<Json<Post>, ViewError> {
+    let posts_table: PostsTable = table_manager.get()?;
     posts_table
         .get_by_id(id)
-        .map(|post| Json(post))
-        .ok()
+        .map(|post| Ok(Json(post)))?
 }
 
 #[put("/posts/<id>", format = "application/json", data = "<post>")]
 pub fn update_post(id: Id, post: Json<NewPost>,
-                   table_manager: State<TableManager>) -> Option<Json<Id>> {
-    let posts_table: PostsTable = table_manager.get().unwrap();
+                   table_manager: State<TableManager>) -> Result<Json<i32>, ViewError> {
+    let posts_table: PostsTable = table_manager.get()?;
 
     posts_table
         .update(id, post.into_inner())
-        .map(|id| Json(id))
-        .ok()
+        .map(|row_affected| Ok(Json(row_affected)))?
 }
 
 #[delete("/posts/<id>")]
-pub fn delete_post(id: Id, table_manager: State<TableManager>) -> Option<Json<Id>> {
-    let posts_table: PostsTable = table_manager.get().unwrap();
+pub fn delete_post(id: Id, table_manager: State<TableManager>) -> Result<Json<i32>, ViewError> {
+    let posts_table: PostsTable = table_manager.get()?;
 
     posts_table
         .delete(id)
-        .map(|id| Json(id))
-        .ok()
+        .map(|row_affected| Ok(Json(row_affected)))?
 }
 
 #[catch(503)]

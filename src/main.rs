@@ -1,14 +1,13 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
 #[macro_use]
-extern crate rocket;
-#[macro_use]
 extern crate diesel;
-extern crate r2d2_diesel;
-
-extern crate serde;
 extern crate dotenv;
 extern crate r2d2;
+extern crate r2d2_diesel;
+#[macro_use]
+extern crate rocket;
+extern crate serde;
 
 use rocket::Rocket;
 

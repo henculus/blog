@@ -1,5 +1,7 @@
-use std::fmt;
-use std::error::Error;
+use std::{
+    error::Error,
+    fmt,
+};
 
 #[derive(Debug)]
 pub enum ModelError {
@@ -19,7 +21,7 @@ impl fmt::Display for ModelError {
 }
 
 impl From<r2d2::Error> for ModelError {
-    fn from(err: r2d2::Error) -> Self {
+    fn from(_: r2d2::Error) -> Self {
         ModelError::DBConnectionError
     }
 }

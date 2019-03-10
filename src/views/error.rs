@@ -1,11 +1,21 @@
-use serde::Serialize;
-use std::fmt;
-use rocket::response::Responder;
-use rocket::{Request, Response};
-use rocket::http::{Status, ContentType};
-use crate::models::error::ModelError;
+use std::{
+    error::Error,
+    fmt,
+};
+
+use rocket::{
+    http::{
+        ContentType,
+        Status,
+    },
+    Request,
+    Response,
+    response::Responder,
+};
 use rocket_contrib::json::Json;
-use std::error::Error;
+use serde::Serialize;
+
+use crate::models::error::ModelError;
 
 #[derive(Debug, Serialize)]
 pub struct ViewError {

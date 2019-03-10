@@ -1,0 +1,49 @@
+image: 'rustlang/rust:nightly'
+
+stages:
+  - test
+  - doc
+  - build
+  - deploy
+
+variables:
+  POSTGRES_DB: blog
+  POSTGRES_USER: lupusanay
+  POSTGRES_PASSWORD: qwerty
+  CARGO_HOME: $CI_PROJECT_DIR/cargo
+  APT_CACHE_DIR: $CI_PROJECT_DIR/apt
+
+services:
+  - postgres:latest
+
+before_script:
+  - cargo install diesel_cli --no-default-features --features postgres
+
+test:
+  stage: test
+  variables:
+    DATABASE_URL: postgres://lupusanay:qwerty@postgres/blog
+  script:
+    - cargo/bin/diesel migration run
+    - rustc --version
+    - cargo --version
+    - cargo test --verbose
+  cache:
+    paths:
+      - cargo/
+      - target/
+      - apt/
+
+
+cache:
+  paths:
+    - apt/
+    - cargo/
+    - target/
+
+production:
+  script:
+    - apt-get update -qy
+    - apt-get install -y ruby-dev
+    - gem install dpl
+    - dpl --provider=heroku --app=gitlab-ci-python-test-prod --api-key=$HEROKU_PRODUCTION_API_KEY

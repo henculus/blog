@@ -10,14 +10,14 @@ variables:
   POSTGRES_DB: blog
   POSTGRES_USER: lupusanay
   POSTGRES_PASSWORD: qwerty
-  CARGO_HOME: $CI_PROJECT_DIR/.cargo
+  CARGO_HOME: $CI_PROJECT_DIR/cargo
   APT_CACHE_DIR: $CI_PROJECT_DIR/apt
 
 services:
   - postgres:latest
 
 before_script:
-  - .cargo/bin/diesel migration run
+  - diesel migration run
 
 test:
   stage: test
@@ -38,5 +38,5 @@ production:
 cache:
   paths:
     - apt/
-    - .cargo/
+    - cargo/
     - target/

@@ -16,14 +16,12 @@ variables:
 services:
   - postgres:latest
 
-before_script:
-  - diesel migration run
-
 test:
   stage: test
   variables:
     DATABASE_URL: postgres://lupusanay:qwerty@postgres/blog
   script:
+    - diesel migration run
     - rustc --version
     - cargo --version
     - cargo test --verbose

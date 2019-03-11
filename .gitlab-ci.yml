@@ -1,4 +1,4 @@
-image: 'rustlang/rust:nightly'
+image: 'lupusanay/rust-diesel:nightly'
 
 stages:
   - test
@@ -10,21 +10,20 @@ variables:
   POSTGRES_DB: blog
   POSTGRES_USER: lupusanay
   POSTGRES_PASSWORD: qwerty
-  CARGO_HOME: $CI_PROJECT_DIR/cargo
+  CARGO_HOME: $CI_PROJECT_DIR/.cargo
   APT_CACHE_DIR: $CI_PROJECT_DIR/apt
 
 services:
   - postgres:latest
 
 before_script:
-  - cargo install diesel_cli --force --no-default-features --features postgres
+  - .cargo/bin/diesel migration run
 
 test:
   stage: test
   variables:
     DATABASE_URL: postgres://lupusanay:qwerty@postgres/blog
   script:
-    - cargo/bin/diesel migration run
     - rustc --version
     - cargo --version
     - cargo test --verbose
@@ -39,5 +38,5 @@ production:
 cache:
   paths:
     - apt/
-    - cargo/
+    - .cargo/
     - target/

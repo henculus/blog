@@ -1,4 +1,4 @@
-image: 'lupusanay/rust-diesel:nightly'
+image: 'lupusanay/rust-diesel:latest'
 
 stages:
   - test

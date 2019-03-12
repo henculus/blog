@@ -12,25 +12,32 @@ extern crate serde;
 use rocket::Rocket;
 
 mod models;
-mod views;
 mod tests;
+mod views;
 
 fn create_app() -> Rocket {
-    let db_pool = models::db_pool()
-        .expect("Cannot connect to database");
+    let db_pool = models::db_pool().expect("Cannot connect to database");
 
     let table_manager = models::TableManager::new(db_pool);
 
     rocket::ignite()
         .manage(table_manager)
-        .register(catchers![views::not_found, views::service_unavailable])
-        .mount("/",
-               routes![
-                   views::new_post,
-                   views::get_post,
-                   views::get_posts,
-                   views::delete_post,
-                   views::update_post])
+        .register(
+            catchers![
+                views::not_found,
+                views::service_unavailable,
+                views::bad_request
+            ])
+        .mount(
+            "/",
+            routes![
+                views::posts::new_post,
+                views::posts::get_post,
+                views::posts::get_posts,
+                views::posts::delete_post,
+                views::posts::update_post
+            ],
+        )
 }
 
 fn main() {

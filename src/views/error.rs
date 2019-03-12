@@ -1,16 +1,9 @@
-use std::{
-    error::Error,
-    fmt,
-};
+use std::{error::Error, fmt};
 
 use rocket::{
-    http::{
-        ContentType,
-        Status,
-    },
+    http::{ContentType, Status},
     Request,
-    Response,
-    response::Responder,
+    Response, response::Responder,
 };
 use rocket_contrib::json::Json;
 use serde::Serialize;
@@ -27,9 +20,11 @@ pub struct ViewError {
 impl std::fmt::Display for ViewError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.kind {
-            ViewErrorKind::ServiceUnavailable => write!(f, "Service {:?} unavailable",
-                                                        self.resource),
-            ViewErrorKind::NotFound => write!(f, "Resource {:?} not found", self.resource)
+            ViewErrorKind::ServiceUnavailable => {
+                write!(f, "Service {:?} unavailable", self.resource)
+            }
+            ViewErrorKind::NotFound => write!(f, "Resource {:?} not found", self.resource),
+            ViewErrorKind::BadRequest => write!(f, "Bad request: {:?}", self.resource)
         }
     }
 }
@@ -41,12 +36,8 @@ impl<'a> Responder<'a> for ViewError {
         resp.header(ContentType::JSON).merge(content);
         match self.kind {
             ViewErrorKind::NotFound => resp.status(Status::NotFound),
-            ViewErrorKind::ServiceUnavailable => resp.status(
-                Status {
-                    code: 503,
-                    reason: "Service Unavailable",
-                }
-            )
+            ViewErrorKind::ServiceUnavailable => resp.status(Status::ServiceUnavailable),
+            ViewErrorKind::BadRequest => resp.status(Status::BadRequest)
         };
         Ok(resp.finalize())
     }
@@ -64,7 +55,7 @@ impl From<ModelError> for ViewError {
                 status: "error".to_string(),
                 kind: ViewErrorKind::NotFound,
                 resource: Some(err.description().to_string()),
-            }
+            },
         }
     }
 }
@@ -73,4 +64,5 @@ impl From<ModelError> for ViewError {
 pub enum ViewErrorKind {
     ServiceUnavailable,
     NotFound,
+    BadRequest
 }

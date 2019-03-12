@@ -67,7 +67,7 @@ fn test_create_post_with_invalid_data() {
     let invalid_data: HashMap<&str, &str> = [
         ("Empty data", ""),
         ("Invalid keys", r#"{"foo": "bar", "baz": "qux"}"#),
-        ("Not an object", r#"hello"#),
+        ("Not an object", r#""hello""#),
         ("Empty values", r#"{"title": "", "body": ""}"#),
         ("Spaces", r#"{"title": " ", "body": " "}"#),
         ("Numbers", r#"{"title": 1, "body": 2}"#),
@@ -174,4 +174,59 @@ fn test_update_post() {
     assert_eq!(id, updated_post.id);
     assert_eq!("Updated body", updated_post.body);
     assert_eq!("Updated title", updated_post.title);
+}
+
+#[test]
+fn test_update_post_with_invalid_data() {
+    let (id, _) = create_post();
+    let client = create_client();
+
+    let invalid_data: HashMap<&str, &str> = [
+        ("Empty data", ""),
+        ("Invalid keys", r#"{"foo": "bar", "baz": "qux"}"#),
+        ("Not an object", r#""hello""#),
+        ("Empty values", r#"{"title": "", "body": ""}"#),
+        ("Spaces", r#"{"title": " ", "body": " "}"#),
+        ("Numbers", r#"{"title": 1, "body": 2}"#),
+    ]
+        .iter()
+        .cloned()
+        .collect();
+
+    for (description, data) in invalid_data {
+        let response = client
+            .put(format!("/posts/{}", id))
+            .body(data)
+            .header(ContentType::JSON)
+            .dispatch();
+        assert_eq!(
+            StatusClass::ClientError,
+            response.status().class(),
+            "Assertion failed on {}",
+            description
+        );
+        assert_eq!(
+            ContentType::JSON,
+            response
+                .content_type()
+                .expect("Response should contain content type header"),
+            "Assertion failed on {}",
+            description
+        )
+    }
+}
+
+#[test]
+fn test_delete_post() {
+    let (id, _) = create_post();
+    let client = create_client();
+    let mut response = client.delete(format!("/posts/{}", id)).dispatch();
+
+    assert_eq!(Status::Ok, response.status());
+    assert_eq!(ContentType::JSON, response.content_type().expect("Couldn't read content type header"));
+
+    response = client.get(format!("/posts/{}", id)).dispatch();
+
+    assert_eq!(Status::NotFound, response.status());
+    assert_eq!(ContentType::JSON, response.content_type().expect("Couldn't read content type header"));
 }

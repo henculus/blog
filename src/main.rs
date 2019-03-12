@@ -12,7 +12,6 @@ extern crate serde;
 use rocket::Rocket;
 
 mod models;
-mod tests;
 mod views;
 
 fn create_app() -> Rocket {

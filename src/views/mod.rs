@@ -4,6 +4,7 @@ use rocket_contrib::json::Json;
 use crate::views::error::*;
 
 mod error;
+mod tests;
 pub mod posts;
 
 #[catch(503)]

@@ -31,7 +31,7 @@ pub fn get_posts(
 ) -> Result<Json<Vec<Post>>, ViewError> {
     let table: PostsTable = table_manager.get()?;
     table
-        .get(cursor.limit.unwrap_or(1), cursor.offset.unwrap_or(0))
+        .get(cursor.limit.unwrap_or(10), cursor.offset.unwrap_or(0))
         .map(|posts| Ok(Json(posts)))?
 }
 

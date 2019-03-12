@@ -153,9 +153,12 @@ fn test_update_post() {
         .body(body)
         .header(ContentType::JSON)
         .dispatch();
+
     assert_eq!(Status::Ok, response.status());
     assert_eq!(ContentType::JSON, response.content_type().unwrap());
+
     let mut updated_post_response = client.get(format!("/posts/{}", id)).dispatch();
+
     assert_eq!(Status::Ok, updated_post_response.status());
     assert_eq!(
         ContentType::JSON,
@@ -167,6 +170,7 @@ fn test_update_post() {
             .expect("Could not read the string body from response"),
     )
         .expect("Could not parse Id object from body");
+
     assert_eq!(id, updated_post.id);
     assert_eq!("Updated body", updated_post.body);
     assert_eq!("Updated title", updated_post.title);

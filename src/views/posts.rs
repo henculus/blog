@@ -1,5 +1,5 @@
 use rocket::{request::Form, State};
-use rocket_contrib::json::Json;
+use rocket_contrib::json::{Json, JsonError};
 
 use crate::{
     models::{Id, Model, post::*, TableManager},
@@ -8,9 +8,10 @@ use crate::{
 
 #[post("/posts", format = "application/json", data = "<post>")]
 pub fn new_post(
-    post: Json<NewPost>,
+    post: Result<Json<NewPost>, JsonError>,
     table_manager: State<TableManager>,
 ) -> Result<Json<Id>, ViewError> {
+    let post = post?;
     let posts_table: PostsTable = table_manager.get()?;
     posts_table
         .create(post.into_inner())
@@ -43,9 +44,10 @@ pub fn get_post(id: Id, table_manager: State<TableManager>) -> Result<Json<Post>
 #[put("/posts/<id>", format = "application/json", data = "<post>")]
 pub fn update_post(
     id: Id,
-    post: Json<NewPost>,
+    post: Result<Json<NewPost>, JsonError>,
     table_manager: State<TableManager>,
 ) -> Result<Json<i32>, ViewError> {
+    let post = post?;
     let posts_table: PostsTable = table_manager.get()?;
 
     posts_table

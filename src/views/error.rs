@@ -5,7 +5,7 @@ use rocket::{
     Request,
     Response, response::Responder,
 };
-use rocket_contrib::json::Json;
+use rocket_contrib::json::{Json, JsonError};
 use serde::Serialize;
 
 use crate::models::error::{ModelError, ModelErrorKind};
@@ -42,6 +42,19 @@ impl<'a> Responder<'a> for ViewError {
             ViewErrorKind::UnprocessableEntity => resp.status(Status::UnprocessableEntity),
         };
         Ok(resp.finalize())
+    }
+}
+
+impl<'a> From<JsonError<'a>> for ViewError {
+    fn from(err: JsonError) -> Self {
+        Self {
+            status: "error".to_string(),
+            kind: ViewErrorKind::UnprocessableEntity,
+            resource: match err {
+                JsonError::Io(_) => Some("Couldn't read request content".to_string()),
+                JsonError::Parse(_, err) => Some(format!("Wrong JSON: '{}'", err.to_string()))
+            },
+        }
     }
 }
 

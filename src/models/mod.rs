@@ -7,9 +7,9 @@ use r2d2_diesel::ConnectionManager;
 
 use crate::models::error::ModelError;
 
+pub mod error;
 pub mod post;
 pub mod schema;
-pub mod error;
 
 type DBPool = Pool<ConnectionManager<PgConnection>>;
 type DBConnection = PooledConnection<ConnectionManager<PgConnection>>;
@@ -27,19 +27,19 @@ pub trait Model {
 }
 
 pub struct TableManager {
-    connection_pool: DBPool
+    connection_pool: DBPool,
 }
 
 impl TableManager {
     pub fn new(db_pool: DBPool) -> Self {
         Self {
-            connection_pool: db_pool
+            connection_pool: db_pool,
         }
     }
     pub fn get<T: Model>(&self) -> Result<T, ModelError> {
         match self.connection_pool.try_get() {
             Some(conn) => Ok(T::new(conn)),
-            None => Err(ModelError::DBConnectionError)
+            None => Err(ModelError::DBConnectionError),
         }
     }
 }

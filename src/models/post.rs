@@ -20,7 +20,7 @@ pub struct NewPost {
 }
 
 pub struct PostsTable {
-    db_connection: DBConnection
+    db_connection: DBConnection,
 }
 
 impl Model for PostsTable {
@@ -30,7 +30,7 @@ impl Model for PostsTable {
 
     fn new(connection: DBConnection) -> Self {
         Self {
-            db_connection: connection
+            db_connection: connection,
         }
     }
 
@@ -64,8 +64,7 @@ impl Model for PostsTable {
     }
 
     fn delete(&self, post_id: Id) -> Result<Id, ModelError> {
-        let result = diesel::delete(posts::table.find(post_id))
-            .execute(&*self.db_connection)?;
+        let result = diesel::delete(posts::table.find(post_id)).execute(&*self.db_connection)?;
         Ok(result as Id)
     }
 }

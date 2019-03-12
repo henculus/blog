@@ -1,7 +1,4 @@
-use std::{
-    error::Error,
-    fmt,
-};
+use std::{error::Error, fmt};
 
 #[derive(Debug)]
 pub enum ModelError {
@@ -15,7 +12,7 @@ impl fmt::Display for ModelError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
             ModelError::OperationError(_) => write!(f, "Cannot execute operation"),
-            ModelError::DBConnectionError => write!(f, "Cannot connect to the database")
+            ModelError::DBConnectionError => write!(f, "Cannot connect to the database"),
         }
     }
 }

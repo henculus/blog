@@ -8,7 +8,7 @@ use rocket::{
 use rocket_contrib::json::Json;
 use serde::Serialize;
 
-use crate::models::error::ModelError;
+use crate::models::error::{ModelError, ModelErrorKind};
 
 #[derive(Debug, Serialize)]
 pub struct ViewError {
@@ -24,7 +24,8 @@ impl std::fmt::Display for ViewError {
                 write!(f, "Service {:?} unavailable", self.resource)
             }
             ViewErrorKind::NotFound => write!(f, "Resource {:?} not found", self.resource),
-            ViewErrorKind::BadRequest => write!(f, "Bad request: {:?}", self.resource)
+            ViewErrorKind::BadRequest => write!(f, "Bad request: {:?}", self.resource),
+            ViewErrorKind::UnprocessableEntity => write!(f, "Unprocessable Entity: {:?}", self.resource)
         }
     }
 }
@@ -37,7 +38,8 @@ impl<'a> Responder<'a> for ViewError {
         match self.kind {
             ViewErrorKind::NotFound => resp.status(Status::NotFound),
             ViewErrorKind::ServiceUnavailable => resp.status(Status::ServiceUnavailable),
-            ViewErrorKind::BadRequest => resp.status(Status::BadRequest)
+            ViewErrorKind::BadRequest => resp.status(Status::BadRequest),
+            ViewErrorKind::UnprocessableEntity => resp.status(Status::UnprocessableEntity),
         };
         Ok(resp.finalize())
     }
@@ -45,17 +47,22 @@ impl<'a> Responder<'a> for ViewError {
 
 impl From<ModelError> for ViewError {
     fn from(err: ModelError) -> Self {
-        match err {
-            ModelError::DBConnectionError => ViewError {
+        match err.kind {
+            ModelErrorKind::DBConnectionError => ViewError {
                 status: "error".to_string(),
                 kind: ViewErrorKind::ServiceUnavailable,
                 resource: Some("database".to_string()),
             },
-            ModelError::OperationError(err) => ViewError {
+            ModelErrorKind::OperationError => ViewError {
                 status: "error".to_string(),
                 kind: ViewErrorKind::NotFound,
                 resource: Some(err.description().to_string()),
             },
+            ModelErrorKind::ValidationError => ViewError {
+                status: "error".to_string(),
+                kind: ViewErrorKind::UnprocessableEntity,
+                resource: Some(err.message),
+            }
         }
     }
 }
@@ -64,5 +71,6 @@ impl From<ModelError> for ViewError {
 pub enum ViewErrorKind {
     ServiceUnavailable,
     NotFound,
-    BadRequest
+    BadRequest,
+    UnprocessableEntity,
 }

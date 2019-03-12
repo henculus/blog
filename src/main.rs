@@ -26,7 +26,8 @@ fn create_app() -> Rocket {
             catchers![
                 views::not_found,
                 views::service_unavailable,
-                views::bad_request
+                views::bad_request,
+                views::unprocessable_entity
             ])
         .mount(
             "/",

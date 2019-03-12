@@ -26,6 +26,16 @@ pub fn not_found(req: &Request) -> Json<ViewError> {
     Json(error)
 }
 
+#[catch(422)]
+pub fn unprocessable_entity(req: &Request) -> Json<ViewError> {
+    let error = ViewError {
+        status: "error".to_string(),
+        kind: ViewErrorKind::UnprocessableEntity,
+        resource: Some(req.to_string()),
+    };
+    Json(error)
+}
+
 #[catch(400)]
 pub fn bad_request(req: &Request) -> Json<ViewError> {
     let error = ViewError {

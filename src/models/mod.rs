@@ -5,7 +5,7 @@ use dotenv::dotenv;
 use r2d2::{Pool, PooledConnection};
 use r2d2_diesel::ConnectionManager;
 
-use crate::models::error::ModelError;
+use crate::models::error::{ModelError, ModelErrorKind};
 
 pub mod error;
 pub mod post;
@@ -36,10 +36,15 @@ impl TableManager {
             connection_pool: db_pool,
         }
     }
+    // TODO: May be there is an error: request while connection pool is fully busy response will be
+    //  an error instead of waiting for free connection. Or may be it is not an error
     pub fn get<T: Model>(&self) -> Result<T, ModelError> {
         match self.connection_pool.try_get() {
             Some(conn) => Ok(T::new(conn)),
-            None => Err(ModelError::DBConnectionError),
+            None => Err(ModelError {
+                kind: ModelErrorKind::DBConnectionError,
+                message: "Cannot get connection from pool".to_string(),
+            }),
         }
     }
 }

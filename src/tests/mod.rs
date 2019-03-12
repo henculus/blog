@@ -71,10 +71,6 @@ fn test_create_post_with_invalid_data() {
         ("Empty values", r#"{"title": "", "body": ""}"#),
         ("Spaces", r#"{"title": " ", "body": " "}"#),
         ("Numbers", r#"{"title": 1, "body": 2}"#),
-        (
-            "Redundant keys",
-            r#"{"title": "foo", "body": "bar", "baz": "qux"}"#,
-        ),
     ]
         .iter()
         .cloned()

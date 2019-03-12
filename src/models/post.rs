@@ -35,6 +35,12 @@ impl Model for PostsTable {
     }
 
     fn create(&self, post: NewPost) -> Result<Post, ModelError> {
+        if post.title.trim() == "" || post.body.trim() == "" {
+            return Err(ModelError {
+                kind: ModelErrorKind::ValidationError,
+                message: "Title or body is empty".to_string(),
+            });
+        }
         let result = diesel::insert_into(posts::table)
             .values(&post)
             .get_result(&*self.db_connection)?;
@@ -42,6 +48,12 @@ impl Model for PostsTable {
     }
 
     fn update(&self, post_id: Id, post: NewPost) -> Result<Id, ModelError> {
+        if post.title.trim() == "" || post.body.trim() == "" {
+            return Err(ModelError {
+                kind: ModelErrorKind::ValidationError,
+                message: "Title or body is empty".to_string(),
+            });
+        }
         let result = diesel::update(posts::table.find(post_id))
             .set(&post)
             .execute(&*self.db_connection)?;

@@ -6,6 +6,7 @@ use crate::views::error::*;
 mod error;
 mod tests;
 pub mod posts;
+pub mod users;
 
 #[catch(503)]
 pub fn service_unavailable(_: &Request) -> Json<ViewError> {

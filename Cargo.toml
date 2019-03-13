@@ -4,18 +4,19 @@ version = "0.1.0"
 authors = ["Ilya Kopeshtianski <lupusanay@gmail.com>"]
 edition = "2018"
 
-[dependencies.r2d2]
-version = "0.8.3"
-
-[dependencies.r2d2-diesel]
-version = "1.0.0"
+[dependencies]
+rocket = "0.4.0"
+r2d2 = "0.8.3"
+r2d2-diesel = "1.0.0"
+dotenv = "0.13.0"
+serde_json = "1.0.39"
+jsonwebtoken = "5.0.1"
+argon2rs = "0.2.5"
+rand = "0.6.5"
 
 [dependencies.serde]
 version = "1.0.89"
 features = ["derive"]
-
-[dependencies.rocket]
-version = "0.4.0"
 
 [dependencies.rocket_contrib]
 version = "0.4.0"
@@ -24,10 +25,5 @@ features = ["json"]
 
 [dependencies.diesel]
 version = "1.4.1"
+default-features = false
 features = ["postgres"]
-
-[dependencies.dotenv]
-version = "0.13.0"
-
-[dependencies.serde_json]
-version = "1.0.39"

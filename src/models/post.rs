@@ -1,9 +1,7 @@
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::models::{DBConnection, Id, Model};
-use crate::models::error::*;
-use crate::models::schema::posts;
+use crate::models::{DBConnection, error::*, Id, Model, schema::posts};
 
 #[derive(Queryable, Serialize, Deserialize, Identifiable)]
 pub struct Post {
@@ -24,8 +22,8 @@ pub struct PostsTable {
 }
 
 impl Model for PostsTable {
+    type Key = i32;
     type Item = Post;
-
     type NewItem = NewPost;
 
     fn new(connection: DBConnection) -> Self {
@@ -75,8 +73,8 @@ impl Model for PostsTable {
         Ok(result)
     }
 
-    fn delete(&self, post_id: Id) -> Result<Id, ModelError> {
+    fn delete(&self, post_id: Id) -> Result<i32, ModelError> {
         let result = diesel::delete(posts::table.find(post_id)).execute(&*self.db_connection)?;
-        Ok(result as Id)
+        Ok(result as i32)
     }
 }

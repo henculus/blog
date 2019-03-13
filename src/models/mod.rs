@@ -9,6 +9,7 @@ use crate::models::error::{ModelError, ModelErrorKind};
 
 pub mod error;
 pub mod post;
+pub mod user;
 pub mod schema;
 
 type DBPool = Pool<ConnectionManager<PgConnection>>;
@@ -16,14 +17,15 @@ type DBConnection = PooledConnection<ConnectionManager<PgConnection>>;
 pub type Id = i32;
 
 pub trait Model {
+    type Key;
     type Item;
     type NewItem;
     fn new(connection: DBConnection) -> Self;
     fn create(&self, item: Self::NewItem) -> Result<Self::Item, ModelError>;
-    fn update(&self, item_id: Id, item: Self::NewItem) -> Result<Id, ModelError>;
+    fn update(&self, item_id: Self::Key, item: Self::NewItem) -> Result<i32, ModelError>;
     fn get(&self, limit: i64, offset: i64) -> Result<Vec<Self::Item>, ModelError>;
-    fn get_by_id(&self, item_id: Id) -> Result<Self::Item, ModelError>;
-    fn delete(&self, item_id: Id) -> Result<Id, ModelError>;
+    fn get_by_id(&self, item_id: Self::Key) -> Result<Self::Item, ModelError>;
+    fn delete(&self, item_id: Self::Key) -> Result<i32, ModelError>;
 }
 
 pub struct TableManager {

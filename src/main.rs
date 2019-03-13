@@ -35,7 +35,8 @@ fn create_app() -> Rocket {
                 views::posts::get_post,
                 views::posts::get_posts,
                 views::posts::delete_post,
-                views::posts::update_post
+                views::posts::update_post,
+                views::users::new_user,
             ],
         )
 }

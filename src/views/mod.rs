@@ -1,4 +1,8 @@
+use std::io;
+use std::path::{Path, PathBuf};
+
 use rocket::Request;
+use rocket::response::NamedFile;
 use rocket_contrib::json::Json;
 
 use crate::views::error::*;
@@ -7,6 +11,16 @@ mod error;
 mod tests;
 pub mod posts;
 pub mod users;
+
+#[get("/")]
+pub fn index() -> io::Result<NamedFile> {
+    NamedFile::open("public/dist/index.html")
+}
+
+#[get("/<file..>", rank = 1)]
+pub fn files(file: PathBuf) -> Option<NamedFile> {
+    NamedFile::open(Path::new("public/dist/").join(file)).ok()
+}
 
 #[catch(503)]
 pub fn service_unavailable(_: &Request) -> Json<ViewError> {

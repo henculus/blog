@@ -31,6 +31,8 @@ fn create_app() -> Rocket {
         .mount(
             "/",
             routes![
+                views::index,
+                views::files,
                 views::posts::new_post,
                 views::posts::get_post,
                 views::posts::get_posts,

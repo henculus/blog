@@ -33,6 +33,9 @@ build:
     - cd public/
     - npm install --progress=false
     - npm run build
+  artifacts:
+    paths:
+      - dist/
 
 production:
   stage: deploy
@@ -40,7 +43,7 @@ production:
     - apt-get update -qy
     - apt-get install -y ruby-dev
     - gem install dpl
-    - dpl --provider=heroku --app=lupusanay-blog-rust --api-key=$HEROKU_PRODUCTION_API_KEY
+    - dpl --provider=heroku --app=lupusanay-blog-rust --api-key=$HEROKU_PRODUCTION_API_KEY --skip_cleanup
 
 cache:
   paths:

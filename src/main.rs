@@ -29,16 +29,21 @@ fn create_app() -> Rocket {
                 views::unprocessable_entity
             ])
         .mount(
-            "/",
+            "/api",
             routes![
-                views::index,
-                views::files,
                 views::posts::new_post,
                 views::posts::get_post,
                 views::posts::get_posts,
                 views::posts::delete_post,
                 views::posts::update_post,
                 views::users::new_user,
+            ],
+        )
+        .mount(
+            "/",
+            routes![
+                views::index,
+                views::files,
             ],
         )
 }

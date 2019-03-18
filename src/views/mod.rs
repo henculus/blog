@@ -12,14 +12,18 @@ mod tests;
 pub mod posts;
 pub mod users;
 
+
 #[get("/")]
 pub fn index() -> io::Result<NamedFile> {
-    NamedFile::open("public/dist/index.html")
+    NamedFile::open("static/dist/index.html")
 }
 
 #[get("/<file..>", rank = 1)]
 pub fn files(file: PathBuf) -> Option<NamedFile> {
-    NamedFile::open(Path::new("public/dist/").join(file)).ok()
+    match NamedFile::open(Path::new("static/dist/").join(file)) {
+        Ok(file) => Some(file),
+        Err(_) => NamedFile::open("static/dist/index.html").ok()
+    }
 }
 
 #[catch(503)]

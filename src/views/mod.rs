@@ -13,12 +13,13 @@ pub mod posts;
 pub mod users;
 
 
-#[get("/")]
+#[get("/", rank = 10)]
 pub fn index() -> io::Result<NamedFile> {
     NamedFile::open("static/dist/index.html")
 }
 
-#[get("/<file..>", rank = 1)]
+// TODO: Handle forwarding to this request from /api routes, may be with request guard
+#[get("/<file..>", rank = 10)]
 pub fn files(file: PathBuf) -> Option<NamedFile> {
     match NamedFile::open(Path::new("static/dist/").join(file)) {
         Ok(file) => Some(file),

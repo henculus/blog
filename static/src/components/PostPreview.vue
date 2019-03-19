@@ -36,6 +36,7 @@
         max-width: 44rem;
     }
     button {
+        cursor: pointer;
         float: left;
         margin-top: 1rem;
         margin-left: 2rem;

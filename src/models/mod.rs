@@ -52,7 +52,7 @@ impl TableManager {
 }
 
 pub fn db_pool() -> Result<DBPool, ModelError> {
-    dotenv().ok();
+    dotenv::from_filename(".env.local").ok();
     let url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let manager = ConnectionManager::<PgConnection>::new(url);
     Ok(Pool::new(manager)?)

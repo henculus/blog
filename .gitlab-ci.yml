@@ -7,18 +7,17 @@ stages:
   - deploy
 
 variables:
-  POSTGRES_DB: blog
-  POSTGRES_USER: lupusanay
-  POSTGRES_PASSWORD: qwerty
   CARGO_HOME: $CI_PROJECT_DIR/cargo
   APT_CACHE_DIR: $CI_PROJECT_DIR/apt
 
-services:
-  - postgres:latest
-
 test:
+  services:
+    - postgres:latest
   stage: test
   variables:
+    POSTGRES_DB: blog
+    POSTGRES_USER: lupusanay
+    POSTGRES_PASSWORD: qwerty
     DATABASE_URL: postgres://lupusanay:qwerty@postgres/blog
   script:
     - diesel migration run
@@ -26,20 +25,16 @@ test:
     - cargo --version
     - cargo test --verbose
 
-build:
-  stage: build
+production:
+  stage: deploy
   script:
     - cd static/
     - npm install --progress=false
     - npm run build
+    - dpl --provider=heroku --app=lupusanay-blog-rust --api-key=$HEROKU_PRODUCTION_API_KEY --skip_cleanup
   artifacts:
     paths:
       - static/dist/
-
-production:
-  stage: deploy
-  script:
-    - dpl --provider=heroku --app=lupusanay-blog-rust --api-key=$HEROKU_PRODUCTION_API_KEY --skip_cleanup
 
 cache:
   paths:

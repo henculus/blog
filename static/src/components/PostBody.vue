@@ -11,7 +11,6 @@
 
 <style scoped>
     #body {
-        margin: auto;
         text-align: justify;
         max-width: 40rem;
     }

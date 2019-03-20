@@ -43,6 +43,9 @@
 </script>
 
 <style scoped>
+    #posts {
+        margin: 1rem;
+    }
     #posts > ul {
         list-style-type: none;
     }

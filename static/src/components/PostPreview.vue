@@ -1,6 +1,8 @@
 <template>
     <div id="post_preview">
-        <PostTitle v-bind:title = "post.title"></PostTitle>
+        <router-link class="title" :to="'/post/' + post.id">
+            <PostTitle v-on:click="open_post" v-bind:title = "post.title"></PostTitle>
+        </router-link>
         <PostBody v-bind:body = "post.body | truncate(500)"></PostBody>
         <button v-on:click="open_post">Read more...</button>
     </div>
@@ -31,21 +33,37 @@
 </script>
 
 <style scoped>
+    .title {
+        color: #9C89B8;
+        text-decoration: none;
+    }
+
+    .title:hover {
+        color: #F0A6CA;
+    }
+
     #post_preview {
         margin: auto auto 4rem;
         max-width: 44rem;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
     }
     button {
+        background-color: #F0E6EF;
+        color: #F0A6CA;
+        justify-content: flex-start;
         cursor: pointer;
-        float: left;
-        margin-top: 1rem;
-        margin-left: 2rem;
-        border: 2px solid gray;
+        border: 2px solid #9C89B8;
         border-radius: 3px;
         padding: 10px 32px;
         text-align: center;
         text-decoration: none;
-        display: inline-block;
         font-size: 16px;
+    }
+
+    button:hover {
+        background-color: #9C89B8;
+        color: #F0A6CA;
     }
 </style>

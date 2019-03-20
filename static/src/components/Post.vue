@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div id="post">
         <PostTitle v-bind:title="post.title"></PostTitle>
         <PostBody v-bind:body="post.body"></PostBody>
 
@@ -41,5 +41,10 @@
 </script>
 
 <style scoped>
-
+#post {
+    margin: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 </style>

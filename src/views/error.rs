@@ -25,7 +25,9 @@ impl std::fmt::Display for ViewError {
             }
             ViewErrorKind::NotFound => write!(f, "Resource {:?} not found", self.resource),
             ViewErrorKind::BadRequest => write!(f, "Bad request: {:?}", self.resource),
-            ViewErrorKind::UnprocessableEntity => write!(f, "Unprocessable Entity: {:?}", self.resource)
+            ViewErrorKind::UnprocessableEntity => {
+                write!(f, "Unprocessable Entity: {:?}", self.resource)
+            }
         }
     }
 }
@@ -52,7 +54,7 @@ impl<'a> From<JsonError<'a>> for ViewError {
             kind: ViewErrorKind::UnprocessableEntity,
             resource: match err {
                 JsonError::Io(_) => Some("Couldn't read request content".to_string()),
-                JsonError::Parse(_, err) => Some(format!("Wrong JSON: '{}'", err.to_string()))
+                JsonError::Parse(_, err) => Some(format!("Wrong JSON: '{}'", err.to_string())),
             },
         }
     }
@@ -75,7 +77,7 @@ impl From<ModelError> for ViewError {
                 status: "error".to_string(),
                 kind: ViewErrorKind::UnprocessableEntity,
                 resource: Some(err.message),
-            }
+            },
         }
     }
 }

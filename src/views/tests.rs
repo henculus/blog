@@ -224,10 +224,20 @@ fn test_delete_post() {
     let mut response = client.delete(format!("/api/posts/{}", id)).dispatch();
 
     assert_eq!(Status::Ok, response.status());
-    assert_eq!(ContentType::JSON, response.content_type().expect("Couldn't read content type header"));
+    assert_eq!(
+        ContentType::JSON,
+        response
+            .content_type()
+            .expect("Couldn't read content type header")
+    );
 
     response = client.get(format!("/api/posts/{}", id)).dispatch();
 
     assert_eq!(Status::NotFound, response.status());
-    assert_eq!(ContentType::JSON, response.content_type().expect("Couldn't read content type header"));
+    assert_eq!(
+        ContentType::JSON,
+        response
+            .content_type()
+            .expect("Couldn't read content type header")
+    );
 }

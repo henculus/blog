@@ -8,24 +8,16 @@ pub trait HashablePassword {
 
 impl HashablePassword for String {
     fn hash(&self) -> String {
-        let salt: String = thread_rng()
-            .sample_iter(&Alphanumeric)
-            .take(10)
-            .collect();
+        let salt: String = thread_rng().sample_iter(&Alphanumeric).take(10).collect();
 
-        let data_hash = Encoded::default2i(
-            self.as_bytes(),
-            salt.as_bytes(),
-            b"",
-            b"",
-        ).to_u8();
+        let data_hash = Encoded::default2i(self.as_bytes(), salt.as_bytes(), b"", b"").to_u8();
         String::from_utf8(data_hash).unwrap()
     }
 
     fn verify(&self, password: &String) -> bool {
         match Encoded::from_u8(self.as_ref()) {
             Ok(hash) => hash.verify(password.as_ref()),
-            Err(_) => false
+            Err(_) => false,
         }
     }
 }

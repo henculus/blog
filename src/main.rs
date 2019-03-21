@@ -11,12 +11,9 @@ extern crate rocket;
 extern crate rocket_contrib;
 extern crate serde;
 
-use std::collections::HashMap;
-use std::env;
-
 use rocket::http::Method;
 use rocket::Rocket;
-use rocket_cors::{AllowedHeaders, AllowedOrigins, Error};
+use rocket_cors::{AllowedHeaders, AllowedOrigins};
 
 mod models;
 mod views;
@@ -25,7 +22,8 @@ mod views;
 pub struct DBConn(diesel::PgConnection);
 
 fn create_app() -> Rocket {
-    let allowed_origins = AllowedOrigins::some(&["http://www.lupusanay.me"], &["http://localhost:8080"]);
+    let allowed_origins =
+        AllowedOrigins::some(&["http://www.lupusanay.me"], &["http://localhost:8080"]);
 
     let cors = rocket_cors::CorsOptions {
         allowed_origins,
@@ -37,15 +35,13 @@ fn create_app() -> Rocket {
         .to_cors()
         .unwrap();
 
-
     rocket::ignite()
-        .register(
-            catchers![
-                views::not_found,
-                views::service_unavailable,
-                views::bad_request,
-                views::unprocessable_entity
-            ])
+        .register(catchers![
+            views::not_found,
+            views::service_unavailable,
+            views::bad_request,
+            views::unprocessable_entity
+        ])
         .mount(
             "/api",
             routes![
@@ -55,15 +51,10 @@ fn create_app() -> Rocket {
                 views::posts::delete_post,
                 views::posts::update_post,
                 views::users::new_user,
+                views::users::login
             ],
         )
-        .mount(
-            "/",
-            routes![
-                views::index,
-                views::files,
-            ],
-        )
+        .mount("/", routes![views::index, views::files,])
         .attach(cors)
         .attach(DBConn::fairing())
 }

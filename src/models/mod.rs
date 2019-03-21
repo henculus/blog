@@ -9,8 +9,8 @@ use crate::models::error::{ModelError, ModelErrorKind};
 
 pub mod error;
 pub mod post;
-pub mod user;
 pub mod schema;
+pub mod user;
 
 pub type Id = i32;
 

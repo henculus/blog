@@ -8,10 +8,9 @@ use rocket_contrib::json::Json;
 use crate::views::error::*;
 
 mod error;
-mod tests;
 pub mod posts;
+mod tests;
 pub mod users;
-
 
 #[get("/", rank = 10)]
 pub fn index() -> io::Result<NamedFile> {
@@ -23,7 +22,7 @@ pub fn index() -> io::Result<NamedFile> {
 pub fn files(file: PathBuf) -> Option<NamedFile> {
     match NamedFile::open(Path::new("static/dist/").join(file)) {
         Ok(file) => Some(file),
-        Err(_) => NamedFile::open("static/dist/index.html").ok()
+        Err(_) => NamedFile::open("static/dist/index.html").ok(),
     }
 }
 

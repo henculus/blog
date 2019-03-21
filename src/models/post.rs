@@ -60,9 +60,7 @@ impl<'a> Model for PostsTable<'a> {
     }
 
     fn get_by_id(&self, post_id: Id) -> Result<Post, ModelError> {
-        let result = posts::table
-            .find(post_id)
-            .first::<Post>(self.0)?;
+        let result = posts::table.find(post_id).first::<Post>(self.0)?;
         Ok(result)
     }
 

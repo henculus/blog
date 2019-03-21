@@ -20,19 +20,25 @@ impl fmt::Display for ModelError {
         match self.kind {
             ModelErrorKind::OperationError => write!(f, "Cannot execute operation"),
             ModelErrorKind::DBConnectionError => write!(f, "Cannot connect to the database"),
-            ModelErrorKind::ValidationError => write!(f, "Cannot validate fields")
+            ModelErrorKind::ValidationError => write!(f, "Cannot validate fields"),
         }
     }
 }
 
 impl From<r2d2::Error> for ModelError {
     fn from(err: r2d2::Error) -> Self {
-        Self { kind: ModelErrorKind::DBConnectionError, message: err.to_string() }
+        Self {
+            kind: ModelErrorKind::DBConnectionError,
+            message: err.to_string(),
+        }
     }
 }
 
 impl From<diesel::result::Error> for ModelError {
     fn from(err: diesel::result::Error) -> Self {
-        Self { kind: ModelErrorKind::OperationError, message: err.to_string() }
+        Self {
+            kind: ModelErrorKind::OperationError,
+            message: err.to_string(),
+        }
     }
 }

@@ -1,8 +1,11 @@
-use rocket::State;
 use rocket_contrib::json::{Json, JsonError};
 use serde::{Deserialize, Serialize};
 
-use crate::{DBConn, models::{Model, user::*}, views::error::*};
+use crate::{
+    DBConn,
+    models::{Model, user::*},
+    views::error::*,
+};
 
 #[post("/users", format = "json", data = "<user>")]
 pub fn new_user(
@@ -24,7 +27,10 @@ pub struct LoginForm {
 }
 
 #[post("/users/login", format = "json", data = "<user>")]
-pub fn login(user: Result<Json<LoginForm>, JsonError>, conn: DBConn) -> Result<Json<String>, ViewError> {
+pub fn login(
+    user: Result<Json<LoginForm>, JsonError>,
+    conn: DBConn,
+) -> Result<Json<String>, ViewError> {
     let user_data = user?.into_inner();
     let users = UsersTable(&conn);
 

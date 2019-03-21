@@ -1,7 +1,11 @@
 use rocket::{request::Form, State};
 use rocket_contrib::json::{Json, JsonError};
 
-use crate::{DBConn, models::{Id, Model, post::*, user::*}, views::error::*};
+use crate::{
+    DBConn,
+    models::{Id, Model, post::*, user::*},
+    views::error::*,
+};
 
 #[post("/posts", format = "application/json", data = "<post>")]
 pub fn new_post(
@@ -22,10 +26,7 @@ pub struct LimitOffset {
 }
 
 #[get("/posts?<cursor..>")]
-pub fn get_posts(
-    cursor: Form<LimitOffset>,
-    conn: DBConn,
-) -> Result<Json<Vec<Post>>, ViewError> {
+pub fn get_posts(cursor: Form<LimitOffset>, conn: DBConn) -> Result<Json<Vec<Post>>, ViewError> {
     let table = PostsTable(&conn);
     table
         .get(cursor.limit.unwrap_or(10), cursor.offset.unwrap_or(0))

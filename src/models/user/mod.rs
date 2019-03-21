@@ -1,7 +1,7 @@
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::models::{DBConnection, error::*, Model, schema::users, user::hasher::HashablePassword};
+use crate::models::{error::*, Model, schema::users, user::hasher::HashablePassword};
 
 mod hasher;
 
@@ -47,27 +47,19 @@ struct UserToken {
     roles: Vec<String>,
 }
 
-pub struct UsersTable {
-    db_connection: DBConnection
-}
+pub struct UsersTable<'a>(pub &'a PgConnection);
 
-impl Model for UsersTable {
+impl<'a> Model for UsersTable<'a> {
     type Key = String;
     type Item = User;
     type NewItem = NewUser;
-
-    fn new(connection: DBConnection) -> Self {
-        Self {
-            db_connection: connection
-        }
-    }
 
     fn create(&self, new_user: NewUser) -> Result<User, ModelError> {
         let user: User = new_user.into();
 
         let result = diesel::insert_into(users::table)
             .values(&user)
-            .get_result(&*self.db_connection)?;
+            .get_result(self.0)?;
         Ok(result)
     }
 

@@ -1,7 +1,8 @@
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
-use crate::models::{DBConnection, error::*, Id, Model, schema::posts};
+use crate::DBConn;
+use crate::models::{error::*, Id, Model, schema::posts};
 
 #[derive(Queryable, Serialize, Deserialize, Identifiable)]
 pub struct Post {
@@ -17,20 +18,12 @@ pub struct NewPost {
     pub body: String,
 }
 
-pub struct PostsTable {
-    db_connection: DBConnection,
-}
+pub struct PostsTable<'a>(pub &'a PgConnection);
 
-impl Model for PostsTable {
+impl<'a> Model for PostsTable<'a> {
     type Key = i32;
     type Item = Post;
     type NewItem = NewPost;
-
-    fn new(connection: DBConnection) -> Self {
-        Self {
-            db_connection: connection,
-        }
-    }
 
     fn create(&self, post: NewPost) -> Result<Post, ModelError> {
         if post.title.trim() == "" || post.body.trim() == "" {
@@ -41,7 +34,7 @@ impl Model for PostsTable {
         }
         let result = diesel::insert_into(posts::table)
             .values(&post)
-            .get_result(&*self.db_connection)?;
+            .get_result(self.0)?;
         Ok(result)
     }
 
@@ -54,7 +47,7 @@ impl Model for PostsTable {
         }
         let result = diesel::update(posts::table.find(post_id))
             .set(&post)
-            .execute(&*self.db_connection)?;
+            .execute(self.0)?;
         Ok(result as Id)
     }
 
@@ -62,19 +55,19 @@ impl Model for PostsTable {
         let result = posts::table
             .offset(offset)
             .limit(limit)
-            .load::<Post>(&*self.db_connection)?;
+            .load::<Post>(self.0)?;
         Ok(result)
     }
 
     fn get_by_id(&self, post_id: Id) -> Result<Post, ModelError> {
         let result = posts::table
             .find(post_id)
-            .first::<Post>(&*self.db_connection)?;
+            .first::<Post>(self.0)?;
         Ok(result)
     }
 
     fn delete(&self, post_id: Id) -> Result<i32, ModelError> {
-        let result = diesel::delete(posts::table.find(post_id)).execute(&*self.db_connection)?;
+        let result = diesel::delete(posts::table.find(post_id)).execute(self.0)?;
         Ok(result as i32)
     }
 }

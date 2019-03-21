@@ -7,7 +7,12 @@ extern crate r2d2;
 extern crate r2d2_diesel;
 #[macro_use]
 extern crate rocket;
+#[macro_use]
+extern crate rocket_contrib;
 extern crate serde;
+
+use std::collections::HashMap;
+use std::env;
 
 use rocket::http::Method;
 use rocket::Rocket;
@@ -16,11 +21,10 @@ use rocket_cors::{AllowedHeaders, AllowedOrigins, Error};
 mod models;
 mod views;
 
+#[database("blog")]
+pub struct DBConn(diesel::PgConnection);
+
 fn create_app() -> Rocket {
-    let db_pool = models::db_pool().expect("Cannot connect to database");
-
-    let table_manager = models::TableManager::new(db_pool);
-
     let allowed_origins = AllowedOrigins::some(&["http://www.lupusanay.me"], &["http://localhost:8080"]);
 
     let cors = rocket_cors::CorsOptions {
@@ -35,7 +39,6 @@ fn create_app() -> Rocket {
 
 
     rocket::ignite()
-        .manage(table_manager)
         .register(
             catchers![
                 views::not_found,
@@ -62,6 +65,7 @@ fn create_app() -> Rocket {
             ],
         )
         .attach(cors)
+        .attach(DBConn::fairing())
 }
 
 fn main() {

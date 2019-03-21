@@ -9,6 +9,7 @@ pub struct Post {
     pub id: Id,
     pub title: String,
     pub body: String,
+    pub author: String,
 }
 
 #[derive(Insertable, Serialize, Deserialize, AsChangeset)]

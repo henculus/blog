@@ -50,8 +50,8 @@ mod tests {
 
         let wrong_hashed_password = "password".to_string().hash();
 
-        assert!(hashed_password.verify_hash(&password));
-        assert!(!hashed_password.verify_hash(&"hello".to_string()));
-        assert!(!wrong_hashed_password.verify_hash(&password));
+        assert!(hashed_password.verify_hash(&password).is_ok());
+        assert!(hashed_password.verify_hash(&"hello".to_string()).is_err());
+        assert!(wrong_hashed_password.verify_hash(&password).is_err());
     }
 }

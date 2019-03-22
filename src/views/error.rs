@@ -25,9 +25,8 @@ impl std::fmt::Display for ViewError {
             }
             ViewErrorKind::NotFound => write!(f, "Resource {:?} not found", self.resource),
             ViewErrorKind::BadRequest => write!(f, "Bad request: {:?}", self.resource),
-            ViewErrorKind::UnprocessableEntity => {
-                write!(f, "Unprocessable Entity: {:?}", self.resource)
-            }
+            ViewErrorKind::UnprocessableEntity => write!(f, "Unprocessable Entity: {:?}", self.resource),
+            ViewErrorKind::Unauthorized => write!(f, "Unauthorized: {:?}", self.resource)
         }
     }
 }
@@ -42,6 +41,7 @@ impl<'a> Responder<'a> for ViewError {
             ViewErrorKind::ServiceUnavailable => resp.status(Status::ServiceUnavailable),
             ViewErrorKind::BadRequest => resp.status(Status::BadRequest),
             ViewErrorKind::UnprocessableEntity => resp.status(Status::UnprocessableEntity),
+            ViewErrorKind::Unauthorized => resp.status(Status::Unauthorized)
         };
         Ok(resp.finalize())
     }
@@ -71,13 +71,18 @@ impl From<ModelError> for ViewError {
             ModelErrorKind::OperationError => ViewError {
                 status: "error".to_string(),
                 kind: ViewErrorKind::NotFound,
-                resource: Some(err.description().to_string()),
+                resource: Some(err.to_string()),
             },
             ModelErrorKind::ValidationError => ViewError {
                 status: "error".to_string(),
                 kind: ViewErrorKind::UnprocessableEntity,
                 resource: Some(err.message),
             },
+            ModelErrorKind::InvalidCredentials => ViewError {
+                status: "error".to_string(),
+                kind: ViewErrorKind::Unauthorized,
+                resource: Some("Invalid credentials".to_string()),
+            }
         }
     }
 }
@@ -88,4 +93,5 @@ pub enum ViewErrorKind {
     NotFound,
     BadRequest,
     UnprocessableEntity,
+    Unauthorized,
 }

@@ -1,9 +1,11 @@
 use argon2rs::{Argon2, defaults::*, Variant, verifier::Encoded};
 use rand::{distributions::Alphanumeric, Rng, thread_rng};
 
+use crate::models::error::{ModelError, ModelErrorKind};
+
 pub trait HashablePassword {
     fn hash(&self) -> String;
-    fn verify(&self, password: &String) -> bool;
+    fn verify_hash(&self, password: &String) -> Result<(), ModelError>;
 }
 
 impl HashablePassword for String {
@@ -14,10 +16,26 @@ impl HashablePassword for String {
         String::from_utf8(data_hash).unwrap()
     }
 
-    fn verify(&self, password: &String) -> bool {
+    fn verify_hash(&self, password: &String) -> Result<(), ModelError> {
         match Encoded::from_u8(self.as_ref()) {
-            Ok(hash) => hash.verify(password.as_ref()),
-            Err(_) => false,
+            Ok(hash) => {
+                if hash.verify(password.as_ref()) {
+                    Ok(())
+                } else {
+                    Err(
+                        ModelError {
+                            kind: ModelErrorKind::InvalidCredentials,
+                            message: "Invalid credentials".to_string(),
+                        }
+                    )
+                }
+            }
+            Err(_) => Err(
+                ModelError {
+                    kind: ModelErrorKind::OperationError,
+                    message: "Cannot read hash from database".to_string(),
+                }
+            ),
         }
     }
 }
@@ -32,8 +50,8 @@ mod tests {
 
         let wrong_hashed_password = "password".to_string().hash();
 
-        assert!(hashed_password.verify(&password));
-        assert!(!hashed_password.verify(&"hello".to_string()));
-        assert!(!wrong_hashed_password.verify(&password));
+        assert!(hashed_password.verify_hash(&password));
+        assert!(!hashed_password.verify_hash(&"hello".to_string()));
+        assert!(!wrong_hashed_password.verify_hash(&password));
     }
 }

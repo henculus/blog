@@ -13,21 +13,17 @@ pub struct User {
     pub user_roles: Vec<String>,
 }
 
+impl User {
+    pub fn check_password(&self, password: String) -> Result<(), ModelError> {
+        self.password_hash.verify_hash(&password)
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct NewUser {
     pub username: String,
     pub password: String,
     pub user_roles: Vec<String>,
-}
-
-impl User {
-    pub fn generate_jwt(&self, password: String) -> Result<String, ModelError> {
-        unimplemented!()
-    }
-
-    pub fn verify_jwt(&self) -> String {
-        unimplemented!()
-    }
 }
 
 impl From<NewUser> for User {
@@ -38,13 +34,6 @@ impl From<NewUser> for User {
             user_roles: new_user.user_roles,
         }
     }
-}
-
-struct UserToken {
-    iat: i64,
-    exp: i64,
-    user: String,
-    roles: Vec<String>,
 }
 
 pub struct UsersTable<'a>(pub &'a PgConnection);
@@ -71,11 +60,12 @@ impl<'a> Model for UsersTable<'a> {
         unimplemented!()
     }
 
-    fn get_by_id(&self, item_id: String) -> Result<User, ModelError> {
-        unimplemented!()
+    fn get_by_id(&self, username: String) -> Result<User, ModelError> {
+        let result = users::table.find(username).first::<User>(self.0)?;
+        Ok(result)
     }
 
-    fn delete(&self, item_id: String) -> Result<i32, ModelError> {
+    fn delete(&self, username: String) -> Result<i32, ModelError> {
         unimplemented!()
     }
 }

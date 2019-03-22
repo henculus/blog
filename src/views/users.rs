@@ -1,3 +1,4 @@
+use rocket::http::{Cookie, Cookies};
 use rocket_contrib::json::{Json, JsonError};
 use serde::{Deserialize, Serialize};
 
@@ -13,7 +14,7 @@ pub fn new_user(
     conn: DBConn,
 ) -> Result<Json<String>, ViewError> {
     let user = user?;
-    let users = UsersTable(&conn);
+    let users = UsersTable(&*conn);
 
     users
         .create(user.into_inner())
@@ -26,14 +27,22 @@ pub struct LoginForm {
     password: String,
 }
 
-#[post("/users/login", format = "json", data = "<user>")]
+#[post("/users/login", format = "json", data = "<login_form>")]
 pub fn login(
-    user: Result<Json<LoginForm>, JsonError>,
+    mut cookies: Cookies,
+    login_form: Result<Json<LoginForm>, JsonError>,
     conn: DBConn,
-) -> Result<Json<String>, ViewError> {
-    let user_data = user?.into_inner();
-    let users = UsersTable(&conn);
+) -> Result<(), ViewError> {
+    let user_data = login_form?.into_inner();
+    let users = UsersTable(&*conn);
 
     let user = users.get_by_id(user_data.username)?;
-    Ok(Json(user.generate_jwt(user_data.password)?))
+    user
+        .check_password(user_data.password)
+        .map(
+            |_| {
+                cookies.add_private(Cookie::new("logged_in", true.to_string()));
+                Ok(())
+            }
+        )?
 }

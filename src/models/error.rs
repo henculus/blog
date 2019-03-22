@@ -11,6 +11,7 @@ pub enum ModelErrorKind {
     OperationError,
     DBConnectionError,
     ValidationError,
+    InvalidCredentials,
 }
 
 impl Error for ModelError {}
@@ -18,9 +19,10 @@ impl Error for ModelError {}
 impl fmt::Display for ModelError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.kind {
-            ModelErrorKind::OperationError => write!(f, "Cannot execute operation"),
+            ModelErrorKind::OperationError => write!(f, "Cannot execute operation: {:?}", self.message),
             ModelErrorKind::DBConnectionError => write!(f, "Cannot connect to the database"),
             ModelErrorKind::ValidationError => write!(f, "Cannot validate fields"),
+            ModelErrorKind::InvalidCredentials => write!(f, "Wrong user's credentials")
         }
     }
 }

@@ -1,4 +1,7 @@
+extern crate time;
+
 use diesel::prelude::*;
+use jsonwebtoken::{Algorithm, decode, encode, Header, Validation};
 use serde::{Deserialize, Serialize};
 
 use crate::models::{error::*, Model, schema::users, user::hasher::HashablePassword};
@@ -13,9 +16,51 @@ pub struct User {
     pub user_roles: Vec<String>,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct UserToken {
+    iat: i64,
+    exp: i64,
+    sub: String,
+}
+
 impl User {
-    pub fn check_password(&self, password: String) -> Result<(), ModelError> {
+    fn check_password(&self, password: String) -> Result<(), ModelError> {
         self.password_hash.verify_hash(&password)
+    }
+
+    pub fn check_password_and_generate_jwt(&self, password: String) -> Result<String, ModelError> {
+        self.check_password(password)?;
+        let now = time::get_time().sec;
+        let payload = UserToken {
+            iat: now,
+            exp: now + 86400,
+            sub: "".to_string(),
+        };
+
+
+        //TODO: Rewrite this
+        // im too lazy for now for adding one more ModelError case
+        // anyway all errors system should be rewrited fully
+        encode(&Header::default(),
+               &payload,
+               "l5KtZcWen4XT4F77Dg2shixUzaIqdWohQf9MEbnjBi0=".as_ref())
+            .map_err(|_| ModelError {
+                kind: ModelErrorKind::InvalidCredentials,
+                message: "Error while processing login request".to_string(),
+            })
+    }
+
+    pub fn verify_jwt(&self, token: String) -> Result<(), ModelError> {
+        decode::<UserToken>(&token,
+                            "l5KtZcWen4XT4F77Dg2shixUzaIqdWohQf9MEbnjBi0=".as_ref(),
+                            &Validation::new(Algorithm::HS256))
+            .map(|data| ())
+            .map_err(|_|
+                ModelError {
+                    kind: ModelErrorKind::InvalidCredentials,
+                    message: "Error while processing JWT token".to_string(),
+                }
+            )
     }
 }
 
@@ -67,5 +112,26 @@ impl<'a> Model for UsersTable<'a> {
 
     fn delete(&self, username: String) -> Result<i32, ModelError> {
         unimplemented!()
+    }
+}
+
+
+mod tests {
+    use crate::models::user::{NewUser, User};
+
+    #[test]
+    fn test_check_jwt() {
+        let password = "qwerty".to_string();
+        let user_data = NewUser {
+            username: "test".to_string(),
+            password: password.clone(),
+            user_roles: vec![],
+        };
+
+        let user: User = user_data.into();
+
+        let token = user.check_password_and_generate_jwt(password.clone()).unwrap();
+        println!("{}", token);
+        assert!(user.verify_jwt(token).is_ok());
     }
 }

@@ -38,10 +38,10 @@ pub fn login(
 
     let user = users.get_by_id(user_data.username)?;
     user
-        .check_password(user_data.password)
+        .check_password_and_generate_jwt(user_data.password)
         .map(
-            |_| {
-                cookies.add_private(Cookie::new("logged_in", true.to_string()));
+            |token| {
+                cookies.add_private(Cookie::new("jwt", token));
                 Ok(())
             }
         )?

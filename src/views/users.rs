@@ -32,7 +32,7 @@ pub fn login(
     mut cookies: Cookies,
     login_form: Result<Json<LoginForm>, JsonError>,
     conn: DBConn,
-) -> Result<(), ViewError> {
+) -> Result<Json<String>, ViewError> {
     let user_data = login_form?.into_inner();
     let users = UsersTable(&*conn);
 
@@ -41,8 +41,15 @@ pub fn login(
         .check_password_and_generate_jwt(user_data.password)
         .map(
             |token| {
-                cookies.add_private(Cookie::new("jwt", token));
-                Ok(())
+                let split_pos = token.rfind('.').unwrap_or(0);
+                let (payload, sign) = token.split_at(split_pos);
+                let mut sign_cookie = Cookie::new("sign", sign.to_string());
+                let mut payload_cookie = Cookie::new("payload", payload.to_string());
+                sign_cookie.set_http_only(true);
+                payload_cookie.set_http_only(false);
+                cookies.add_private(sign_cookie);
+                cookies.add(payload_cookie);
+                Ok(Json(payload.to_string()))
             }
         )?
 }

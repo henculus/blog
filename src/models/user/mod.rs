@@ -34,7 +34,7 @@ impl User {
         let payload = UserToken {
             iat: now,
             exp: now + 86400,
-            sub: "".to_string(),
+            sub: self.username.to_string(),
         };
 
 

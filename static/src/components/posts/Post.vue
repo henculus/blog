@@ -1,7 +1,7 @@
 <template>
     <div id="post">
-        <PostTitle v-bind:title="post.title"></PostTitle>
-        <PostBody v-bind:body="post.body"></PostBody>
+        <post-title v-bind:title="post.title"></post-title>
+        <post-body v-bind:body="post.body"></post-body>
 
         <ul v-if="errors && errors.length">
             <li v-for="error of errors" v-bind:key="error">
@@ -13,8 +13,8 @@
 
 <script>
     import {HTTP} from '@/http-common'
-    import PostTitle from "@/components/PostTitle";
-    import PostBody from "@/components/PostBody";
+    import PostTitle from "@/components/posts/PostTitle";
+    import PostBody from "@/components/posts/PostBody";
 
     export default {
         name: "Post",

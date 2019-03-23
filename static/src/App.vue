@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <MenuBar/>
+        <nav-bar/>
         <router-view/>
         <footer>
             <p>Created by LupusAnay</p>
@@ -11,10 +11,10 @@
 </template>
 
 <script>
-    import MenuBar from "@/components/MenuBar";
+    import NavBar from "@/components/nav/NavBar";
 
     export default {
-        components: {MenuBar}
+        components: {NavBar}
     }
 </script>
 
@@ -28,7 +28,13 @@
         background-color: #F0E6EF;
     }
 
+    footer {
+        color: #F0E6EF;
+        background-color: #9C89B8;
+    }
+
     #app {
+        color: #67678c;
         min-height: 100%;
         display: grid;
         grid-template-rows: auto 1fr auto;
@@ -37,5 +43,23 @@
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
         text-align: center;
+    }
+
+    button {
+        background-color: #F0E6EF;
+        color: #67678c;
+        justify-content: flex-start;
+        cursor: pointer;
+        border: 2px solid #9C89B8;
+        border-radius: 3px;
+        padding: 10px 32px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 16px;
+    }
+
+    button:hover {
+        background-color: #9C89B8;
+        color: #F0A6CA;
     }
 </style>

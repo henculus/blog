@@ -1,10 +1,10 @@
 <template>
     <div id="posts">
-        <PostPreview
+        <post-preview
                 v-for = "post in posts"
                 v-bind:key = "post.id"
                 v-bind:post = "post"
-        ></PostPreview>
+        ></post-preview>
 
         <ul v-if="errors && errors.length">
             <li v-for="error of errors" v-bind:key="error">
@@ -16,7 +16,7 @@
 
 <script>
     import {HTTP} from '@/http-common';
-    import PostPreview from "@/components/PostPreview";
+    import PostPreview from "@/components/posts/PostPreview";
 
     export default {
         name: "Posts",

@@ -3,14 +3,14 @@
         <router-link class="title" :to="'/post/' + post.id">
             <PostTitle v-on:click="open_post" v-bind:title = "post.title"></PostTitle>
         </router-link>
-        <PostBody v-bind:body = "post.body | truncate(500)"></PostBody>
+        <post-body v-bind:body = "post.body | truncate(500)"></post-body>
         <button v-on:click="open_post">Read more...</button>
     </div>
 </template>
 
 <script>
-    import PostTitle from "@/components/PostTitle";
-    import PostBody from "@/components/PostBody";
+    import PostTitle from "@/components/posts/PostTitle";
+    import PostBody from "@/components/posts/PostBody";
 
     export default {
         name: "PostPreview",
@@ -48,22 +48,5 @@
         display: flex;
         flex-direction: column;
         align-items: flex-start;
-    }
-    button {
-        background-color: #F0E6EF;
-        color: #F0A6CA;
-        justify-content: flex-start;
-        cursor: pointer;
-        border: 2px solid #9C89B8;
-        border-radius: 3px;
-        padding: 10px 32px;
-        text-align: center;
-        text-decoration: none;
-        font-size: 16px;
-    }
-
-    button:hover {
-        background-color: #9C89B8;
-        color: #F0A6CA;
     }
 </style>

@@ -7,13 +7,16 @@
                          :to="`${routes.page}`">
                 <p class="link-text">{{routes.text}}</p>
             </router-link>
+            <nav-user class="nav-item"></nav-user>
         </nav>
     </div>
 </template>
 
 <script>
+    import NavUser from "@/components/nav/NavUser";
     export default {
         name: "MenuBar",
+        components: {NavUser},
         data() {
             return {
                 links: [
@@ -31,7 +34,7 @@
                         id: 2,
                         text: 'Search',
                         page: '/search'
-                    }
+                    },
                 ]
             }
         }
@@ -67,7 +70,7 @@
         color: #B8BEDD;
     }
 
-    .link-text {
+    .nav-item p {
         margin: 1rem
     }
 </style>

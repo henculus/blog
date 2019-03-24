@@ -1,9 +1,9 @@
-use rocket::{request::Form, State};
+use rocket::request::Form;
 use rocket_contrib::json::{Json, JsonError};
 
 use crate::{
     DBConn,
-    models::{Id, Model, post::*, user::*},
+    models::{Id, post::*, user::*},
     views::error::*,
 };
 
@@ -11,11 +11,13 @@ use crate::{
 pub fn new_post(
     post: Result<Json<NewPost>, JsonError>,
     conn: DBConn,
+    user: Result<User, ViewError>,
 ) -> Result<Json<Id>, ViewError> {
+    let user = user?;
     let post = post?;
     let table = PostsTable(&*conn);
     table
-        .create(post.into_inner())
+        .create(post.into_inner(), user.username)
         .map(|post| Ok(Json(post.id)))?
 }
 
@@ -44,20 +46,26 @@ pub fn update_post(
     id: Id,
     post: Result<Json<NewPost>, JsonError>,
     conn: DBConn,
+    user: Result<User, ViewError>,
 ) -> Result<Json<i32>, ViewError> {
+    let user = user?;
     let post = post?;
-    let posts_table = PostsTable(&*conn);
+    let posts = PostsTable(&*conn);
 
-    posts_table
+    posts
+        .is_user_author(user, id)?
         .update(id, post.into_inner())
         .map(|row_affected| Ok(Json(row_affected)))?
+
 }
 
 #[delete("/posts/<id>")]
-pub fn delete_post(id: Id, conn: DBConn) -> Result<Json<i32>, ViewError> {
+pub fn delete_post(id: Id, conn: DBConn, user: Result<User, ViewError>) -> Result<Json<i32>, ViewError> {
+    let user = user?;
     let posts_table = PostsTable(&*conn);
 
     posts_table
+        .is_user_author(user, id)?
         .delete(id)
         .map(|row_affected| Ok(Json(row_affected)))?
 }

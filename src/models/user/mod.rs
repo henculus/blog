@@ -4,7 +4,7 @@ use diesel::prelude::*;
 use jsonwebtoken::{Algorithm, decode, encode, Header, Validation};
 use serde::{Deserialize, Serialize};
 
-use crate::models::{error::*, Model, schema::users, user::hasher::HashablePassword};
+use crate::models::{error::*, schema::users, user::hasher::HashablePassword};
 
 mod hasher;
 
@@ -15,6 +15,14 @@ pub struct User {
     pub password_hash: String,
     pub user_roles: Vec<String>,
 }
+
+#[derive(Serialize, Deserialize)]
+pub struct NewUser {
+    pub username: String,
+    pub password: String,
+    pub user_roles: Vec<String>,
+}
+
 
 #[derive(Serialize, Deserialize)]
 pub struct UserToken {
@@ -40,14 +48,11 @@ impl User {
 
         //TODO: Rewrite this
         // im too lazy for now for adding one more ModelError case
-        // anyway all errors system should be rewrited fully
+        // anyway all errors system should be rewritten fully
         encode(&Header::default(),
                &payload,
                "l5KtZcWen4XT4F77Dg2shixUzaIqdWohQf9MEbnjBi0=".as_ref())
-            .map_err(|_| ModelError {
-                kind: ModelErrorKind::InvalidCredentials,
-                message: "Error while processing login request".to_string(),
-            })
+            .map_err(|_| ModelError::InvalidCredentials(Some("Invalid JWT".to_string())))
     }
 
     pub fn verify_jwt(&self, token: String) -> Result<(), ModelError> {
@@ -55,20 +60,21 @@ impl User {
                             "l5KtZcWen4XT4F77Dg2shixUzaIqdWohQf9MEbnjBi0=".as_ref(),
                             &Validation::new(Algorithm::HS256))
             .map(|data| ())
-            .map_err(|_|
-                ModelError {
-                    kind: ModelErrorKind::InvalidCredentials,
-                    message: "Error while processing JWT token".to_string(),
-                }
-            )
+            .map_err(|_| ModelError::InvalidCredentials(Some("Invalid JWT".to_string())))
     }
-}
 
-#[derive(Serialize, Deserialize)]
-pub struct NewUser {
-    pub username: String,
-    pub password: String,
-    pub user_roles: Vec<String>,
+    pub fn from_jwt(token: String) -> Result<Self, ModelError> {
+        decode::<UserToken>(
+            &token,
+            "l5KtZcWen4XT4F77Dg2shixUzaIqdWohQf9MEbnjBi0=".as_ref(),
+            &Validation::new(Algorithm::HS256))
+            .map(|data| Self {
+                username: data.claims.sub,
+                password_hash: "".to_string(),
+                user_roles: vec![],
+            })
+            .map_err(|_| ModelError::InvalidCredentials(Some("Invalid JWT".to_string())))
+    }
 }
 
 impl From<NewUser> for User {
@@ -83,12 +89,8 @@ impl From<NewUser> for User {
 
 pub struct UsersTable<'a>(pub &'a PgConnection);
 
-impl<'a> Model for UsersTable<'a> {
-    type Key = String;
-    type Item = User;
-    type NewItem = NewUser;
-
-    fn create(&self, new_user: NewUser) -> Result<User, ModelError> {
+impl<'a> UsersTable<'a> {
+    pub fn create(&self, new_user: NewUser) -> Result<User, ModelError> {
         let user: User = new_user.into();
 
         let result = diesel::insert_into(users::table)
@@ -97,20 +99,16 @@ impl<'a> Model for UsersTable<'a> {
         Ok(result)
     }
 
-    fn update(&self, item_id: String, item: NewUser) -> Result<i32, ModelError> {
+    pub fn update(&self, item_id: String, item: NewUser) -> Result<i32, ModelError> {
         unimplemented!()
     }
 
-    fn get(&self, limit: i64, offset: i64) -> Result<Vec<User>, ModelError> {
-        unimplemented!()
-    }
-
-    fn get_by_id(&self, username: String) -> Result<User, ModelError> {
+    pub fn get_by_id(&self, username: String) -> Result<User, ModelError> {
         let result = users::table.find(username).first::<User>(self.0)?;
         Ok(result)
     }
 
-    fn delete(&self, username: String) -> Result<i32, ModelError> {
+    pub fn delete(&self, username: String) -> Result<i32, ModelError> {
         unimplemented!()
     }
 }

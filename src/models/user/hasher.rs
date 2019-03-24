@@ -1,7 +1,7 @@
-use argon2rs::{Argon2, defaults::*, Variant, verifier::Encoded};
+use argon2rs::verifier::Encoded;
 use rand::{distributions::Alphanumeric, Rng, thread_rng};
 
-use crate::models::error::{ModelError, ModelErrorKind};
+use crate::models::error::ModelError;
 
 pub trait HashablePassword {
     fn hash(&self) -> String;
@@ -23,18 +23,12 @@ impl HashablePassword for String {
                     Ok(())
                 } else {
                     Err(
-                        ModelError {
-                            kind: ModelErrorKind::InvalidCredentials,
-                            message: "Invalid credentials".to_string(),
-                        }
+                        ModelError::InvalidCredentials(None)
                     )
                 }
             }
             Err(_) => Err(
-                ModelError {
-                    kind: ModelErrorKind::OperationError,
-                    message: "Cannot read hash from database".to_string(),
-                }
+                ModelError::DatabaseError(Some("Cannot read hash from database".to_string()))
             ),
         }
     }

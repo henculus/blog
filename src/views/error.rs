@@ -1,4 +1,4 @@
-use std::{error::Error, fmt};
+use std::fmt;
 
 use rocket::{
     http::{ContentType, Status},
@@ -8,7 +8,7 @@ use rocket::{
 use rocket_contrib::json::{Json, JsonError};
 use serde::Serialize;
 
-use crate::models::error::{ModelError, ModelErrorKind};
+use crate::models::error::ModelError;
 
 #[derive(Debug, Serialize)]
 pub struct ViewError {
@@ -17,16 +17,26 @@ pub struct ViewError {
     pub resource: Option<String>,
 }
 
+impl ViewError {
+    pub fn new_unauthorized() -> Self {
+        Self {
+            status: "error".to_string(),
+            kind: ViewErrorKind::Unauthorized,
+            resource: None,
+        }
+    }
+}
+
 impl std::fmt::Display for ViewError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self.kind {
-            ViewErrorKind::ServiceUnavailable => {
-                write!(f, "Service {:?} unavailable", self.resource)
-            }
+            ViewErrorKind::ServiceUnavailable => write!(f, "Service {:?} unavailable", self.resource),
             ViewErrorKind::NotFound => write!(f, "Resource {:?} not found", self.resource),
             ViewErrorKind::BadRequest => write!(f, "Bad request: {:?}", self.resource),
             ViewErrorKind::UnprocessableEntity => write!(f, "Unprocessable Entity: {:?}", self.resource),
-            ViewErrorKind::Unauthorized => write!(f, "Unauthorized: {:?}", self.resource)
+            ViewErrorKind::Unauthorized => write!(f, "Unauthorized: {:?}", self.resource),
+            ViewErrorKind::InternalError => write!(f, "Internal Error: {:?}", self.resource),
+            ViewErrorKind::Conflict => write!(f, "Conflict: {:?}", self.resource),
         }
     }
 }
@@ -41,7 +51,9 @@ impl<'a> Responder<'a> for ViewError {
             ViewErrorKind::ServiceUnavailable => resp.status(Status::ServiceUnavailable),
             ViewErrorKind::BadRequest => resp.status(Status::BadRequest),
             ViewErrorKind::UnprocessableEntity => resp.status(Status::UnprocessableEntity),
-            ViewErrorKind::Unauthorized => resp.status(Status::Unauthorized)
+            ViewErrorKind::Unauthorized => resp.status(Status::Unauthorized),
+            ViewErrorKind::InternalError => resp.status(Status::InternalServerError),
+            ViewErrorKind::Conflict => resp.status(Status::Conflict),
         };
         Ok(resp.finalize())
     }
@@ -62,28 +74,21 @@ impl<'a> From<JsonError<'a>> for ViewError {
 
 impl From<ModelError> for ViewError {
     fn from(err: ModelError) -> Self {
-        match err.kind {
-            ModelErrorKind::DBConnectionError => ViewError {
-                status: "error".to_string(),
-                kind: ViewErrorKind::ServiceUnavailable,
-                resource: Some("database".to_string()),
-            },
-            ModelErrorKind::OperationError => ViewError {
-                status: "error".to_string(),
-                kind: ViewErrorKind::NotFound,
-                resource: Some(err.to_string()),
-            },
-            ModelErrorKind::ValidationError => ViewError {
-                status: "error".to_string(),
-                kind: ViewErrorKind::UnprocessableEntity,
-                resource: Some(err.message),
-            },
-            ModelErrorKind::InvalidCredentials => ViewError {
-                status: "error".to_string(),
-                kind: ViewErrorKind::Unauthorized,
-                resource: Some("Invalid credentials".to_string()),
-            }
+        let mut res = ViewError {
+            status: "error".to_string(),
+            kind: ViewErrorKind::InternalError,
+            resource: None,
+        };
+
+        match err {
+            ModelError::NotFound(_) => res.kind = ViewErrorKind::NotFound,
+            ModelError::Conflict(_) => res.kind = ViewErrorKind::Conflict,
+            ModelError::ValidationError(_) => res.kind = ViewErrorKind::UnprocessableEntity,
+            ModelError::InvalidCredentials(_) => res.kind = ViewErrorKind::Unauthorized,
+            ModelError::DatabaseError(_) => res.kind = ViewErrorKind::ServiceUnavailable,
         }
+
+        res
     }
 }
 
@@ -92,6 +97,8 @@ pub enum ViewErrorKind {
     ServiceUnavailable,
     NotFound,
     BadRequest,
+    Conflict,
     UnprocessableEntity,
     Unauthorized,
+    InternalError,
 }

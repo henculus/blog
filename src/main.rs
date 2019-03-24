@@ -51,7 +51,8 @@ fn create_app() -> Rocket {
                 views::posts::delete_post,
                 views::posts::update_post,
                 views::users::new_user,
-                views::users::login
+                views::users::login,
+                views::users::token
             ],
         )
         .mount("/", routes![views::index, views::files,])

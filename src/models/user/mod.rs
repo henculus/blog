@@ -8,7 +8,7 @@ use crate::models::{error::*, schema::users, user::hasher::HashablePassword};
 
 mod hasher;
 
-#[derive(Queryable, Insertable, Identifiable, AsChangeset, Serialize, Deserialize)]
+#[derive(Queryable, Insertable, Identifiable, AsChangeset, Serialize, Deserialize, Debug)]
 #[primary_key(username)]
 pub struct User {
     pub username: String,

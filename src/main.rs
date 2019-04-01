@@ -13,13 +13,19 @@ extern crate serde;
 
 use rocket::http::Method;
 use rocket::Rocket;
+use rocket_contrib::json::Json;
 use rocket_cors::{AllowedHeaders, AllowedOrigins};
 
-mod models;
-mod views;
+mod posts_view;
+mod users_view;
+mod user;
+mod post;
+
+type Id = i64;
+type Result<T> = std::result::Result<Json<T>, ViewError>;
 
 #[database("blog")]
-pub struct DBConn(diesel::PgConnection);
+pub struct Database(diesel::PgConnection);
 
 fn create_app() -> Rocket {
     let allowed_origins =
@@ -57,7 +63,7 @@ fn create_app() -> Rocket {
         )
         .mount("/", routes![views::index, views::files,])
         .attach(cors)
-        .attach(DBConn::fairing())
+        .attach(Database::fairing())
 }
 
 fn main() {

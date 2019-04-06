@@ -25,6 +25,9 @@ impl User {
     pub fn verify_password_and_generate_jwt(&self, password: String) -> Result<String> {
         unimplemented!()
     }
+    pub fn from_jwt(jwt: String) -> Result<User> {
+        unimplemented!()
+    }
 }
 
 impl<'a, 'r> FromRequest<'a, 'r> for User {
@@ -53,7 +56,7 @@ pub struct UserData {
 
 trait PasswordHash {
     fn to_password_hash(&self) -> String;
-    fn is_password_hash_correct(&self, raw_password: String) -> bool;
+    fn is_password_hash_correct(&self, raw_password: &String) -> bool;
 }
 
 impl PasswordHash for String {
@@ -68,7 +71,7 @@ impl PasswordHash for String {
         String::from_utf8(data_hash).unwrap()
     }
 
-    fn is_password_hash_correct(&self, raw_password: String) -> bool {
+    fn is_password_hash_correct(&self, raw_password: &String) -> bool {
         let hash = Encoded::from_u8(self.as_ref()).unwrap();
         hash.verify(raw_password.as_ref())
     }
@@ -76,13 +79,13 @@ impl PasswordHash for String {
 
 #[cfg(test)]
 mod tests {
-    use crate::user::PasswordHash;
+    use crate::user::{PasswordHash, User, UserData};
 
     #[test]
     fn test_password_hashing() {
         let password = "password".to_string();
         let hash = password.to_password_hash();
-        assert!(hash.is_password_hash_correct(password))
+        assert!(hash.is_password_hash_correct(&password))
     }
 
     #[test]
@@ -90,9 +93,17 @@ mod tests {
         let password = "password".to_string();
         let hash = password.to_password_hash();
         let wrong_password = "wrong_password".to_string();
-        assert!(!hash.is_password_hash_correct(wrong_password))
+        assert!(!hash.is_password_hash_correct(&wrong_password))
     }
 
     #[test]
-    fn test_user_from_user_data() {}
+    fn test_user_from_user_data() {
+        let username = &"Hello".to_string();
+        let password = &"Hello".to_string();
+        let user_data = UserData { username: username.to_string(), password: password.to_string() };
+
+        let user: User = user_data.into();
+        assert_eq!(user.username(), username);
+        assert!(user.password_hash.is_password_hash_correct(password));
+    }
 }

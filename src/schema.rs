@@ -4,6 +4,7 @@ table! {
         title -> Varchar,
         body -> Text,
         author -> Text,
+        published -> Bool,
     }
 }
 

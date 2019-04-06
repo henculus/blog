@@ -1,54 +1,59 @@
 use diesel::prelude::*;
-use rocket::request::Form;
-use rocket_contrib::json::{Json, JsonError};
+use rocket_contrib::json::Json;
 
+use crate::{Id, Result};
 use crate::Database;
-use crate::models::schema::posts::dsl::*;
-use crate::views::{Id, Result};
+use crate::post::{Post, PostData};
+use crate::schema::posts::dsl::*;
+use crate::user::User;
 
-const OFFSET: i32 = 10;
-const LIMIT: i32 = 0;
+const OFFSET: i64 = 10;
+const LIMIT: i64 = 0;
 
 
 #[post("/posts", format = "json", data = "<post>")]
-pub fn new_post(post: Json<NewPost>, conn: Database, user: User) -> Result<Post> {
-    diesel::insert_into(posts)
-        .values(post.into_inner())
-        .execute(&*conn)?
+pub fn new_post(post: Json<PostData>, conn: Database, user: User) -> Result<Post> {
+    Ok(
+        Json(
+            diesel::insert_into(posts)
+                .values(post.into_inner())
+                .get_result(&*conn)?
+        )
+    )
 }
 
 #[get("/posts?<limit>&<offset>")]
-pub fn get_posts(db: Database, limit: Option<i32>, offset: Option<i32>) -> Result<Vec<Post>> {
-    posts
-        .filter(published.eq(true))
-        .offset(offset.unwrap_or(OFFSET))
-        .limit(limit.unwrap_or(LIMIT))
-        .order(views.desc())
-        .load::<Post>(&db)?
-}
-
-#[get("/posts/<id>")]
-pub fn get_post(id: Id, conn: Database, user: Option<User>) -> Result<Post> {
-    let query = match user {
-        Some(user) => posts.filter(author.eq(user.id)),
-        None => posts.filter(published.eq(true))
-    };
-
-    query
-        .filter(id.eq(&id))
-        .load::<Post>(&conn)?
-}
-
-#[put("/posts/<id>", format = "application/json", data = "<post>")]
-pub fn update_post(id: Id, post: Json<NewPost>, conn: Database, user: User) -> Result<Post> {
-    diesel::update(
-        posts.filter(id.eq(post_id).and(author.eq(user.id)))
+pub fn get_posts(conn: Database, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<Post>> {
+    Ok(
+        Json(
+            posts
+                .filter(published.eq(true))
+                .offset(offset.unwrap_or(OFFSET))
+                .limit(limit.unwrap_or(LIMIT))
+                .load::<Post>(&*conn)?
+        )
     )
-        .set(&post)
-        .execute(&db)?
 }
 
-#[delete("/posts/<id>")]
-pub fn delete_post(id: Id, conn: Database, user: User) -> Result<()> {
-    diesel::delete(posts.find(id)).execute(&db)?
+#[get("/posts/<post_id>")]
+pub fn get_post(post_id: Id, conn: Database) -> Result<Post> {
+    let query_result = posts
+        .filter(id.eq(&post_id).and(published.eq(true)))
+        .get_result(&*conn)?;
+    Ok(Json(query_result))
+}
+
+#[put("/posts/<post_id>", format = "application/json", data = "<post_data>")]
+pub fn update_post(post_id: Id, post_data: Json<PostData>, conn: Database, user: User) -> Result<Post> {
+    let post_data = post_data.into_inner();
+    let original_post = posts.filter(id.eq(post_id).and(author.eq(user.username())));
+    let query_result = diesel::update(original_post).set(&post_data).get_result(&*conn)?;
+    Ok(Json(query_result))
+}
+
+#[delete("/posts/<post_id>")]
+pub fn delete_post(post_id: Id, conn: Database, user: User) -> Result<usize> {
+    let post = posts.filter(id.eq(post_id).and(author.eq(user.username())));
+    let query_result = diesel::delete(post).execute(&*conn)?;
+    Ok(Json(query_result))
 }

@@ -20,9 +20,21 @@ mod posts_view;
 mod users_view;
 mod user;
 mod post;
+mod schema;
 
-type Id = i64;
+type Id = i32;
 type Result<T> = std::result::Result<Json<T>, ViewError>;
+
+#[derive(Debug)]
+pub enum ViewError {
+    UnimplementedError,
+}
+
+impl From<diesel::result::Error> for ViewError {
+    fn from(_: diesel::result::Error) -> Self {
+        ViewError::UnimplementedError
+    }
+}
 
 #[database("blog")]
 pub struct Database(diesel::PgConnection);
@@ -42,26 +54,18 @@ fn create_app() -> Rocket {
         .unwrap();
 
     rocket::ignite()
-        .register(catchers![
-            views::not_found,
-            views::service_unavailable,
-            views::bad_request,
-            views::unprocessable_entity
-        ])
         .mount(
             "/api",
             routes![
-                views::posts::new_post,
-                views::posts::get_post,
-                views::posts::get_posts,
-                views::posts::delete_post,
-                views::posts::update_post,
-                views::users::new_user,
-                views::users::login,
-                views::users::token
+                posts_view::new_post,
+                posts_view::get_post,
+                posts_view::get_posts,
+                posts_view::delete_post,
+                posts_view::update_post,
+                users_view::new_user,
+                users_view::login,
             ],
         )
-        .mount("/", routes![views::index, views::files,])
         .attach(cors)
         .attach(Database::fairing())
 }

@@ -5,14 +5,14 @@ use crate::{Id, ViewResult};
 use crate::Database;
 use crate::post::{Post, PostData};
 use crate::schema::posts::dsl::*;
-use crate::user::User;
+use crate::user::Token;
 
 const OFFSET: i64 = 10;
 const LIMIT: i64 = 0;
 
 
 #[post("/posts", format = "json", data = "<post>")]
-pub fn new_post(post: Json<PostData>, conn: Database, user: User) -> ViewResult<Post> {
+pub fn new_post(post: Json<PostData>, conn: Database, token: Token) -> ViewResult<Post> {
     Ok(
         Json(
             diesel::insert_into(posts)
@@ -44,16 +44,16 @@ pub fn get_post(post_id: Id, conn: Database) -> ViewResult<Post> {
 }
 
 #[put("/posts/<post_id>", format = "application/json", data = "<post_data>")]
-pub fn update_post(post_id: Id, post_data: Json<PostData>, conn: Database, user: User) -> ViewResult<Post> {
+pub fn update_post(post_id: Id, post_data: Json<PostData>, conn: Database, token: Token) -> ViewResult<Post> {
     let post_data = post_data.into_inner();
-    let original_post = posts.filter(id.eq(post_id).and(author.eq(user.username())));
+    let original_post = posts.filter(id.eq(post_id).and(author.eq(token.username())));
     let query_result = diesel::update(original_post).set(&post_data).get_result(&*conn)?;
     Ok(Json(query_result))
 }
 
 #[delete("/posts/<post_id>")]
-pub fn delete_post(post_id: Id, conn: Database, user: User) -> ViewResult<usize> {
-    let post = posts.filter(id.eq(post_id).and(author.eq(user.username())));
+pub fn delete_post(post_id: Id, conn: Database, token: Token) -> ViewResult<usize> {
+    let post = posts.filter(id.eq(post_id).and(author.eq(token.username())));
     let query_result = diesel::delete(post).execute(&*conn)?;
     Ok(Json(query_result))
 }

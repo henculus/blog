@@ -1,4 +1,4 @@
-use std::convert::{TryFrom, TryInto};
+use std::convert::TryFrom;
 
 use argon2rs::verifier::Encoded;
 use jsonwebtoken::{Algorithm, decode, encode, Header, Validation};
@@ -10,7 +10,7 @@ use rocket::Request;
 use rocket_contrib::json::Json;
 use serde::{Deserialize, Serialize};
 
-use crate::{Error, ModelResult, ViewResult};
+use crate::{Error, ViewResult};
 use crate::schema::users;
 
 const SECRET_KEY: &str = "l5KtZcWen4XT4F77Dg2shixUzaIqdWohQf9MEbnjBi0=";
@@ -27,9 +27,6 @@ pub struct User {
 }
 
 impl User {
-    pub fn username(&self) -> &String {
-        &self.username
-    }
     pub fn verify_password_and_generate_jwt(&self, password: String) -> ViewResult<String> {
         if !self.password_hash.is_password_hash_correct(&password) {
             return Err(Error::WrongPassword);
@@ -48,23 +45,17 @@ impl User {
     }
 }
 
-impl TryFrom<Token> for User {
-    type Error = Error;
-
-    fn try_from(token: Token) -> Result<User, Error> {
-        Ok(User {
-            username: token.sub,
-            password_hash: "".to_string(),
-            user_roles: vec![],
-        })
-    }
-}
-
 #[derive(Debug, Serialize, Deserialize)]
-struct Token {
+pub struct Token {
     iat: i64,
     exp: i64,
     sub: String,
+}
+
+impl Token {
+    pub fn username(&self) -> &String {
+        &self.sub
+    }
 }
 
 impl TryFrom<String> for Token {
@@ -81,34 +72,22 @@ impl TryFrom<String> for Token {
     }
 }
 
-impl<'a, 'r> TryFrom<&'a Request<'r>> for Token {
+impl<'a, 'r> FromRequest<'a, 'r> for Token {
     type Error = Error;
 
-    fn try_from(request: &'a Request<'r>) -> Result<Token, Self::Error> {
-        let header = request.headers()
-            .get_one("Authorization")
-            .ok_or(Error::NoAuthHeader)?;
+    fn from_request(request: &'a Request<'r>) -> Outcome<Token, Self::Error> {
+        let header = match request.headers().get_one("Authorization") {
+            Some(h) => h,
+            None => return Outcome::Failure((Status::Unauthorized, Error::NoAuthHeader))
+        };
         let header_parts: Vec<&str> = header.split(" ").collect();
         if header_parts[0] != "Bearer" {
-            return Err(Error::WrongAuthType);
+            return Outcome::Failure((Status::Unauthorized, Error::WrongAuthType));
         }
 
         let token = header_parts[1];
-        Ok(Token::try_from(token.to_string())?)
-    }
-}
-
-impl<'a, 'r> FromRequest<'a, 'r> for User {
-    type Error = Error;
-
-    fn from_request(request: &'a Request<'r>) -> Outcome<User, Self::Error> {
-        let token = match Token::try_from(request) {
-            Ok(t) => t,
-            Err(e) => return Outcome::Failure((Status::Unauthorized, e))
-        };
-
-        match token.try_into() {
-            Ok(u) => Outcome::Success(u),
+        match Token::try_from(token.to_string()) {
+            Ok(t) => Outcome::Success(t),
             Err(e) => Outcome::Failure((Status::Unauthorized, e))
         }
     }

@@ -1,13 +1,21 @@
+use std::convert::{TryFrom, TryInto};
+
 use argon2rs::verifier::Encoded;
-use diesel::prelude::*;
+use jsonwebtoken::{Algorithm, decode, encode, Header, Validation};
 use rand::{Rng, thread_rng};
 use rand::distributions::Alphanumeric;
+use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome};
 use rocket::Request;
+use rocket_contrib::json::Json;
 use serde::{Deserialize, Serialize};
 
-use crate::{Result, ViewError};
+use crate::{Error, ModelResult, ViewResult};
 use crate::schema::users;
+
+const SECRET_KEY: &str = "l5KtZcWen4XT4F77Dg2shixUzaIqdWohQf9MEbnjBi0=";
+const JWT_K: &[u8] = b"";
+const JWT_X: &[u8] = b"";
 
 #[derive(Queryable, Identifiable, Insertable, Serialize, Deserialize, PartialEq, Debug)]
 #[primary_key(username)]
@@ -22,19 +30,87 @@ impl User {
     pub fn username(&self) -> &String {
         &self.username
     }
-    pub fn verify_password_and_generate_jwt(&self, password: String) -> Result<String> {
-        unimplemented!()
+    pub fn verify_password_and_generate_jwt(&self, password: String) -> ViewResult<String> {
+        if !self.password_hash.is_password_hash_correct(&password) {
+            return Err(Error::WrongPassword);
+        }
+        let now = time::get_time().sec;
+        let payload = Token {
+            iat: now,
+            exp: now + 86400,
+            sub: self.username.to_string(),
+        };
+
+        let token = encode(&Header::default(),
+                           &payload,
+                           SECRET_KEY.as_ref())?;
+        Ok(Json(token))
     }
-    pub fn from_jwt(jwt: String) -> Result<User> {
-        unimplemented!()
+}
+
+impl TryFrom<Token> for User {
+    type Error = Error;
+
+    fn try_from(token: Token) -> Result<User, Error> {
+        Ok(User {
+            username: token.sub,
+            password_hash: "".to_string(),
+            user_roles: vec![],
+        })
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+struct Token {
+    iat: i64,
+    exp: i64,
+    sub: String,
+}
+
+impl TryFrom<String> for Token {
+    type Error = Error;
+
+    fn try_from(raw_token: String) -> Result<Token, Self::Error> {
+        let data = decode::<Token>(
+            &raw_token,
+            SECRET_KEY.as_ref(),
+            &Validation::new(Algorithm::HS256))?;
+        let token = data.claims;
+
+        Ok(token)
+    }
+}
+
+impl<'a, 'r> TryFrom<&'a Request<'r>> for Token {
+    type Error = Error;
+
+    fn try_from(request: &'a Request<'r>) -> Result<Token, Self::Error> {
+        let header = request.headers()
+            .get_one("Authorization")
+            .ok_or(Error::NoAuthHeader)?;
+        let header_parts: Vec<&str> = header.split(" ").collect();
+        if header_parts[0] != "Bearer" {
+            return Err(Error::WrongAuthType);
+        }
+
+        let token = header_parts[1];
+        Ok(Token::try_from(token.to_string())?)
     }
 }
 
 impl<'a, 'r> FromRequest<'a, 'r> for User {
-    type Error = ViewError;
+    type Error = Error;
 
-    fn from_request(request: &'a Request<'r>) -> Outcome<User, ViewError> {
-        unimplemented!()
+    fn from_request(request: &'a Request<'r>) -> Outcome<User, Self::Error> {
+        let token = match Token::try_from(request) {
+            Ok(t) => t,
+            Err(e) => return Outcome::Failure((Status::Unauthorized, e))
+        };
+
+        match token.try_into() {
+            Ok(u) => Outcome::Success(u),
+            Err(e) => Outcome::Failure((Status::Unauthorized, e))
+        }
     }
 }
 
@@ -66,8 +142,8 @@ impl PasswordHash for String {
         let data_hash = Encoded::default2i(
             self.as_bytes(),
             salt.as_bytes(),
-            b"",
-            b"").to_u8();
+            JWT_K,
+            JWT_X).to_u8();
         String::from_utf8(data_hash).unwrap()
     }
 

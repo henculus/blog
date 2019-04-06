@@ -1,4 +1,4 @@
-#![feature(proc_macro_hygiene, decl_macro)]
+#![feature(proc_macro_hygiene, decl_macro, type_alias_enum_variants)]
 
 #[macro_use]
 extern crate diesel;
@@ -23,16 +23,27 @@ mod post;
 mod schema;
 
 type Id = i32;
-type Result<T> = std::result::Result<Json<T>, ViewError>;
+type ViewResult<T> = std::result::Result<Json<T>, Error>;
+type ModelResult<T> = std::result::Result<T, Error>;
 
 #[derive(Debug)]
-pub enum ViewError {
+pub enum Error {
     UnimplementedError,
+    WrongAuthType,
+    NoAuthHeader,
+    TokenError,
+    WrongPassword,
 }
 
-impl From<diesel::result::Error> for ViewError {
+impl From<diesel::result::Error> for Error {
     fn from(_: diesel::result::Error) -> Self {
-        ViewError::UnimplementedError
+        Error::UnimplementedError
+    }
+}
+
+impl From<jsonwebtoken::errors::Error> for Error {
+    fn from(_: jsonwebtoken::errors::Error) -> Self {
+        Error::UnimplementedError
     }
 }
 

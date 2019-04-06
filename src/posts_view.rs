@@ -1,7 +1,7 @@
 use diesel::prelude::*;
 use rocket_contrib::json::Json;
 
-use crate::{Id, Result};
+use crate::{Id, ViewResult};
 use crate::Database;
 use crate::post::{Post, PostData};
 use crate::schema::posts::dsl::*;
@@ -12,7 +12,7 @@ const LIMIT: i64 = 0;
 
 
 #[post("/posts", format = "json", data = "<post>")]
-pub fn new_post(post: Json<PostData>, conn: Database, user: User) -> Result<Post> {
+pub fn new_post(post: Json<PostData>, conn: Database, user: User) -> ViewResult<Post> {
     Ok(
         Json(
             diesel::insert_into(posts)
@@ -23,7 +23,7 @@ pub fn new_post(post: Json<PostData>, conn: Database, user: User) -> Result<Post
 }
 
 #[get("/posts?<limit>&<offset>")]
-pub fn get_posts(conn: Database, limit: Option<i64>, offset: Option<i64>) -> Result<Vec<Post>> {
+pub fn get_posts(conn: Database, limit: Option<i64>, offset: Option<i64>) -> ViewResult<Vec<Post>> {
     Ok(
         Json(
             posts
@@ -36,7 +36,7 @@ pub fn get_posts(conn: Database, limit: Option<i64>, offset: Option<i64>) -> Res
 }
 
 #[get("/posts/<post_id>")]
-pub fn get_post(post_id: Id, conn: Database) -> Result<Post> {
+pub fn get_post(post_id: Id, conn: Database) -> ViewResult<Post> {
     let query_result = posts
         .filter(id.eq(&post_id).and(published.eq(true)))
         .get_result(&*conn)?;
@@ -44,7 +44,7 @@ pub fn get_post(post_id: Id, conn: Database) -> Result<Post> {
 }
 
 #[put("/posts/<post_id>", format = "application/json", data = "<post_data>")]
-pub fn update_post(post_id: Id, post_data: Json<PostData>, conn: Database, user: User) -> Result<Post> {
+pub fn update_post(post_id: Id, post_data: Json<PostData>, conn: Database, user: User) -> ViewResult<Post> {
     let post_data = post_data.into_inner();
     let original_post = posts.filter(id.eq(post_id).and(author.eq(user.username())));
     let query_result = diesel::update(original_post).set(&post_data).get_result(&*conn)?;
@@ -52,7 +52,7 @@ pub fn update_post(post_id: Id, post_data: Json<PostData>, conn: Database, user:
 }
 
 #[delete("/posts/<post_id>")]
-pub fn delete_post(post_id: Id, conn: Database, user: User) -> Result<usize> {
+pub fn delete_post(post_id: Id, conn: Database, user: User) -> ViewResult<usize> {
     let post = posts.filter(id.eq(post_id).and(author.eq(user.username())));
     let query_result = diesel::delete(post).execute(&*conn)?;
     Ok(Json(query_result))

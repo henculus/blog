@@ -57,6 +57,15 @@ pub fn update_post(post_id: Id, post_data: Json<PostData>, conn: Database, token
     Ok(Json(query_result))
 }
 
+#[put("/posts/<post_id>/publish")]
+pub fn publish_post(post_id: Id, conn: Database, token: Token) -> ViewResult<Post> {
+    let original_post = posts.filter(id.eq(post_id).and(author.eq(token.username())));
+    let query_result = diesel::update(original_post)
+        .set(published.eq(true))
+        .get_result(&*conn)?;
+    Ok(Json(query_result))
+}
+
 #[delete("/posts/<post_id>")]
 pub fn delete_post(post_id: Id, conn: Database, token: Token) -> ViewResult<usize> {
     let post = posts.filter(id.eq(post_id).and(author.eq(token.username())));

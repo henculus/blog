@@ -83,6 +83,7 @@ fn create_app() -> Rocket {
                 posts_view::get_posts,
                 posts_view::delete_post,
                 posts_view::update_post,
+                posts_view::publish_post,
                 users_view::new_user,
                 users_view::login,
             ],

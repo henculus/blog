@@ -27,6 +27,9 @@ mod post;
 mod schema;
 mod error;
 
+#[cfg(test)]
+mod tests;
+
 type Id = i32;
 type ViewResult<T> = std::result::Result<Json<T>, Error>;
 

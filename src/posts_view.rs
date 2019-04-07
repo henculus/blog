@@ -15,7 +15,7 @@ const LIMIT: i64 = 0;
 #[post("/posts", format = "json", data = "<post>")]
 pub fn new_post(post: Json<PostData>, conn: Database, token: Token) -> ViewResult<Post> {
     let query_result = diesel::insert_into(posts)
-        .values((post.into_inner(), author.eq(token.sub)))
+        .values((post.into_inner(), author.eq(token.username())))
         .get_result(&*conn)?;
 
     Ok(Json(query_result))
@@ -34,7 +34,7 @@ pub fn get_posts(conn: Database, limit: Option<i64>, offset: Option<i64>) -> Vie
 
 #[get("/posts/<post_id>")]
 pub fn get_users_post(post_id: Id, conn: Database, token: Token) -> ViewResult<Post> {
-    let user: User = users.find(token.sub).get_result(&*conn)?;
+    let user: User = users.find(token.username()).get_result(&*conn)?;
     let query_result = Post::belonging_to(&user)
         .filter(id.eq(&post_id))
         .get_result(&*conn)?;

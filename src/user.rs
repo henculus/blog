@@ -7,10 +7,9 @@ use rand::distributions::Alphanumeric;
 use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome};
 use rocket::Request;
-use rocket_contrib::json::Json;
 use serde::{Deserialize, Serialize};
 
-use crate::{Error, ViewResult};
+use crate::Error;
 use crate::schema::users;
 
 const SECRET_KEY: &str = "l5KtZcWen4XT4F77Dg2shixUzaIqdWohQf9MEbnjBi0=";
@@ -29,32 +28,39 @@ pub struct User {
 }
 
 impl User {
-    pub fn verify_password_and_generate_jwt(&self, password: String) -> ViewResult<String> {
+    pub fn username(&self) -> &String {
+        &self.username
+    }
+    pub fn verify_password_and_generate_jwt(&self, password: String) -> Result<String, Error> {
         if !self.password_hash.is_password_hash_correct(&password) {
             return Err(Error::WrongPassword);
         }
-        let now = time::get_time().sec;
-        let payload = Token {
-            iat: now,
-            exp: now + JWT_EXP_TIME,
-            sub: self.username.to_string(),
-        };
-
-        let token = encode(&Header::default(),
-                           &payload,
-                           SECRET_KEY.as_ref())?;
-        Ok(Json(token))
+        let token = Token::new(self.username(), JWT_EXP_TIME);
+        Ok(token.encode())
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq)]
 pub struct Token {
     iat: i64,
     exp: i64,
-    pub sub: String,
+    sub: String,
 }
 
 impl Token {
+    fn new(username: &String, expires_in: i64) -> Self {
+        let now = time::get_time().sec;
+        Self {
+            iat: now,
+            exp: now + expires_in,
+            sub: username.to_string(),
+        }
+    }
+
+    pub fn encode(&self) -> String {
+        encode(&Header::default(), &self, SECRET_KEY.as_ref()).unwrap()
+    }
+
     pub fn username(&self) -> &String {
         &self.sub
     }
@@ -139,7 +145,7 @@ impl PasswordHash for String {
 
 #[cfg(test)]
 mod tests {
-    use crate::user::{PasswordHash, User, UserData};
+    use super::*;
 
     #[test]
     fn test_password_hashing() {
@@ -165,5 +171,39 @@ mod tests {
         let user: User = user_data.into();
         assert_eq!(user.username(), username);
         assert!(user.password_hash.is_password_hash_correct(password));
+    }
+
+    #[test]
+    fn test_token_from_string() {
+        let username = "some_user".to_string();
+        let token = Token::new(&username, 120);
+        let encoded_token = token.encode();
+        let restored_token = Token::try_from(encoded_token).unwrap();
+        assert_eq!(token, restored_token);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_token_expiring() {
+        let username = "some_user".to_string();
+        let token = Token::new(&username, -1);
+        let encoded_token = token.encode();
+        let _ = Token::try_from(encoded_token).unwrap();
+    }
+
+    #[test]
+    fn test_verify_password_and_generate_jwt() {
+        let password = &"some_password".to_string();
+        let username = &"some_user".to_string();
+        let user_data = UserData { username: username.to_string(), password: password.to_string() };
+        let user = User::from(user_data);
+
+        let token = user
+            .verify_password_and_generate_jwt(password.to_string())
+            .unwrap();
+
+        let restored_token = Token::try_from(token).unwrap();
+
+        assert_eq!(user.username(), restored_token.username())
     }
 }

@@ -20,5 +20,6 @@ pub fn new_user(user_data: Json<UserData>, conn: Database) -> ViewResult<User> {
 pub fn login(user_data: Json<UserData>, conn: Database) -> ViewResult<String> {
     let user_data = user_data.into_inner();
     let user: User = users.find(user_data.username).first::<User>(&*conn)?;
-    Ok(user.verify_password_and_generate_jwt(user_data.password)?)
+    let token = user.verify_password_and_generate_jwt(user_data.password)?;
+    Ok(Json(token))
 }

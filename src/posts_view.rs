@@ -14,26 +14,22 @@ const LIMIT: i64 = 0;
 
 #[post("/posts", format = "json", data = "<post>")]
 pub fn new_post(post: Json<PostData>, conn: Database, token: Token) -> ViewResult<Post> {
-    Ok(
-        Json(
-            diesel::insert_into(posts)
-                .values(post.into_inner())
-                .get_result(&*conn)?
-        )
-    )
+    let query_result = diesel::insert_into(posts)
+        .values((post.into_inner(), author.eq(token.sub)))
+        .get_result(&*conn)?;
+
+    Ok(Json(query_result))
 }
 
 #[get("/posts?<limit>&<offset>")]
 pub fn get_posts(conn: Database, limit: Option<i64>, offset: Option<i64>) -> ViewResult<Vec<Post>> {
-    Ok(
-        Json(
-            posts
-                .filter(published.eq(true))
-                .offset(offset.unwrap_or(OFFSET))
-                .limit(limit.unwrap_or(LIMIT))
-                .load::<Post>(&*conn)?
-        )
-    )
+    let query_result = posts
+        .filter(published.eq(true))
+        .offset(offset.unwrap_or(OFFSET))
+        .limit(limit.unwrap_or(LIMIT))
+        .load::<Post>(&*conn)?;
+
+    Ok(Json(query_result))
 }
 
 #[get("/posts/<post_id>")]

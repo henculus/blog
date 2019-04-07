@@ -1,48 +1,49 @@
 use rocket::http::{ContentType, Header};
 use rocket::local::{Client, LocalRequest};
-use serde_json;
 
 use super::*;
 
 struct TestContext {
-    token: String,
     client: Client,
+    token: Option<String>,
 }
 
 impl TestContext {
     pub fn new() -> Self {
         let rocket = create_app();
         let client = Client::new(rocket).unwrap();
-        let token = Self::create_user_and_login();
 
-        Self { client, token }
+        Self { client, token: None }
     }
 
-    fn create_user_and_login() -> String {
-        let rocket = create_app();
-        let client = Client::new(rocket).unwrap();
-        let serialized_user_data = r#"{"username": "some_user","password": "some_password"}"#;
+    fn create_user_and_get_token(&mut self) -> String {
+        self.clear_database();
+        use schema::users;
+        use diesel::prelude::*;
 
-        let _ = client
-            .post("/api/users")
-            .header(ContentType::JSON)
-            .body(serialized_user_data)
-            .dispatch();
+        let conn = Database::get_one(self.client.rocket()).unwrap();
 
-        let mut user_login_response = client
-            .post("/api/users/login")
-            .header(ContentType::JSON)
-            .body(serialized_user_data)
-            .dispatch();
+        let username = &"some_user".to_string();
+        let password = &"some_password".to_string();
+        let user_data = user::UserData { username: username.to_string(), password: password.to_string() };
+        let user = user::User::from(user_data);
 
-        let user_login_response_body = user_login_response.body_string().unwrap();
-        serde_json::from_str(&user_login_response_body).unwrap()
+        diesel::insert_into(users::table)
+            .values(&user)
+            .execute(&*conn)
+            .unwrap_or_default();
+
+        user.verify_password_and_generate_jwt(password.to_string()).unwrap()
     }
 
-    pub fn authorized_request(&self, method: Method, url: String) -> LocalRequest {
+    pub fn authorized_request(&mut self, method: Method, url: String) -> LocalRequest {
+        if self.token == None {
+            self.token = Some(self.create_user_and_get_token())
+        }
+        let token = self.token.as_ref().unwrap().to_string();
         self.client
             .req(method, url)
-            .header(Header::new("Authorization", format!("Bearer {}", self.token)))
+            .header(Header::new("Authorization", format!("Bearer {}", token)))
     }
 
     fn clear_database(&mut self) {
@@ -64,12 +65,26 @@ impl Drop for TestContext {
 
 #[test]
 fn test_get_user_post() {
-    let context = TestContext::new();
+    let mut context = TestContext::new();
 
     let response = context
         .authorized_request(Method::Get, "/api/posts".to_string())
         .dispatch();
 
     println!("{:?}", response);
-    assert_eq!(response.status().code, 200)
+    assert_eq!(200, response.status().code)
+}
+
+#[test]
+fn test_create_post() {
+    let mut context = TestContext::new();
+
+    let post_serialized = r#"{"title": "test", "body": "test"}"#;
+    let response = context
+        .authorized_request(Method::Post, "/api/posts".to_string())
+        .body(post_serialized)
+        .header(ContentType::JSON)
+        .dispatch();
+
+    assert_eq!(200, response.status().code)
 }

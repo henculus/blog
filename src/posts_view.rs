@@ -5,7 +5,8 @@ use crate::{Id, ViewResult};
 use crate::Database;
 use crate::post::{Post, PostData};
 use crate::schema::posts::dsl::*;
-use crate::user::Token;
+use crate::schema::users::dsl::*;
+use crate::user::{Token, User};
 
 const OFFSET: i64 = 10;
 const LIMIT: i64 = 0;
@@ -36,6 +37,15 @@ pub fn get_posts(conn: Database, limit: Option<i64>, offset: Option<i64>) -> Vie
 }
 
 #[get("/posts/<post_id>")]
+pub fn get_users_post(post_id: Id, conn: Database, token: Token) -> ViewResult<Post> {
+    let user: User = users.find(token.sub).get_result(&*conn)?;
+    let query_result = Post::belonging_to(&user)
+        .filter(id.eq(&post_id))
+        .get_result(&*conn)?;
+    Ok(Json(query_result))
+}
+
+#[get("/posts/<post_id>", rank = 2)]
 pub fn get_post(post_id: Id, conn: Database) -> ViewResult<Post> {
     let query_result = posts
         .filter(id.eq(&post_id).and(published.eq(true)))

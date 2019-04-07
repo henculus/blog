@@ -16,6 +16,8 @@ use crate::schema::users;
 const SECRET_KEY: &str = "l5KtZcWen4XT4F77Dg2shixUzaIqdWohQf9MEbnjBi0=";
 const JWT_K: &[u8] = b"";
 const JWT_X: &[u8] = b"";
+const HASH_SALT_LEN: usize = 10;
+const JWT_EXP_TIME: i64 = 86400;
 
 #[derive(Queryable, Identifiable, Insertable, Serialize, Deserialize, PartialEq, Debug)]
 #[primary_key(username)]
@@ -34,7 +36,7 @@ impl User {
         let now = time::get_time().sec;
         let payload = Token {
             iat: now,
-            exp: now + 86400,
+            exp: now + JWT_EXP_TIME,
             sub: self.username.to_string(),
         };
 
@@ -49,7 +51,7 @@ impl User {
 pub struct Token {
     iat: i64,
     exp: i64,
-    sub: String,
+    pub sub: String,
 }
 
 impl Token {
@@ -116,7 +118,10 @@ trait PasswordHash {
 
 impl PasswordHash for String {
     fn to_password_hash(&self) -> String {
-        let salt: String = thread_rng().sample_iter(&Alphanumeric).take(10).collect();
+        let salt: String = thread_rng()
+            .sample_iter(&Alphanumeric)
+            .take(HASH_SALT_LEN)
+            .collect();
 
         let data_hash = Encoded::default2i(
             self.as_bytes(),

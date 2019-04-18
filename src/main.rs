@@ -13,7 +13,11 @@ extern crate rocket;
 extern crate rocket_contrib;
 extern crate serde;
 
+use std::io;
+use std::path::{Path, PathBuf};
+
 use rocket::http::Method;
+use rocket::response::NamedFile;
 use rocket::Rocket;
 use rocket_contrib::json::Json;
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors};
@@ -35,6 +39,20 @@ type ViewResult<T> = std::result::Result<Json<T>, Error>;
 
 #[database("blog")]
 pub struct Database(diesel::PgConnection);
+
+#[get("/", rank = 10)]
+pub fn index() -> io::Result<NamedFile> {
+    NamedFile::open("static/dist/index.html")
+}
+
+// TODO: Handle forwarding to this request from /api routes, may be with request guard
+#[get("/<file..>", rank = 10)]
+pub fn files(file: PathBuf) -> Option<NamedFile> {
+    match NamedFile::open(Path::new("static/dist/").join(file)) {
+        Ok(file) => Some(file),
+        Err(_) => NamedFile::open("static/dist/index.html").ok(),
+    }
+}
 
 fn configure_cors() -> Cors {
     let allowed_origins = AllowedOrigins::some(
@@ -89,6 +107,13 @@ fn create_app() -> Rocket {
                 posts_view::publish_post,
                 users_view::new_user,
                 users_view::login,
+            ],
+        )
+        .mount(
+            "/",
+            routes![
+                index,
+                files,
             ],
         )
         .attach(cors)

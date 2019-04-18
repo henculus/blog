@@ -1,20 +1,25 @@
 use rocket::{Request, Response};
 use rocket::http::{ContentType, Status};
 use rocket::response::Responder;
-use rocket_contrib::json::Json;
+use rocket_contrib::json::{Json, JsonError};
 use serde::{Deserialize, Serialize};
 
 type DieselError = diesel::result::Error;
 type DatabaseErrorKind = diesel::result::DatabaseErrorKind;
+type JwtError = jsonwebtoken::errors::Error;
 
 #[derive(Debug)]
 pub enum Error {
+    JsonParseError(String),
+    InternalServerError,
+    EmptyTitle,
+    EmptyBody,
     UnimplementedError,
     WrongAuthType,
     NoAuthHeader,
-    TokenError(jsonwebtoken::errors::Error),
+    TokenError(JwtError),
     WrongPassword,
-    DieselError(diesel::result::Error),
+    DieselError(DieselError),
 }
 
 impl std::error::Error for Error {
@@ -32,11 +37,26 @@ impl std::fmt::Display for Error {
         match self {
             Error::TokenError(e) => write!(f, "{}", e.to_string()),
             Error::DieselError(e) => write!(f, "{}", e.to_string()),
+            Error::JsonParseError(e) => write!(f, "{}", e),
             _ => write!(f, "{:?}", self)
         }
     }
 }
 
+impl From<serde_json::error::Error> for Error {
+    fn from(e: serde_json::error::Error) -> Self {
+        Error::JsonParseError(e.to_string())
+    }
+}
+
+impl<'a> From<rocket_contrib::json::JsonError<'a>> for Error {
+    fn from(e: rocket_contrib::json::JsonError) -> Self {
+        match e {
+            JsonError::Io(_) => { Error::InternalServerError },
+            JsonError::Parse(_, e) => { e.into() },
+        }
+    }
+}
 
 impl From<diesel::result::Error> for Error {
     fn from(e: diesel::result::Error) -> Self {
@@ -74,7 +94,11 @@ impl<'a> Responder<'a> for Error {
                 },
                 DieselError::NotFound => resp.status(Status::NotFound),
                 _ => resp.status(Status::InternalServerError),
-            }
+            },
+            Error::EmptyBody => resp.status(Status::UnprocessableEntity),
+            Error::EmptyTitle => resp.status(Status::UnprocessableEntity),
+            Error::JsonParseError(_) => resp.status(Status::UnprocessableEntity),
+            Error::InternalServerError => resp.status(Status::InternalServerError),
         };
         let content = Json(error).respond_to(request)?;
         resp.header(ContentType::JSON).merge(content);

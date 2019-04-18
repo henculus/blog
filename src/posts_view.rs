@@ -1,5 +1,5 @@
 use diesel::prelude::*;
-use rocket_contrib::json::Json;
+use rocket_contrib::json::{Json, JsonError};
 
 use crate::{Id, ViewResult};
 use crate::Database;
@@ -11,11 +11,16 @@ use crate::user::{Token, User};
 const OFFSET: i64 = 10;
 const LIMIT: i64 = 0;
 
+type JsonForm<'a, T> = Result<Json<T>, JsonError<'a>>;
 
-#[post("/posts", format = "json", data = "<post>")]
-pub fn new_post(post: Json<PostData>, conn: Database, token: Token) -> ViewResult<Post> {
+#[post("/posts", format = "json", data = "<post_form>")]
+pub fn new_post(post_form: JsonForm<PostData>, conn: Database, token: Token) -> ViewResult<Post> {
+    let post = post_form?
+        .into_inner()
+        .validate()?;
+
     let query_result = diesel::insert_into(posts)
-        .values((post.into_inner(), author.eq(token.username())))
+        .values((post, author.eq(token.username())))
         .get_result(&*conn)?;
 
     Ok(Json(query_result))

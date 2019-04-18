@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+use crate::error::Error;
 use crate::Id;
 use crate::schema::posts;
 use crate::user::User;
@@ -20,4 +21,16 @@ pub struct Post {
 pub struct PostData {
     title: String,
     body: String,
+}
+
+impl PostData {
+    pub fn validate(self) -> Result<Self, Error> {
+        if self.title.trim() == "" {
+            return Err(Error::EmptyTitle);
+        }
+        if self.body.trim() == "" {
+            return Err(Error::EmptyBody)
+        }
+        Ok(self)
+    }
 }

@@ -33,6 +33,8 @@ test:
 
 production:
   stage: deploy
+  only:
+    - master
   script:
     - cd static/
     - npm install --progress=false

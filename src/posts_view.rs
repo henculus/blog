@@ -8,8 +8,8 @@ use crate::schema::posts::dsl::*;
 use crate::schema::users::dsl::*;
 use crate::user::{Token, User};
 
-const OFFSET: i64 = 10;
-const LIMIT: i64 = 0;
+const OFFSET: i64 = 0;
+const LIMIT: i64 = 10;
 
 type JsonForm<'a, T> = Result<Json<T>, JsonError<'a>>;
 

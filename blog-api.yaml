@@ -1,18 +1,211 @@
-swagger: "2.0"
+openapi: 3.0.0
 info:
-  title: Sample API
-  description: API description in Markdown.
-  version: 1.0.0
-host: api.example.com
-schemes:
-  - https
+  title: Blog API
+  description: Rust blog API specification
+  version: "1.0.0-oas3"
+servers:
+  - url: http://www.lupusanay.me/api
+    description: Production server hosted on heroku
+  - url: http://localhost:8000/api
+    description: Development local server
+tags:
+  - name: Users
+  - name: Posts
 paths:
-  /users:
-    get:
-      summary: Returns a list of users.
-      description: Optional extended description in Markdown.
-      produces:
-        - application/json
+  /posts:
+    post:
+      security:
+        - BearerAuth: [user]
+      summary: Creates new post
+      description: Accepts a json post body
+      tags:
+        - Posts
+      requestBody:
+        $ref: '#/components/requestBodies/PostBody'
       responses:
         200:
-          description: OK
+          description: Created post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+    get:
+      summary: Returns array of posts
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: offset
+          required: false
+          schema:
+            type: integer
+      tags:
+        - Posts
+      responses:
+        200:
+          description: Posts array with selected limit and offset
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+  /posts/{post_id}:
+    parameters:
+      - name: post_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    get:
+      tags:
+        - Posts
+      description: Returns specific post
+      responses:
+        200:
+          description: Selected post
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+        404:
+          description: Post not found
+    delete:
+      security:
+        - BearerAuth: [user]
+      tags:
+        - Posts
+      responses:
+        204:
+          description: Post deleted
+        404:
+          $ref: '#/components/responses/NotFound'
+    put:
+      security:
+        - BearerAuth: [user]
+      tags:
+        - Posts
+      responses:
+        204:
+          description: Post updated
+        401:
+          $ref: '#/components/responses/Unauthorized'
+        404:
+          $ref: '#/components/responses/NotFound'
+  /posts/{post_id}/publish:
+    parameters:
+      - name: post_id
+        in: path
+        required: true
+        schema:
+          type: integer
+    put:
+      security:
+        - BearerAuth: [user]
+      tags:
+        - Posts
+      responses:
+        200:
+          description: Post published
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Post'
+  /users:
+    post:
+      tags:
+        - Users
+      requestBody:
+        $ref: '#/components/requestBodies/UserBody'
+      responses:
+        200:
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        409:
+          $ref: '#/components/responses/Conflict'
+  /users/login:
+    post:
+      requestBody:
+        $ref: '#/components/requestBodies/UserBody'
+      tags:
+        - Users
+      responses:
+        200:
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+
+  requestBodies:
+    UserBody:
+      description: User request body
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+    PostBody:
+      description: Post request body
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Post'
+
+  schemas:
+    UserResponse:
+      properties:
+        username:
+          type: string
+          example: "JohnDoe"
+        password_hash:
+          type: string
+          example: "asd2334sFD5234"
+      required:
+        - username
+    User:
+      properties:
+        username:
+          type: string
+          example: "JohnDoe"
+        password:
+          type: string
+          example: "myVeRyStRoN44Pass_ord"
+      required:
+        - username
+        - password
+    Post:
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        body:
+          type: string
+      required:
+        - title
+        - body
+  responses:
+    Unauthorized:
+      description: Login successful
+    NotFound:
+      description: Not found
+    Conflict:
+      description: Conflict

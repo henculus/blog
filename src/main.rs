@@ -1,8 +1,10 @@
-#![feature(proc_macro_hygiene, decl_macro)]
+#![feature(proc_macro_hygiene, decl_macro, type_alias_enum_variants, type_ascription)]
 
 #[macro_use]
 extern crate diesel;
 extern crate dotenv;
+#[macro_use]
+extern crate log;
 extern crate r2d2;
 extern crate r2d2_diesel;
 #[macro_use]
@@ -11,53 +13,111 @@ extern crate rocket;
 extern crate rocket_contrib;
 extern crate serde;
 
-use rocket::http::Method;
-use rocket::Rocket;
-use rocket_cors::{AllowedHeaders, AllowedOrigins};
+use std::io;
+use std::path::{Path, PathBuf};
 
-mod models;
-mod views;
+use rocket::http::Method;
+use rocket::response::NamedFile;
+use rocket::Rocket;
+use rocket_contrib::json::Json;
+use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors};
+
+use crate::error::Error;
+
+mod posts_view;
+mod users_view;
+mod user;
+mod post;
+mod schema;
+mod error;
+
+#[cfg(test)]
+mod tests;
+
+type Id = i32;
+type ViewResult<T> = std::result::Result<Json<T>, Error>;
 
 #[database("blog")]
-pub struct DBConn(diesel::PgConnection);
+pub struct Database(diesel::PgConnection);
 
-fn create_app() -> Rocket {
-    let allowed_origins =
-        AllowedOrigins::some(&["http://www.lupusanay.me"], &["http://localhost:8080"]);
+#[get("/", rank = 10)]
+pub fn index() -> io::Result<NamedFile> {
+    NamedFile::open("static/dist/index.html")
+}
 
-    let cors = rocket_cors::CorsOptions {
+// TODO: Handle forwarding to this request from /api routes, may be with request guard
+#[get("/<file..>", rank = 10)]
+pub fn files(file: PathBuf) -> Option<NamedFile> {
+    match NamedFile::open(Path::new("static/dist/").join(file)) {
+        Ok(file) => Some(file),
+        Err(_) => NamedFile::open("static/dist/index.html").ok(),
+    }
+}
+
+fn configure_cors() -> Cors {
+    let allowed_origins = AllowedOrigins::some(
+        &["http://www.lupusanay.me"],
+        &["http://localhost:8080"],
+    );
+
+    let allowed_methods = vec![
+        Method::Get,
+        Method::Post,
+        Method::Put,
+        Method::Delete
+    ]
+        .into_iter()
+        .map(From::from)
+        .collect();
+
+    let allowed_headers = AllowedHeaders::some(
+        &[
+            "Authorization",
+            "Accept",
+            "Content-Type"
+        ]
+    );
+
+    let allow_credentials = true;
+
+    rocket_cors::CorsOptions {
         allowed_origins,
-        allowed_methods: vec![Method::Get, Method::Post, Method::Put, Method::Delete].into_iter().map(From::from).collect(),
-        allowed_headers: AllowedHeaders::some(&["Authorization", "Accept", "Content-Type"]),
-        allow_credentials: true,
+        allowed_methods,
+        allowed_headers,
+        allow_credentials,
         ..Default::default()
     }
         .to_cors()
-        .unwrap();
+        .unwrap()
+}
+
+fn create_app() -> Rocket {
+    let cors = configure_cors();
 
     rocket::ignite()
-        .register(catchers![
-            views::not_found,
-            views::service_unavailable,
-            views::bad_request,
-            views::unprocessable_entity
-        ])
         .mount(
             "/api",
             routes![
-                views::posts::new_post,
-                views::posts::get_post,
-                views::posts::get_posts,
-                views::posts::delete_post,
-                views::posts::update_post,
-                views::users::new_user,
-                views::users::login,
-                views::users::token
+                posts_view::new_post,
+                posts_view::get_users_post,
+                posts_view::get_post,
+                posts_view::get_posts,
+                posts_view::delete_post,
+                posts_view::update_post,
+                posts_view::publish_post,
+                users_view::new_user,
+                users_view::login,
             ],
         )
-        .mount("/", routes![views::index, views::files,])
+        .mount(
+            "/",
+            routes![
+                index,
+                files,
+            ],
+        )
         .attach(cors)
-        .attach(DBConn::fairing())
+        .attach(Database::fairing())
 }
 
 fn main() {

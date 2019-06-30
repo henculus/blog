@@ -16,6 +16,7 @@ pub enum Error {
     EmptyBody,
     UnimplementedError,
     WrongAuthType,
+    NoAuthCookie,
     NoAuthHeader,
     TokenError(JwtError),
     WrongPassword,
@@ -27,7 +28,7 @@ impl std::error::Error for Error {
         match self {
             Error::TokenError(e) => Some(e),
             Error::DieselError(e) => Some(e),
-            _ => None
+            _ => None,
         }
     }
 }
@@ -38,7 +39,7 @@ impl std::fmt::Display for Error {
             Error::TokenError(e) => write!(f, "{}", e.to_string()),
             Error::DieselError(e) => write!(f, "{}", e.to_string()),
             Error::JsonParseError(e) => write!(f, "{}", e),
-            _ => write!(f, "{:?}", self)
+            _ => write!(f, "{:?}", self),
         }
     }
 }
@@ -52,8 +53,8 @@ impl From<serde_json::error::Error> for Error {
 impl<'a> From<rocket_contrib::json::JsonError<'a>> for Error {
     fn from(e: rocket_contrib::json::JsonError) -> Self {
         match e {
-            JsonError::Io(_) => { Error::InternalServerError },
-            JsonError::Parse(_, e) => { e.into() },
+            JsonError::Io(_) => Error::InternalServerError,
+            JsonError::Parse(_, e) => e.into(),
         }
     }
 }
@@ -77,7 +78,9 @@ struct ErrorResponse {
 
 impl<'a> Responder<'a> for Error {
     fn respond_to(self, request: &Request) -> Result<Response<'a>, Status> {
-        let error = ErrorResponse { error: self.to_string() };
+        let error = ErrorResponse {
+            error: self.to_string(),
+        };
         let mut resp = Response::build();
         error!("{:#?}", self);
         match self {
@@ -99,6 +102,7 @@ impl<'a> Responder<'a> for Error {
             Error::EmptyTitle => resp.status(Status::UnprocessableEntity),
             Error::JsonParseError(_) => resp.status(Status::UnprocessableEntity),
             Error::InternalServerError => resp.status(Status::InternalServerError),
+            Error::NoAuthCookie => resp.status(Status::Unauthorized),
         };
         let content = Json(error).respond_to(request)?;
         resp.header(ContentType::JSON).merge(content);

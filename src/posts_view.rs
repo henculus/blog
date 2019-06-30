@@ -15,9 +15,7 @@ type JsonForm<'a, T> = Result<Json<T>, JsonError<'a>>;
 
 #[post("/posts", format = "json", data = "<post_form>")]
 pub fn new_post(post_form: JsonForm<PostData>, conn: Database, token: Token) -> ViewResult<Post> {
-    let post = post_form?
-        .into_inner()
-        .validate()?;
+    let post = post_form?.into_inner().validate()?;
 
     let query_result = diesel::insert_into(posts)
         .values((post, author.eq(token.username())))
@@ -54,19 +52,17 @@ pub fn get_post(post_id: Id, conn: Database) -> ViewResult<Post> {
     Ok(Json(query_result))
 }
 
-#[put("/posts/<post_id>", format = "application/json", data = "<post_data>")]
-pub fn update_post(post_id: Id, post_data: Json<PostData>, conn: Database, token: Token) -> ViewResult<Post> {
+#[patch("/posts/<post_id>", format = "application/json", data = "<post_data>")]
+pub fn update_post(
+    post_id: Id,
+    post_data: Json<PostData>,
+    conn: Database,
+    token: Token,
+) -> ViewResult<Post> {
     let post_data = post_data.into_inner();
     let original_post = posts.filter(id.eq(post_id).and(author.eq(token.username())));
-    let query_result = diesel::update(original_post).set(&post_data).get_result(&*conn)?;
-    Ok(Json(query_result))
-}
-
-#[put("/posts/<post_id>/publish")]
-pub fn publish_post(post_id: Id, conn: Database, token: Token) -> ViewResult<Post> {
-    let original_post = posts.filter(id.eq(post_id).and(author.eq(token.username())));
     let query_result = diesel::update(original_post)
-        .set(published.eq(true))
+        .set(&post_data)
         .get_result(&*conn)?;
     Ok(Json(query_result))
 }

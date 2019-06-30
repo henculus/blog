@@ -1,4 +1,9 @@
-#![feature(proc_macro_hygiene, decl_macro, type_alias_enum_variants, type_ascription)]
+#![feature(
+proc_macro_hygiene,
+decl_macro,
+type_alias_enum_variants,
+type_ascription
+)]
 
 #[macro_use]
 extern crate diesel;
@@ -16,20 +21,20 @@ extern crate serde;
 use std::io;
 use std::path::{Path, PathBuf};
 
-use rocket::http::Method;
-use rocket::response::NamedFile;
-use rocket::Rocket;
+use rocket::{Request, Response, Rocket};
+use rocket::http::{Method, Status};
+use rocket::response::{NamedFile, Responder};
 use rocket_contrib::json::Json;
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors};
 
 use crate::error::Error;
 
-mod posts_view;
-mod users_view;
-mod user;
-mod post;
-mod schema;
 mod error;
+mod post;
+mod posts_view;
+mod schema;
+mod user;
+mod users_view;
 
 #[cfg(test)]
 mod tests;
@@ -55,28 +60,15 @@ pub fn files(file: PathBuf) -> Option<NamedFile> {
 }
 
 fn configure_cors() -> Cors {
-    let allowed_origins = AllowedOrigins::some(
-        &["http://www.lupusanay.me"],
-        &["http://localhost:8080"],
-    );
+    let allowed_origins =
+        AllowedOrigins::some(&["http://www.lupusanay.me"], &["http://localhost:8080"]);
 
-    let allowed_methods = vec![
-        Method::Get,
-        Method::Post,
-        Method::Put,
-        Method::Delete
-    ]
+    let allowed_methods = vec![Method::Get, Method::Post, Method::Put, Method::Delete]
         .into_iter()
         .map(From::from)
         .collect();
 
-    let allowed_headers = AllowedHeaders::some(
-        &[
-            "Authorization",
-            "Accept",
-            "Content-Type"
-        ]
-    );
+    let allowed_headers = AllowedHeaders::some(&["Authorization", "Accept", "Content-Type"]);
 
     let allow_credentials = true;
 
@@ -104,18 +96,12 @@ fn create_app() -> Rocket {
                 posts_view::get_posts,
                 posts_view::delete_post,
                 posts_view::update_post,
-                posts_view::publish_post,
                 users_view::new_user,
                 users_view::login,
+                users_view::get_session_info,
             ],
         )
-        .mount(
-            "/",
-            routes![
-                index,
-                files,
-            ],
-        )
+        .mount("/", routes![index, files,])
         .attach(cors)
         .attach(Database::fairing())
 }

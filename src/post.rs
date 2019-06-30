@@ -29,7 +29,7 @@ impl PostData {
             return Err(Error::EmptyTitle);
         }
         if self.body.trim() == "" {
-            return Err(Error::EmptyBody)
+            return Err(Error::EmptyBody);
         }
         Ok(self)
     }

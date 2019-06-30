@@ -10,7 +10,7 @@ use super::*;
 struct TestContext {
     client: Client,
     token: Option<String>,
-    user: Option<User>
+    user: Option<User>,
 }
 
 impl TestContext {
@@ -18,12 +18,16 @@ impl TestContext {
         let rocket = create_app();
         let client = Client::new(rocket).unwrap();
 
-        Self { client, token: None, user: None }
+        Self {
+            client,
+            token: None,
+            user: None,
+        }
     }
 
     fn create_user_and_get_token(&mut self) -> String {
-        use schema::users;
         use diesel::prelude::*;
+        use schema::users;
 
         let conn = Database::get_one(self.client.rocket()).unwrap();
 
@@ -47,7 +51,9 @@ impl TestContext {
             .values(&user)
             .execute(&*conn)
             .unwrap_or_default();
-        let token = user.verify_password_and_generate_jwt(password.to_string()).unwrap();
+        let token = user
+            .verify_password_and_generate_jwt(password.to_string())
+            .unwrap();
         self.user = Some(user);
         token
     }
@@ -73,12 +79,13 @@ impl Drop for TestContext {
 
         let user = self.user.as_mut().unwrap();
 
-        diesel::delete(posts).filter(author.eq(user.username()))
+        diesel::delete(posts)
+            .filter(author.eq(user.username()))
             .execute(&*conn)
             .unwrap();
-//        diesel::delete(users).filter(username.eq(user.username()))
-//            .execute(&*conn)
-//            .unwrap();
+        //        diesel::delete(users).filter(username.eq(user.username()))
+        //            .execute(&*conn)
+        //            .unwrap();
     }
 }
 

@@ -8,6 +8,7 @@ use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome};
 use rocket::Request;
 use serde::{Deserialize, Serialize};
+use serde_json::to_string;
 
 use crate::Error;
 use crate::schema::users;
@@ -73,30 +74,44 @@ impl TryFrom<String> for Token {
         let data = decode::<Token>(
             &raw_token,
             SECRET_KEY.as_ref(),
-            &Validation::new(Algorithm::HS256))?;
+            &Validation::new(Algorithm::HS256),
+        )?;
         let token = data.claims;
 
         Ok(token)
     }
 }
 
+fn get_token_from_cookie(r: &Request) -> Result<String, Error> {
+    let cookie = r.cookies()
+        .get_private("token")
+        .ok_or(Error::NoAuthCookie)?;
+    Ok(cookie.value().to_string())
+}
+
+fn get_token_from_auth_header(request: &Request) -> Result<String, Error> {
+    let header = request
+        .headers()
+        .get_one("Authorization")
+        .ok_or(Error::NoAuthHeader)?;
+
+    match header.split(" ").collect::<Vec<&str>>().as_slice() {
+        ["Bearer", token] => Ok(token.to_string()),
+        _ => Err(Error::WrongAuthType),
+    }
+}
+
 impl<'a, 'r> FromRequest<'a, 'r> for Token {
     type Error = Error;
 
-    fn from_request(request: &'a Request<'r>) -> Outcome<Token, Self::Error> {
-        let header = match request.headers().get_one("Authorization") {
-            Some(h) => h,
-            None => return Outcome::Failure((Status::Unauthorized, Error::NoAuthHeader))
-        };
-        let header_parts: Vec<&str> = header.split(" ").collect();
-        if header_parts[0] != "Bearer" {
-            return Outcome::Failure((Status::Unauthorized, Error::WrongAuthType));
-        }
+    fn from_request(r: &'a Request<'r>) -> Outcome<Token, Self::Error> {
+        let token = get_token_from_auth_header(r)
+            .or(get_token_from_cookie(r))
+            .and_then(|t| Token::try_from(t));
 
-        let token = header_parts[1];
-        match Token::try_from(token.to_string()) {
+        match token {
             Ok(t) => Outcome::Success(t),
-            Err(e) => Outcome::Failure((Status::Unauthorized, e))
+            Err(e) => Outcome::Failure((Status::Unauthorized, e)),
         }
     }
 }
@@ -129,11 +144,7 @@ impl PasswordHash for String {
             .take(HASH_SALT_LEN)
             .collect();
 
-        let data_hash = Encoded::default2i(
-            self.as_bytes(),
-            salt.as_bytes(),
-            JWT_K,
-            JWT_X).to_u8();
+        let data_hash = Encoded::default2i(self.as_bytes(), salt.as_bytes(), JWT_K, JWT_X).to_u8();
         String::from_utf8(data_hash).unwrap()
     }
 
@@ -166,7 +177,10 @@ mod tests {
     fn test_user_from_user_data() {
         let username = &"Hello".to_string();
         let password = &"Hello".to_string();
-        let user_data = UserData { username: username.to_string(), password: password.to_string() };
+        let user_data = UserData {
+            username: username.to_string(),
+            password: password.to_string(),
+        };
 
         let user: User = user_data.into();
         assert_eq!(user.username(), username);
@@ -195,7 +209,10 @@ mod tests {
     fn test_verify_password_and_generate_jwt() {
         let password = &"some_password".to_string();
         let username = &"some_user".to_string();
-        let user_data = UserData { username: username.to_string(), password: password.to_string() };
+        let user_data = UserData {
+            username: username.to_string(),
+            password: password.to_string(),
+        };
         let user = User::from(user_data);
 
         let token = user
@@ -205,5 +222,16 @@ mod tests {
         let restored_token = Token::try_from(token).unwrap();
 
         assert_eq!(user.username(), restored_token.username())
+    }
+
+    #[test]
+    fn test_split_header() {
+        let header = "Bearer abcd";
+        let result = match header.split(" ").collect::<Vec<&str>>().as_slice() {
+            ["Bearer", token] => Ok(token.to_string()),
+            _ => Err(Error::NoAuthHeader),
+        }
+            .unwrap();
+        assert_eq!(result, "abcd")
     }
 }

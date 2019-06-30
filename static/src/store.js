@@ -9,7 +9,7 @@ const store = new Vuex.Store({
     state: {
         status: '',
         posts: [],
-        user: {}
+        user: {},
     },
     mutations: {
         auth_request(state) {
@@ -31,8 +31,9 @@ const store = new Vuex.Store({
         async login({commit}, user) {
             commit('auth_request');
             try {
-                let resp = await HTTP.post('/api/users/login/', user);
-                let payload_data = JSON.parse(atob(resp.data.split('.')[1]));
+                await HTTP.post('/session', user);
+                let response = await HTTP.get('/session');
+                let payload_data = JSON.parse(response.data);
                 commit('auth_success', payload_data)
             } catch (err) {
                 commit('auth_error', err);
@@ -43,6 +44,7 @@ const store = new Vuex.Store({
     getters: {
         isLoggedIn: state => !!state.user,
         authStatus: state => !!state.status,
+        user: state => state.user
     }
 });
 

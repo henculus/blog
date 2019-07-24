@@ -27,7 +27,7 @@
         },
 
         created() {
-            HTTP.get(`/api/posts/${this.$route.params.id}`)
+            HTTP.get(`/posts/${this.$route.params.id}`)
                 .then(
                     response => {
                         this.post = response.data

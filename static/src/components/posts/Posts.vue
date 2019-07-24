@@ -29,7 +29,7 @@
         },
 
         created() {
-            HTTP.get('/api/posts')
+            HTTP.get('/posts')
                 .then(
                     response => {
                         this.posts = response.data

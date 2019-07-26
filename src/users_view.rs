@@ -1,5 +1,5 @@
 use diesel::prelude::*;
-use rocket::http::{Cookie, Cookies};
+use rocket::http::{Cookie, Cookies, SameSite};
 use rocket_contrib::json::Json;
 
 use crate::{Database, Id};
@@ -46,7 +46,14 @@ pub fn login(user_data: Json<UserData>, conn: Database, mut cookies: Cookies) ->
     let user_data = user_data.into_inner();
     let user: User = users.find(user_data.username).first::<User>(&*conn)?;
     let token = user.verify_password_and_generate_jwt(user_data.password)?;
-    cookies.add_private(Cookie::new("token", token));
+
+    cookies.add_private(
+        Cookie::build("token", token)
+            .secure(true)
+            .same_site(SameSite::Strict)
+            .finish()
+    );
+
     Ok(())
 }
 

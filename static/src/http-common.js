@@ -7,5 +7,3 @@ export const HTTP = axios.create({
 
 HTTP.defaults.headers.post['Content-Type'] = 'application/json';
 HTTP.defaults.headers.put['Content-Type'] = 'application/json';
-
- 

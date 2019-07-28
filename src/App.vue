@@ -1,28 +1,35 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+    <div id="app">
+        <top-menu></top-menu>
+        <transition name="fade" mode="out-in">
+            <router-view class="page-content"></router-view>
+        </transition>
+    </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+    import TopMenu from './components/TopMenu'
 
-export default {
-  name: 'app',
-  components: {
-    HelloWorld
-  }
-}
+    export default {
+        name: 'app',
+        components: {
+            TopMenu,
+        },
+    }
+
+    //Уровни необходимости 1 - простая необходимая задача 2 - посредственная, менее важная, более сложная 3 - при условии выполенения полного проекта
+    //TODO 1. Ленивая загрузка картинок(1) 2. Редактор статей(3) 3. База данных (firebird) для работы со статьями, картинками и тд (2-3)
 </script>
 
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style lang="sass">
+    @import "normalize/normalize.css"
+    @import "variables"
+    html, body, #app
+        position: relative
+        top: 0
+        //background: rgba(128, 128, 128, 0.02)
+        text-rendering: optimizeLegibility
+        font-family: $default_font
+        //font-family: 'Montserrat Alternates', sans-serif;
+        width: 100%
 </style>

@@ -1,29 +1,5 @@
-# forest_material
+# Blog on Vue 
+## Simple blog/news site on Vue 
+### /IN DEVELOPMENT/
+![Alt text](https://i.imgur.com/JNObK7y.png)
 
-## Project setup
-```
-npm install
-```
-
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).

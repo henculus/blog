@@ -117,10 +117,10 @@
             display: block
             position: relative
             width: 100%
+            padding: 20px 10px
             .article-list
                 display: block
                 position: relative
-                padding: $content-padding-mobile
             .article-block-name
                 font-size: 1.6em
 </style>

@@ -1,7 +1,7 @@
 <template>
     <div class="article-list-wrapper">
+        <div class="article-block-name">Последние статьи</div>
         <div class="article-list">
-            <div class="block-name">Последние статьи</div>
             <article-list-item v-for="article in articles" :key="article.id" :article="article"></article-list-item>
         </div>
     </div>
@@ -97,10 +97,14 @@
 <style lang="sass" scoped>
     @import "../variables"
     .article-list-wrapper
+        display: flex
+        flex-direction: column
         margin: 0 auto
-        padding: 95px 0
-        width: 800px
-        .block-name
+        padding: 20px 0
+        width: 830px
+        .article-block-name
+            +deselect
+            //align-self: center
             font-size: 1.8em
             margin-bottom: 20px
         .article-list
@@ -116,7 +120,7 @@
             .article-list
                 display: block
                 position: relative
-                padding: 0 20px
-            .block-name
+                padding: $content-padding-mobile
+            .article-block-name
                 font-size: 1.6em
 </style>

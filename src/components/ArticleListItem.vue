@@ -27,8 +27,8 @@
         +deselect
         min-width: 200px
         position: relative
-        box-shadow: 0 0 4px rgba(0, 0, 0, 0.4)
-        //border: 1px solid rgb(238, 238, 238)
+        //box-shadow: 0 0 4px rgba(0, 0, 0, 0.4)
+        border: 1px solid $menu_border_color
         margin-bottom: 20px
         display: flex
         flex-direction: column
@@ -42,10 +42,8 @@
         -webkit-font-smoothing: subpixel-antialiased
         backface-visibility: hidden
         transform: scale(1)
-        +mediacursorpointer
-            &:hover
-                .top-image-wrapper .top-image-placeholder
-                    padding-bottom: 25%
+        //.top-image-placeholder
+            //padding-bottom: 25%
 
         .top-image-wrapper
             position: relative
@@ -57,13 +55,14 @@
             .top-image-placeholder
                 display: block
                 position: relative
-                transition: all 0.2s ease-in-out
-                padding-bottom: 14%
+                padding-bottom: 25%
 
             .top-image
                 transform: translateZ(0)
+                transition: all .2s ease-out
                 width: 100%
                 position: absolute
+                pointer-events: none
                 top: 0
                 left: 0
 
@@ -85,15 +84,22 @@
                 font-family: $default_font
 
     +mediascreensize_mobile
-        .top-image-wrapper
-            display: none
         .list-item
             font-size: 14px
             transition: all 0.15s ease-in-out
 
-            &:hover
-                //box-shadow: 0 0 10px rgba(98, 240, 193, 1)
-                transform: translateX(10px)
+            .top-image-wrapper
+                display: none
+
+        .no-touch .list-item:hover
+            border: 1px solid $rnt_green
+            box-shadow: 0 0 4px $rnt_green
+            //transform: translateX(5px)
+
+    .no-touch
+        .list-item:hover
+            .top-image
+                transform: scale(1.05)
 
 
 </style>

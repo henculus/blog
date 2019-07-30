@@ -47,7 +47,8 @@
 
     export default {
         name: "ArticleComponent",
-        components: {},
+        components: {
+        },
         data() {
             return {
                 card_info: {
@@ -159,14 +160,11 @@
             #content
                 width: 100%
                 margin: 20px auto
-                padding: 0 10px
+                padding: $content-padding-mobile
 
                 .article
                     font-size: 13px
             #top-card-wrapper
                 display: none
-            &
-                top: 70px
-
     //чтобы был нормальный отступ на мобилке
 </style>

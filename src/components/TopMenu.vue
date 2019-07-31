@@ -41,8 +41,8 @@
         justify-content: center
         //border-bottom: 1px $menu_border_color solid
     .top-menu
-        width: 830px
-        max-width: 830px
+        width: $content-width
+        max-width: $content-width
         display: flex
         flex-direction: row
         position: relative

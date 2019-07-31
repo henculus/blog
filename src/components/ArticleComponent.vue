@@ -1,6 +1,5 @@
 <template>
     <div id="content-wrapper">
-        <div></div>
         <div id="top-card-wrapper">
             <div id="top-card">
             </div>
@@ -102,7 +101,7 @@
                 position: absolute
 
         #content
-            max-width: 700px
+            max-width: $content-width
             margin: 60px auto
 
             .article

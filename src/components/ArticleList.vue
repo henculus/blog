@@ -101,11 +101,11 @@
         flex-direction: column
         margin: 0 auto
         padding: 20px 0
-        width: 830px
+        width: $content-width
         .article-block-name
             +deselect
             //align-self: center
-            font-size: 1.8em
+            font-size: 2em
             margin-bottom: 20px
         .article-list
             //width: 50%
@@ -122,5 +122,5 @@
                 display: block
                 position: relative
             .article-block-name
-                font-size: 1.6em
+                font-size: 1.8em
 </style>

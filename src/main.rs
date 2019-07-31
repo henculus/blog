@@ -102,6 +102,7 @@ fn create_app() -> Rocket {
             ],
         )
         .mount("/", routes![index, files,])
+        .attach(cors)
         .attach(Database::fairing())
 }
 

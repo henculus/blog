@@ -50,7 +50,7 @@ pub fn login(user_data: Json<UserData>, conn: Database, mut cookies: Cookies) ->
     cookies.add_private(
         Cookie::build("token", token)
             .secure(false)
-            .same_site(SameSite::Strict)
+            .same_site(SameSite::None)
             .finish()
     );
 

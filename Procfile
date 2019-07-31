@@ -1,2 +1,2 @@
-release: npm install -g @vue/cli-service
+release: npm install @vue/cli-service
 web: ./node_modules/.bin/vue-cli-service serve

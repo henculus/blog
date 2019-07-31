@@ -49,7 +49,7 @@ pub fn login(user_data: Json<UserData>, conn: Database, mut cookies: Cookies) ->
 
     cookies.add_private(
         Cookie::build("token", token)
-            .secure(true)
+            .secure(false)
             .same_site(SameSite::Strict)
             .finish()
     );

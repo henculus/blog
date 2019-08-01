@@ -3,6 +3,10 @@ import App from './App.vue'
 import VueRouter from "vue-router"
 import ArticleList from "@/components/ArticleList";
 import ArticleComponent from "@/components/ArticleComponent";
+import {watchForHover} from './hover_watcher'
+import store from "@/storage";
+
+
 
 Vue.config.productionTip = false
 
@@ -12,48 +16,22 @@ if ('scrollRestoration' in history) { //Отключение дефолтной 
     history.scrollRestoration = 'manual';
 }
 
-function watchForHover() {
-    var hasHoverClass = false;
-    var container = document.body;
-    var lastTouchTime = 0;
-
-    function enableHover() { //Добавляем .no-touch класс к body, если это не тач устройство
-        if (new Date() - lastTouchTime < 500) return; //Если удерживать на таче долго, то hover не сработает
-        if (hasHoverClass) return;
-
-        container.className += ' no-touch';
-        hasHoverClass = true;
-    }
-
-    function disableHover() {
-        if (!hasHoverClass) return;
-        container.className = container.className.replace(' no-touch', '');
-        hasHoverClass = false;
-    }
-
-    function updateLastTouchTime() {
-        lastTouchTime = new Date();
-    }
-
-    document.addEventListener('touchstart', updateLastTouchTime, true);
-    document.addEventListener('touchend', disableHover, true);
-    document.addEventListener('mousemove', enableHover, true);
-
-    enableHover();
-}
-
-watchForHover();
-
-Vue.directive('scroll', {
-    inserted: function (el, binding) {
-        let f = function (evt) {
-            if (binding.value(evt, el)) {
-                window.removeEventListener('scroll', f)
+Vue.directive('click-outside', {
+    bind(el, binding) {
+        el.clickOutsideEvent = function (event) {
+            if (!(el === event.target || el.contains(event.target))) {
+                store.dispatch(binding.arg)
             }
-        }
-        window.addEventListener('scroll', f)
+        };
+        document.body.addEventListener('mousedown', el.clickOutsideEvent);
+    },
+    unbind(el) {
+        document.body.removeEventListener('mousedown', el.clickOutsideEvent);
     }
-})
+});
+
+
+watchForHover(); //Коллим проверку на ховер
 
 const routes = [
     {
@@ -90,5 +68,6 @@ const router = new VueRouter({
 
 new Vue({
     render: h => h(App),
-    router
+    router,
+    store
 }).$mount('#app')

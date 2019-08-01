@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "axios": "^0.19.0",
     "core-js": "^2.6.5",
     "firebase": "^6.3.0",
     "node-sass": "^4.12.0",
@@ -15,7 +16,8 @@
     "vue": "^2.6.10",
     "vue-image-upload-resize": "^2.0.4",
     "vue-router": "^3.0.7",
-    "vuefire": "^2.0.0-alpha.24"
+    "vuefire": "^2.0.0-alpha.24",
+    "vuex": "^3.1.1"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.9.0",

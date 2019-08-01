@@ -4,22 +4,26 @@
         <transition name="fade" mode="out-in">
             <router-view class="page-content"></router-view>
         </transition>
+        <modal-authorization v-if="$store.state.AuthorizationShown"></modal-authorization>
     </div>
 </template>
 
 <script>
     import TopMenu from './components/TopMenu'
-
+    import ModalAuthorization from "@/components/ModalAuthorization";
     export default {
         name: 'app',
+        data(){
+            return{
+
+            }
+        },
         components: {
             TopMenu,
+            ModalAuthorization
         },
-
     }
 
-    //Уровни необходимости 1 - простая необходимая задача 2 - посредственная, менее важная, более сложная 3 - при условии выполенения полного проекта
-    //TODO 1. Ленивая загрузка картинок(1) 2. Редактор статей(3) 3. База данных (firebird) для работы со статьями, картинками и тд (2-3)
 </script>
 
 <style lang="sass">

@@ -361,3 +361,7 @@ button:focus, button:active
     outline: none;
     padding: 0;
 }
+input
+{
+ outline: none;
+}

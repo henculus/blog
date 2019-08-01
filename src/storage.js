@@ -1,23 +1,12 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { moduleAuthorizationShown } from './storage_modules/AuthorizationShown'
 
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
-    state: {
-        AuthorizationShown: false
-    },
-    mutations: {
-        ToggleAuthorizationShown(state)
-        {
-            state.AuthorizationShown = !state.AuthorizationShown
-        }
-    },
-    actions:{
-        ToggleAuthorizationShown({ commit })
-        {
-            commit('ToggleAuthorizationShown')
-        }
+    modules: {
+        AuthShown: moduleAuthorizationShown
     }
 })
 

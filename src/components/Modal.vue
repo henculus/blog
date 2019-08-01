@@ -1,8 +1,8 @@
 <template>
     <transition name="modal" appear>
         <div class="modal-wrapper">
-            <div class="modal-container" v-click-outside:ToggleAuthorizationShown>
-                <modal-close-button class="close" @click.native="$store.dispatch('ToggleAuthorizationShown')"></modal-close-button>
+            <div class="modal-container" v-click-outside>
+                <modal-close-button class="close" @click.native="$store.dispatch('AuthShown/ToggleAuthorizationShown')"></modal-close-button>
                 <div class="modal-header">
                     <slot name="header">
                         default header
@@ -17,7 +17,7 @@
 
                 <div class="modal-footer">
                     <slot name="footer">
-
+                        default footer
                     </slot>
                 </div>
             </div>
@@ -55,6 +55,8 @@
             display: flex
             transition: all .3s ease
             flex-direction: column
+            justify-content: center
+            align-items: center
             background: white
             border-radius: $block_border_radius
             padding: 50px
@@ -69,8 +71,11 @@
                 +deselect
                 margin-bottom: 30px
                 font-size: 1.6em
+            .modal-body
+                width: 100%
             .modal-footer
                 +deselect
+                width: 100%
                 font-size: 1.4em
                 margin-top: 30px
 
@@ -84,6 +89,12 @@
         transform: scale(0.6)
     .modal-enter-to, .modal-leave
         opacity: 1
+    +mediascreensize_mobile
+        .modal-wrapper
+            .modal-container
+                width: 100%
+                height: 100%
+                border-radius: 0
 </style>
 
 <style lang="sass">

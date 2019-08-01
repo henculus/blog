@@ -1,5 +1,5 @@
 <template>
-    <Modal>
+    <Modal @clickOutside="closeAuth">
         <template v-slot:header>
             <span>Вход</span>
         </template>
@@ -55,6 +55,9 @@
                     }
                 )
 
+            },
+            closeAuth: function () {
+                this.$store.dispatch('AuthShown/ToggleAuthorizationShown')
             }
         },
         mounted() {
@@ -78,6 +81,7 @@
             border-radius: $block_border_radius
             border: 1px solid $menu_border_color
             transition: all .2s ease
+            width: 100%
 
             &:focus
                 border: 1px solid $rnt_green

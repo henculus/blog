@@ -39,8 +39,8 @@ const router = new VueRouter({
     }
 });
 router.beforeEach((to, from, next) => {
-    if (store.state.AuthorizationShown) {
-        store.dispatch('ToggleAuthorizationShown')
+    if (store.state.AuthShown.AuthorizationShown) {
+        store.dispatch('AuthShown/ToggleAuthorizationShown')
         next(false)
     } else
         next()

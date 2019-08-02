@@ -58,6 +58,10 @@ pub fn login(user_data: Json<UserData>, conn: Database, mut cookies: Cookies) ->
 }
 
 #[delete("/session")]
-pub fn logout(token: Token, conn: Database) -> ViewResult<()> {
-    unimplemented!()
+pub fn logout(token: Token, mut cookies: Cookies) -> Result<(), Error> {
+    cookies.remove_private(
+        Cookie::named("token")
+    );
+
+    Ok(())
 }

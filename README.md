@@ -1,5 +1,8 @@
 # Blog on Vue 
 ## Simple blog/news site on Vue 
 ### /IN DEVELOPMENT/
-![Alt text](https://i.imgur.com/VwwUu8l.png)
+Main feed
+![Alt text](https://i.imgur.com/5ujDnGT.png)
+Article
+![Alt text](https://i.imgur.com/XAWQPiT.png)
 

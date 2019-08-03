@@ -29,9 +29,9 @@
         watch: {
             AuthorizationShown: function (newState) {
                 if (newState)
-                    document.documentElement.style.overflow = 'hidden';
+                    document.body.style.overflow = 'hidden';
                 else
-                    document.documentElement.style.overflow = 'visible';
+                    document.body.style.overflow = 'visible';
             }
         }
     }
@@ -43,6 +43,7 @@
     @import "variables"
     html, body, #app
         position: relative
+        display: block
         top: 0
         //background: rgba(128, 128, 128, 0.02)
         text-rendering: optimizeLegibility

@@ -78,7 +78,6 @@
         #top-card-wrapper
             display: block
             position: relative
-            box-shadow: $bottom_box_shadow
             background: lightgray
             width: 100%
             //max-height: 50vh
@@ -92,17 +91,19 @@
             background: url("../assets/banner/banner.jpg") no-repeat bottom
             background-size: cover
 
-            &:before
+            &:after
+                display: block
                 left: 0
                 right: 0
                 bottom: 0
                 top: 0
                 content: ''
                 position: absolute
+                box-shadow: inset 0 6px 6px rgba(0, 0, 0, 0.5), inset 0 -6px 6px rgba(0, 0, 0, 0.5)
 
         #content
             max-width: $content-width
-            margin: 60px auto
+            margin: 30px auto
 
             .article
                 word-wrap: break-word

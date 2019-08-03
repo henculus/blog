@@ -16,8 +16,7 @@
     .close-button
         display: block
         position: relative
-        width: 20px
-        height: 20px
+        width: 16px
+        height: 16px
         fill: black
-        transition: fill .2s ease
 </style>

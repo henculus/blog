@@ -1,101 +1,84 @@
 <template>
-    <Modal @clickOutside="closeAuth">
-        <template v-slot:header>
-            <span>Вход</span>
-        </template>
-        <template v-slot:body>
-            <form name="authorization" @keypress.enter="authorization">
-                <div class="form-item form-item--login">
-                    <input class="input" v-model="user.username" type="text" id="blog-login" placeholder="Логин"/>
-                </div>
-                <div class="form-item form-item--password">
-                    <input class="input" v-model="user.password" type="password" id="password"
-                           placeholder="Пароль"/>
-                </div>
-            </form>
-        </template>
-        <template v-slot:footer>
-            <button class="button button-authorize" @click="authorization">Войти</button>
-        </template>
-    </Modal>
+    <keep-alive>
+        <component
+                @switch="currentComponent==='login-component' ? currentComponent='reg-component' : currentComponent='login-component'"
+                :is="currentComponent"></component> <!--Придумать как сделать, чтобы модальное окно не перезагружалось-->
+    </keep-alive>
 </template>
 
 <script>
-    import Modal from "@/components/Modal";
-    import {HTTP} from '../server_defaults'
+    import ModalAuthorizationLogin from "@/components/ModalAuthorizationLogin";
+    import ModalAuthorizationRegistration from "@/components/ModalAuthorizationRegistration";
 
     export default {
         name: "ModalAuthorization",
         components: {
-            Modal
+            'login-component': ModalAuthorizationLogin,
+            'reg-component': ModalAuthorizationRegistration
         },
         data() {
             return {
-                user: {
-                    username: '',
-                    password: ''
-                }
+                currentComponent: 'login-component'
             }
         },
-        methods: {
-            authorization: function () {
-                HTTP({
-                    method: 'post',
-                    url: '/session',
-                    headers: {'Content-type': 'application/json'},
-                    dataType: 'application/json',
-                    data: this.user,
-                    withCredentials: true,
-                    crossDomain: true
-                }).then(response => {
-                    /* eslint-disable */
-                        console.log(response)
-                        HTTP.get('/session', {withCredentials: true})
-                            .then(response => console.log(response))
-                    }
-                )
 
-            },
-            closeAuth: function () {
-                this.$store.dispatch('AuthShown/ToggleAuthorizationShown')
-            }
-        },
-        mounted() {
-
-        }
     }
 </script>
 
 
-<style lang="sass" scoped>
+<style lang="sass">
     @import "../variables"
-    .form-item
-        margin-bottom: 10px
+    .authorization
+        width: 100%
 
-        &:last-child
-            margin-bottom: 0
-
-        .input
-            height: 50px
-            padding: 0 10px
-            border-radius: $block_border_radius
-            border: 1px solid $menu_border_color
-            transition: all .2s ease
+        .form-item
+            margin-bottom: 10px
             width: 100%
 
-            &:focus
-                border: 1px solid $rnt_green
 
-    .button-authorize
-        background: white
-        border-radius: $block_border_radius
-        border: 1px solid $menu_border_color
-        height: 50px
-        width: 100%
-        transition: all .2s ease
+            &:last-child
+                margin-bottom: 0
 
-    .no-touch .button-authorize:hover
-        background: $rnt_green
-        border: 1px solid $rnt_green
-        color: white
+            .input
+                display: block
+                position: relative
+                height: 50px
+                padding: 0 10px
+                border-radius: $block_border_radius
+                border: 1px solid $menu_border_color
+                transition: all .3s ease
+                width: 100%
+
+                &:focus
+                    border-color: $rnt_green
+
+        .button-authorize
+            border: none
+            margin-top: 20px
+            font-weight: bold
+            background: $rnt_green
+            color: white
+            border-radius: $block_border_radius
+            height: 50px
+            width: 100%
+            transition: all .2s ease
+
+    .header-text
+        font-size: 1.8em
+        font-weight: bold
+        color: $rnt_green
+
+    .reg-link
+        transition: $ease_transition02
+        cursor: pointer
+        font-size: 1em
+        color: #007de6
+
+    .no-touch
+        .button-authorize:hover
+            background: #3dd779
+            color: white
+
+        .reg-link:hover
+            color: #00abf5
 </style>

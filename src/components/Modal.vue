@@ -1,24 +1,27 @@
 <template>
     <transition name="modal" appear>
-        <div class="modal-wrapper">
-            <div class="modal-container" v-click-outside>
-                <modal-close-button class="close" @click.native="$store.dispatch('AuthShown/ToggleAuthorizationShown')"></modal-close-button>
-                <div class="modal-header">
-                    <slot name="header">
-                        default header
-                    </slot>
-                </div>
+        <div class="modal-wrapper" @click="$store.dispatch('AuthShown/ToggleAuthorizationShown')">
+            <div class="modal-container" @click="modalClick">
+                <modal-close-button class="close"
+                                    @click.native="$store.dispatch('AuthShown/ToggleAuthorizationShown')"></modal-close-button>
+                <div class="modal-content">
 
-                <div class="modal-body">
-                    <slot name="body">
-                        default body
-                    </slot>
-                </div>
+                    <div class="modal-header modal-element">
+                        <slot name="header">
+                            default header
+                        </slot>
+                    </div>
 
-                <div class="modal-footer">
-                    <slot name="footer">
-                        default footer
-                    </slot>
+                    <div class="modal-body modal-element">
+                        <slot name="body">
+                            default body
+                        </slot>
+                    </div>
+
+                    <div class="modal-footer modal-element">
+                        <slot name="footer">
+                        </slot>
+                    </div>
                 </div>
             </div>
         </div>
@@ -27,10 +30,16 @@
 
 <script>
     import ModalCloseButton from "@/components/ModalCloseButton";
+
     export default {
         name: "Modal",
         components: {
             ModalCloseButton
+        },
+        methods: {
+            modalClick: function (event) {
+                event.stopPropagation()
+            }
         }
     }
 </script>
@@ -42,62 +51,92 @@
         position: fixed
         display: flex
         flex-direction: row
-        justify-content: center
         align-items: center
+        justify-content: center
         z-index: 9998
         top: 0
         left: 0
         width: 100%
         height: 100%
         background-color: rgba(0, 0, 0, .8)
+        overflow-y: auto
+
         .modal-container
-            position: relative
+            position: absolute
+            max-height: 100%
             display: flex
-            transition: all .3s ease
             flex-direction: column
-            justify-content: center
             align-items: center
+            transition: all .3s ease
             background: white
             border-radius: $block_border_radius
-            padding: 50px
-            .close
-                +deselect
-                position: absolute
+            //padding: 50px
+            max-width: 560px
+            overflow-y: auto
+            .modal-content
+                position: relative
                 display: block
-                padding: 5px
-                top: 20px
-                right: 20px
+                padding: 50px 50px 30px 50px
+                height: auto
+                width: 100%
+            .modal-element
+                position: relative
+                display: block
+
             .modal-header
                 +deselect
                 margin-bottom: 30px
-                font-size: 1.6em
+
             .modal-body
                 width: 100%
+
             .modal-footer
                 +deselect
+                margin-top: 20px
                 width: 100%
-                font-size: 1.4em
-                margin-top: 30px
+
+        .close
+            +deselect
+            border-radius: 100%
+            z-index: 9999
+            position: absolute
+            display: block
+            top: 15px
+            right: 15px
+            padding: 10px
 
     .modal-enter-active, .modal-leave-active
         transition: all .2s
 
     .modal-enter, .modal-leave-to
         opacity: 0
+
     .modal-enter .modal-container,
     .modal-leave-to .modal-container
         transform: scale(0.6)
+
     .modal-enter-to, .modal-leave
         opacity: 1
+
     +mediascreensize_mobile
         .modal-wrapper
+            //background: white Полностью белый экран - скорее нет, чем да
             .modal-container
                 width: 100%
-                height: 100%
                 border-radius: 0
+
 </style>
 
 <style lang="sass">
-    .no-touch .close:hover .close-button
-        fill: red
+    @import "../variables"
+    .close
+        transition: $ease_transition02
+        .close-button
+            transition: $ease_transition02
+    .no-touch
+        .close:hover
+            background: rgba(255, 0, 37, 0.06)
+            .close-button
+                fill: #ff0025
+
 </style>

@@ -35,7 +35,7 @@ test:
 production:dev:
   stage: deploy
   only:
-    - master
+    - dev
   script:
     - cd frontend/
     - npm install --progress=false

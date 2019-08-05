@@ -36,7 +36,7 @@ production:
   only:
     - master
   script:
-    - cd static/
+    - cd frontend/
     - npm install --progress=false
     - npm run build
     - cd ../

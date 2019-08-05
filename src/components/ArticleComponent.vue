@@ -76,7 +76,7 @@
         position: relative
 
         #top-card-wrapper
-            display: block
+            display: none
             position: relative
             background: lightgray
             width: 100%
@@ -102,12 +102,12 @@
                 box-shadow: inset 0 6px 6px rgba(0, 0, 0, 0.5), inset 0 -6px 6px rgba(0, 0, 0, 0.5)
 
         #content
-            max-width: $content-width
-            margin: 30px auto
-
+            width: 100%
+            margin: 20px auto
+            padding: $content-padding-mobile
             .article
                 word-wrap: break-word
-                font-size: 16px
+                font-size: 13px
 
                 .headline
                     .title
@@ -156,15 +156,14 @@
                 //grid-template-columns: repeat(3, minmax(300px, 1fr))
                 grid-gap: 20px
 
-        +mediascreensize_mobile
+        +media_screensize_mobile
             #content
-                width: 100%
-                margin: 20px auto
-                padding: $content-padding-mobile
+                max-width: $content-width
+                margin: 30px auto
 
                 .article
-                    font-size: 13px
+                    font-size: 16px
             #top-card-wrapper
-                display: none
+                display: block
     //чтобы был нормальный отступ на мобилке
 </style>

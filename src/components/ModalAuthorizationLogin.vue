@@ -1,10 +1,10 @@
 <template>
-    <Modal key="modal">
-        <template v-slot:header>
+    <div class="modal-content">
+        <div class="modal-header modal-element">
             <span class="header-text">Вход</span>
-        </template>
-        <template v-slot:body>
-            <form class="authorization" name="authorization" @keypress.enter="sendLoginData" @submit="onSubmitForm">
+        </div>
+        <div class="modal-body modal-element">
+            <form class="authorization" name="authorization" @submit.prevent @keyup.enter="sendLoginData">
                 <div class="form-item form-item--login">
                     <input class="input" v-model="user.username" type="text" id="blog-login" placeholder="Логин"/>
                 </div>
@@ -12,24 +12,22 @@
                     <input class="input" v-model="user.password" type="password" id="password"
                            placeholder="Пароль"/>
                 </div>
-                <button class="button button-authorize" @click="sendLoginData">Войти</button>
+                <input class="button button-authorize" value="Войти" type="submit" @mousedown="sendLoginData">
             </form>
-        </template>
-        <template class="modal-footer" v-slot:footer>
+        </div>
+        <div class="modal-footer modal-element">
             <span class="reg-link" @click="$emit('switch')">Создать аккаунт</span>
-        </template>
-    </Modal>
+        </div>
+    </div>
 </template>
 
 <script>
     import {HTTP} from '../server_defaults'
-    import Modal from "@/components/Modal";
 
     export default {
         name: "ModalAuthorizationLogin",
-        components: {Modal},
-        data(){
-            return{
+        data() {
+            return {
                 user: {
                     username: '',
                     password: ''
@@ -55,14 +53,11 @@
                 )
 
             },
-            onSubmitForm: function (event) {
-                event.preventDefault()
-            },
         },
     }
 
 </script>
 
 <style lang="sass" scoped>
-
+    @import "../modal_auth_style"
 </style>

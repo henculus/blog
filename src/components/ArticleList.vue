@@ -100,27 +100,25 @@
         display: flex
         flex-direction: column
         margin: 0 auto
-        padding: 20px 0
-        width: $content-width
+        padding: 20px 10px
+        width: 100%
+
         .article-block-name
             +deselect
             //align-self: center
-            font-size: 2em
+            font-size: 1.8em
+
             margin-bottom: 20px
         .article-list
             //width: 50%
             position: relative
             display: block
 
-    +mediascreensize_mobile
+    +media_screensize_mobile
         .article-list-wrapper
-            display: block
             position: relative
-            width: 100%
-            padding: 20px 10px
-            .article-list
-                display: block
-                position: relative
+            width: $content-width
+            padding: 20px 0
             .article-block-name
-                font-size: 1.8em
+                font-size: 2em
 </style>

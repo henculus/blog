@@ -1,40 +1,22 @@
 <template>
-    <transition name="modal" appear>
-        <div class="modal-wrapper" @click="$store.dispatch('AuthShown/ToggleAuthorizationShown')">
-            <div class="modal-container" @click="modalClick">
-                <modal-close-button class="close"
-                                    @click.native="$store.dispatch('AuthShown/ToggleAuthorizationShown')"></modal-close-button>
-                <div class="modal-content">
-
-                    <div class="modal-header modal-element">
-                        <slot name="header">
-                            default header
-                        </slot>
-                    </div>
-
-                    <div class="modal-body modal-element">
-                        <slot name="body">
-                            default body
-                        </slot>
-                    </div>
-
-                    <div class="modal-footer modal-element">
-                        <slot name="footer">
-                        </slot>
-                    </div>
-                </div>
-            </div>
+    <div class="modal-wrapper" @click="$store.dispatch('ModalShownStore/ToggleModalShown')">
+        <div class="modal-container" @click="modalClick">
+            <modal-close-button class="close"
+                                @click.native="$store.dispatch('ModalShownStore/ToggleModalShown')"></modal-close-button>
+            <component :is="$store.state.ModalShownStore.ModalComponent"></component>
         </div>
-    </transition>
+    </div>
 </template>
 
 <script>
     import ModalCloseButton from "@/components/ModalCloseButton";
+    import ModalAuthorization from "@/components/ModalAuthorization";
 
     export default {
         name: "Modal",
         components: {
-            ModalCloseButton
+            ModalCloseButton,
+            ModalAuthorization
         },
         methods: {
             modalClick: function (event) {
@@ -67,33 +49,12 @@
             display: flex
             flex-direction: column
             align-items: center
-            transition: all .3s ease
+            transition: $ease_transition02
             background: white
-            border-radius: $block_border_radius
-            //padding: 50px
             max-width: 560px
             overflow-y: auto
-            .modal-content
-                position: relative
-                display: block
-                padding: 50px 50px 30px 50px
-                height: auto
-                width: 100%
-            .modal-element
-                position: relative
-                display: block
-
-            .modal-header
-                +deselect
-                margin-bottom: 30px
-
-            .modal-body
-                width: 100%
-
-            .modal-footer
-                +deselect
-                margin-top: 20px
-                width: 100%
+            width: 100%
+            border-radius: 0
 
         .close
             +deselect
@@ -105,25 +66,20 @@
             right: 15px
             padding: 10px
 
-    .modal-enter-active, .modal-leave-active
-        transition: all .2s
-
-    .modal-enter, .modal-leave-to
+    .modal-content-enter, .modal-content-leave-to
         opacity: 0
 
-    .modal-enter .modal-container,
-    .modal-leave-to .modal-container
-        transform: scale(0.6)
-
-    .modal-enter-to, .modal-leave
+    .modal-content-enter-to, .modal-content-leave
         opacity: 1
 
-    +mediascreensize_mobile
+    .modal-content-leave-active, .modal-content-enter-active
+        transition: $ease_transition02
+
+    +media_screensize_mobile
         .modal-wrapper
-            //background: white Полностью белый экран - скорее нет, чем да
             .modal-container
-                width: 100%
-                border-radius: 0
+                border-radius: $block_border_radius
+                width: auto
 
 </style>
 
@@ -131,11 +87,14 @@
     @import "../variables"
     .close
         transition: $ease_transition02
+
         .close-button
             transition: $ease_transition02
+
     .no-touch
         .close:hover
             background: rgba(255, 0, 37, 0.06)
+
             .close-button
                 fill: #ff0025
 

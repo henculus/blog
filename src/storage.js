@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { moduleAuthorizationShown } from './storage_modules/AuthorizationShown'
+import { moduleModalShown } from './storage_modules/ModalShown'
 
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
     modules: {
-        AuthShown: moduleAuthorizationShown
+        ModalShownStore: moduleModalShown
     }
 })
 

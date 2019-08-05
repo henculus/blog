@@ -1,16 +1,18 @@
 <template>
     <div id="app">
         <top-menu></top-menu>
-        <transition name="fade" mode="out-in">
+        <transition name="fade" mode="out-in" appear>
             <router-view class="page-content"></router-view>
         </transition>
-        <modal-authorization v-if="$store.state.AuthShown.AuthorizationShown"></modal-authorization>
+        <transition name="modal">
+            <modal v-if="$store.state.ModalShownStore.ModalShown"></modal>
+        </transition>
     </div>
 </template>
 
 <script>
     import TopMenu from './components/TopMenu'
-    import ModalAuthorization from "@/components/ModalAuthorization";
+    import Modal from "@/components/Modal"
 
     export default {
         name: 'app',
@@ -19,15 +21,15 @@
         },
         components: {
             TopMenu,
-            ModalAuthorization
+            Modal
         },
         computed: {
-            AuthorizationShown: function () {
-                return this.$store.state.AuthShown.AuthorizationShown
+            ModalShown: function () {
+                return this.$store.state.ModalShownStore.ModalShown
             }
         },
         watch: {
-            AuthorizationShown: function (newState) {
+            ModalShown: function (newState) {
                 if (newState)
                     document.body.style.overflow = 'hidden';
                 else
@@ -45,9 +47,20 @@
         position: relative
         display: block
         top: 0
-        //background: rgba(128, 128, 128, 0.02)
         text-rendering: optimizeLegibility
         font-family: $default_font
-        //font-family: 'Montserrat Alternates', sans-serif;
         width: 100%
+
+    .modal-enter-active, .modal-leave-active
+        transition: all .2s
+
+    .modal-enter, .modal-leave-to
+        opacity: 0
+
+    .modal-enter .modal-container,
+    .modal-leave-to .modal-container
+        transform: scale(0.6)
+
+    .modal-enter-to, .modal-leave
+        opacity: 1
 </style>

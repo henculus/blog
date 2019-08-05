@@ -19,16 +19,17 @@ $border_style: 1px solid black
 $rnt_green: #00E676
 $menu_border_color: #e6e6e6
 $content-padding-mobile: 0 10px
-$content-width: 830px
-$ease_transition02: all .2s ease
+$content-width: 820px
+$ease_transition02: all .2s ease-in-out
 
 =deselect
   -ms-user-select: none
   -moz-user-select: none
   -webkit-user-select: none
   user-select: none
-=mediascreensize_mobile
-  @media (max-width: 850px)
+
+=media_screensize_mobile
+  @media (min-width: 850px)
     @content
 
 .fade-enter-active, .fade-leave-active

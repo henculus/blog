@@ -36,16 +36,18 @@
         background: white
         color: black
         border-radius: $block_border_radius
-        font-size: 16px
         font-style: normal
         font-weight: 400
         -webkit-font-smoothing: subpixel-antialiased
         backface-visibility: hidden
         transform: scale(1)
+        font-size: 14px
+        transition: all 0.15s ease-in-out
         //.top-image-placeholder
             //padding-bottom: 25%
 
         .top-image-wrapper
+            display: none
             position: relative
             overflow: hidden
             border-top-right-radius: $block_border_radius
@@ -82,19 +84,18 @@
             .article-content
                 position: relative
                 font-family: $default_font
+    .no-touch .list-item:hover
+        border: 1px solid $rnt_green
+        box-shadow: 0 0 4px $rnt_green
 
-    +mediascreensize_mobile
+    +media_screensize_mobile
         .list-item
-            font-size: 14px
-            transition: all 0.15s ease-in-out
-
+            font-size: 16px
             .top-image-wrapper
-                display: none
-
+                display: block
         .no-touch .list-item:hover
-            border: 1px solid $rnt_green
-            box-shadow: 0 0 4px $rnt_green
-            //transform: translateX(5px)
+            border: 1px solid $menu_border_color
+            box-shadow: none
 
     .no-touch
         .list-item:hover

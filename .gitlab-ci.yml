@@ -31,7 +31,19 @@ test:
       - cargo/
       - target/
 
-production:
+production:dev:
+  stage: deploy
+  only:
+    - master
+  script:
+    - cd frontend/
+    - npm install --progress=false
+    - npm run build
+    - cd ../
+    - rm -rf cargo/ target/ ci/ static/
+    - dpl --provider=heroku --app=lupusanay-blog-rust --api-key=$HEROKU_PRODUCTION_API_KEY --skip_cleanup
+
+production:master:
   stage: deploy
   only:
     - master
@@ -42,3 +54,4 @@ production:
     - cd ../
     - rm -rf cargo/ target/ ci/
     - dpl --provider=heroku --app=lupusanay-blog-rust --api-key=$HEROKU_PRODUCTION_API_KEY --skip_cleanup
+  when: manual

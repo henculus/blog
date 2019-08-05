@@ -47,15 +47,15 @@ pub struct Database(diesel::PgConnection);
 
 #[get("/", rank = 10)]
 pub fn index() -> io::Result<NamedFile> {
-    NamedFile::open("static/dist/index.html")
+    NamedFile::open("frontend/dist/index.html")
 }
 
 // TODO: Handle forwarding to this request from /api routes, may be with request guard
 #[get("/<file..>", rank = 10)]
 pub fn files(file: PathBuf) -> Option<NamedFile> {
-    match NamedFile::open(Path::new("static/dist/").join(file)) {
+    match NamedFile::open(Path::new("frontend/dist/").join(file)) {
         Ok(file) => Some(file),
-        Err(_) => NamedFile::open("static/dist/index.html").ok(),
+        Err(_) => NamedFile::open("frontend/dist/index.html").ok(),
     }
 }
 

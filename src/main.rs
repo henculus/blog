@@ -63,16 +63,19 @@ pub fn files(file: PathBuf) -> Option<NamedFile> {
 
 fn configure_cors() -> Cors {
     let allowed_origins =
-        AllowedOrigins::some(
-            &["https://www.lupusanay.me"],
-            &["http://localhost:8080"],
-            &["https://localhost:8080"],
-            &["http://0.0.0.0:8080"],
-            &["https://0.0.0.0:8080"],
-            &["http://localhost:8000"],
-            &["https://localhost:8000"],
-            &["http://0.0.0.0:8000"],
-            &["https://0.0.0.0:8000"],
+        AllowedOrigins::some_exact(
+            &[
+                "https://www.lupusanay.me",
+                "https://lupusanay.me",
+                "http://localhost:8080",
+                "https://localhost:8080",
+                "http://0.0.0.0:8080",
+                "https://0.0.0.0:8080",
+                "http://localhost:8000",
+                "https://localhost:8000",
+                "http://0.0.0.0:8000",
+                "https://0.0.0.0:8000"
+            ],
         );
 
     let allowed_methods = vec![Method::Get, Method::Post, Method::Put, Method::Delete]

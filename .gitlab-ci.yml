@@ -37,6 +37,8 @@ production:dev:
   only:
     - dev
   script:
+    - git submodule sync --recursive
+    - git submodule update --recursive --remote
     - cd frontend/
     - npm install --progress=false
     - npm run build

@@ -24,8 +24,10 @@ use std::path::{Path, PathBuf};
 use rocket::{Request, Response, Rocket};
 use rocket::http::{Method, Status};
 use rocket::response::{NamedFile, Responder};
+use rocket_contrib::helmet::{Hsts, SpaceHelmet};
 use rocket_contrib::json::Json;
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors};
+use time::Duration;
 
 use crate::error::Error;
 
@@ -61,7 +63,7 @@ pub fn files(file: PathBuf) -> Option<NamedFile> {
 
 fn configure_cors() -> Cors {
     let allowed_origins =
-        AllowedOrigins::some(&["http://www.lupusanay.me"], &["http://localhost:8080"]);
+        AllowedOrigins::some(&["https://www.lupusanay.me"], &["https://localhost:8080"]);
 
     let allowed_methods = vec![Method::Get, Method::Post, Method::Put, Method::Delete]
         .into_iter()
@@ -103,6 +105,7 @@ fn create_app() -> Rocket {
         )
         .mount("/", routes![index, files,])
         .attach(cors)
+        .attach(SpaceHelmet::default().enable(Hsts::IncludeSubDomains(Duration::days(30))))
         .attach(Database::fairing())
 }
 

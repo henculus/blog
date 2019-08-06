@@ -1,0 +1,43 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat&display=swap')
+@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')
+@import url('https://fonts.googleapis.com/css?family=Playfair+Display&display=swap')
+@import url('https://fonts.googleapis.com/css?family=Lora&display=swap')
+
+$menu_color: #1c1918
+$menu_height: 70px
+$menu_text_color: #cecece
+$menu_font_size: 18px
+$bottom_box_shadow: 0 2px 4px rgba(0, 0, 0, 0.5)
+$default_font: 'Montserrat', sans-serif
+$title_font: 'Playfair Display', serif
+$subtitle_font: 'Open Sans', sans-serif
+$article_font: 'Lora', serif
+$banner_height: 45vh
+$subtitle-color: #b0b0b0
+$block_border_radius: 8px
+$border_style: 1px solid black
+$rnt_green: #00E676
+$menu_border_color: #e6e6e6
+$content-padding-mobile: 0 10px
+$content-width: 820px
+$ease_transition02: all .2s ease-in-out
+
+=deselect
+  -ms-user-select: none
+  -moz-user-select: none
+  -webkit-user-select: none
+  user-select: none
+
+=media_screensize_mobile
+  @media (min-width: 850px)
+    @content
+
+.fade-enter-active, .fade-leave-active
+  transition: opacity 0.15s
+.fade-enter, .fade-leave-to
+  opacity: 0
+.fade-enter-to, .fade-leave
+  opacity: 1
+
+
+

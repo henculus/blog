@@ -1,0 +1,89 @@
+@import "variables"
+$form_disabled_button: rgb(215, 215, 215)
+.modal-content
+  position: relative
+  display: block
+  height: auto
+  padding: 50px 50px 30px 50px
+  width: 100%
+
+  .modal-element
+    position: relative
+    display: block
+
+  .modal-header
+    +deselect
+    margin-bottom: 30px
+
+  .modal-footer
+    +deselect
+    display: flex
+    flex-direction: column
+    margin-top: 20px
+    width: 100%
+    .reg-link
+      transition: $ease_transition02
+      cursor: pointer
+      font-size: 1em
+      color: #007de6
+  .error_message
+    font-weight: bold
+    color: red
+    padding: 0 0 20px 0
+
+
+  .modal-body
+    width: 100%
+
+    .authorization
+      width: 100%
+
+    .form-item
+      margin-bottom: 10px
+      width: 100%
+
+
+      &:last-child
+        margin-bottom: 0
+
+      .input
+        display: block
+        position: relative
+        height: 50px
+        padding: 0 10px
+        border-radius: $block_border_radius
+        border: 1px solid $menu_border_color
+        transition: all .3s ease
+        width: 100%
+
+        &:focus
+          border-color: $rnt_green
+
+    .button-authorize
+      cursor: pointer
+      border: none
+      margin-top: 20px
+      font-weight: bold
+      background: $rnt_green
+      color: white
+      border-radius: $block_border_radius
+      height: 50px
+      width: 100%
+      transition: all .2s ease
+      &:disabled
+        background: $form_disabled_button
+
+  .header-text
+    font-size: 1.8em
+    font-weight: bold
+    color: $rnt_green
+
+.no-touch
+  .button-authorize:hover
+    background: #3dd779
+    color: white
+  .button-authorize:disabled:hover
+    background: $form_disabled_button
+
+  .reg-link:hover
+    color: #00abf5

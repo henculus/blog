@@ -24,8 +24,10 @@ use std::path::{Path, PathBuf};
 use rocket::{Request, Response, Rocket};
 use rocket::http::{Method, Status};
 use rocket::response::{NamedFile, Responder};
+use rocket_contrib::helmet::{Hsts, SpaceHelmet};
 use rocket_contrib::json::Json;
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors};
+use time::Duration;
 
 use crate::error::Error;
 
@@ -47,21 +49,34 @@ pub struct Database(diesel::PgConnection);
 
 #[get("/", rank = 10)]
 pub fn index() -> io::Result<NamedFile> {
-    NamedFile::open("static/dist/index.html")
+    NamedFile::open("frontend/dist/index.html")
 }
 
 // TODO: Handle forwarding to this request from /api routes, may be with request guard
 #[get("/<file..>", rank = 10)]
 pub fn files(file: PathBuf) -> Option<NamedFile> {
-    match NamedFile::open(Path::new("static/dist/").join(file)) {
+    match NamedFile::open(Path::new("frontend/dist/").join(file)) {
         Ok(file) => Some(file),
-        Err(_) => NamedFile::open("static/dist/index.html").ok(),
+        Err(_) => NamedFile::open("frontend/dist/index.html").ok(),
     }
 }
 
 fn configure_cors() -> Cors {
     let allowed_origins =
-        AllowedOrigins::some(&["http://www.lupusanay.me"], &["http://localhost:8080"]);
+        AllowedOrigins::some_exact(
+            &[
+                "https://www.lupusanay.me",
+                "https://lupusanay.me",
+                "http://localhost:8080",
+                "https://localhost:8080",
+                "http://0.0.0.0:8080",
+                "https://0.0.0.0:8080",
+                "http://localhost:8000",
+                "https://localhost:8000",
+                "http://0.0.0.0:8000",
+                "https://0.0.0.0:8000"
+            ],
+        );
 
     let allowed_methods = vec![Method::Get, Method::Post, Method::Put, Method::Delete]
         .into_iter()
@@ -103,6 +118,7 @@ fn create_app() -> Rocket {
         )
         .mount("/", routes![index, files,])
         .attach(cors)
+        .attach(SpaceHelmet::default().enable(Hsts::IncludeSubDomains(Duration::days(30))))
         .attach(Database::fairing())
 }
 

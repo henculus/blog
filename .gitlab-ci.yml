@@ -9,7 +9,6 @@ stages:
 variables:
   CARGO_HOME: $CI_PROJECT_DIR/cargo
   APT_CACHE_DIR: $CI_PROJECT_DIR/apt
-  GIT_SUBMODULE_STRATEGY: recursive
 
 test:
   services:
@@ -37,13 +36,11 @@ production:dev:
   only:
     - dev
   script:
-    - git submodule sync --recursive
-    - git submodule update --recursive --remote
     - cd frontend/
     - npm install --progress=false
     - npm run build
     - cd ../
-    - rm -rf cargo/ target/ ci/ static/
+    - rm -rf cargo/ target/ ci/ old-frontend/
     - dpl --provider=heroku --app=lupusanay-blog-rust --api-key=$HEROKU_PRODUCTION_API_KEY --skip_cleanup
 
 production:master:

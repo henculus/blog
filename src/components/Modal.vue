@@ -1,9 +1,9 @@
 <template>
-    <div class="modal-wrapper" @click="$store.dispatch('ModalShownStore/ToggleModalShown')">
-        <div class="modal-container" @click="modalClick">
+    <div class="modal-wrapper" @click="modalClose">
+        <div :class="{'disabled': isDisabled}" class="modal-container" @click="modalClick">
             <modal-close-button class="close"
-                                @click.native="$store.dispatch('ModalShownStore/ToggleModalShown')"></modal-close-button>
-            <component :is="$store.state.ModalShownStore.ModalComponent"></component>
+                                @click.native="modalClose"></modal-close-button>
+            <component @disableForm="disableForm" :is="$store.state.ModalShownStore.ModalComponent"></component>
         </div>
     </div>
 </template>
@@ -18,9 +18,21 @@
             ModalCloseButton,
             ModalAuthorization
         },
+        data(){
+            return{
+                isDisabled: false
+            }
+        },
         methods: {
+            modalClose: function(){
+                if (!this.isDisabled)
+                    this.$store.dispatch('ModalShownStore/ToggleModalShown')
+            },
             modalClick: function (event) {
                 event.stopPropagation()
+            },
+            disableForm: function (state) {
+                this.isDisabled = state
             }
         }
     }
@@ -44,6 +56,7 @@
         overflow-y: auto
 
         .modal-container
+            pointer-events: all
             position: absolute
             max-height: 100%
             display: flex
@@ -55,6 +68,18 @@
             overflow-y: auto
             width: 100%
             border-radius: 0
+            &:after
+                content: ''
+                transition: all .1s ease
+            &.disabled
+                pointer-events: none
+                &:after
+                    width: 100%
+                    height: 100%
+                    content: ''
+                    position: absolute
+                    background: rgba(0, 0, 0, 0.5)
+                    z-index: 10000
 
         .close
             +deselect
@@ -79,7 +104,7 @@
         .modal-wrapper
             .modal-container
                 border-radius: $block_border_radius
-                width: auto
+                max-width: 400px
 
 </style>
 

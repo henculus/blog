@@ -365,3 +365,8 @@ input
 {
  outline: none;
 }
+
+:focus {outline:none;}
+input::-moz-focus-inner {border:0;}
+
+

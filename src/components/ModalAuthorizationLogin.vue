@@ -6,14 +6,15 @@
         <div class="modal-body modal-element">
             <form class="authorization" name="authorization" @submit.prevent @keyup.enter="sendLoginData">
                 <div class="form-item form-item--login">
-                    <input class="input" v-model="user.username" type="text" id="blog-login" placeholder="Логин"/>
+                    <input class="input" v-model="user.username" type="text" id="blog-login" placeholder="Логин"
+                           autocomplete="off"/>
                 </div>
                 <div class="form-item form-item--password">
                     <input class="input" v-model="user.password" type="password" id="password"
-                           placeholder="Пароль"/>
+                           placeholder="Пароль" autocomplete="off"/>
                 </div>
-                <input class="button button-authorize" value="Войти" type="submit" @mousedown="sendLoginData"
-                       :disabled="isDisabled">
+                <span v-if="error_message" class="error_message">{{ error_message }}</span>
+                <input class="button button-authorize" value="Войти" type="submit" @mousedown="sendLoginData">
             </form>
         </div>
         <div class="modal-footer modal-element">
@@ -26,6 +27,7 @@
     import {HTTP} from '../server_defaults'
 
     export default {
+        //TODO Сделать модуль авторизации vuex с state isAuthorized true/false
         name: "ModalAuthorizationLogin",
         data() {
             return {
@@ -33,6 +35,7 @@
                     username: '',
                     password: ''
                 },
+                error_message: undefined,
                 isDisabled: false
             }
         },
@@ -40,7 +43,9 @@
             /* eslint-disable */
             sendLoginData: function () {
                 if (!this.isDisabled) {
+                    this.error_message = undefined
                     this.isDisabled = true
+                    this.$emit('disableForm', this.isDisabled)
                     let self = this
                     HTTP({
                         method: 'post',
@@ -52,33 +57,41 @@
                         crossDomain: true
                     }).then(
                         response => {
-                            if (response.status !== 200) {
-                                //Проверка кодов и вывод ошибок (проблемы с сервером, POST ошибка)
-                                self.isDisabled = false
-                            }
-                            console.log(response)
+                            console.log(response) //Логаем ответ POST
                             HTTP.get('/session', {withCredentials: true})
                                 .then(response => {
-                                        if (response.status !== 200) {
-                                            //Так же обработка ошибок (неверный пароль, юзера нет и тд)
-                                            self.isDisabled = false
-                                        }
-                                        if (response.status === 200) {
-                                            self.$store.dispatch('ModalShownStore/ToggleModalShown', '')
-                                        }
-                                        console.log(response)
-                                    })
+                                    if (response.status === 200) { //Успешный вход
+                                        self.$store.dispatch('ModalShownStore/ToggleModalShown', '')
+                                        self.$emit('disableForm', this.isDisabled)
+                                    }
+                                    console.log(response) //Логаем ответ GET
+                                })
                                 .catch(error => {
                                     //Ошибка get (А так бывает? o_0)
                                 })
                         })
                         .catch(error => {
-                            //Серьезная ошибка серва (например Cors :) )
+                            //Ошибка от серва (404, 401 и тд)
                             self.isDisabled = false
+                            self.$emit('disableForm', this.isDisabled)
+                            if (error.response.status === 404) {
+                                self.error_message = 'Такого пользователя нет'
+                            }
+                            if (error.response.status === 401) {
+                                self.error_message = 'Неверный пароль'
+                            }
                         })
                 }
             },
         },
+        watch: {
+            user: {
+                handler: function (newData, oldData) {
+                    this.error_message = undefined
+                },
+                deep: true
+            }
+        }
     }
 
 </script>

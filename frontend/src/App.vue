@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <top-menu></top-menu>
+        <top-bar></top-bar>
         <transition name="fade" mode="out-in" appear>
             <router-view class="page-content"></router-view>
         </transition>
@@ -11,22 +11,38 @@
 </template>
 
 <script>
-    import TopMenu from './components/TopMenu'
+    import TopBar from './components/TopBar'
     import Modal from "@/components/Modal"
 
     export default {
         name: 'app',
         data() {
-            return {}
+            return {
+                authorized: false,
+                sub: undefined
+            }
         },
         components: {
-            TopMenu,
+            TopBar,
             Modal
+        },
+        beforeMount: function(){
+            this.authorized = window.localStorage.getItem('authorized')
+            this.sub = window.localStorage.getItem('sub')
+            this.$store.dispatch('AuthorizationStore/CheckAuthorize').then(
+                //eslint-disable-next-line
+                result => {
+
+                },
+                error => {
+                    console.log(error)
+                }
+            )
         },
         computed: {
             ModalShown: function () {
                 return this.$store.state.ModalShownStore.ModalShown
-            }
+            },
         },
         watch: {
             ModalShown: function (newState) {
@@ -34,7 +50,7 @@
                     document.body.style.overflow = 'hidden';
                 else
                     document.body.style.overflow = 'visible';
-            }
+            },
         }
     }
 

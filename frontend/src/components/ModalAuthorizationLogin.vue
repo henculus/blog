@@ -27,7 +27,6 @@
     import {HTTP} from '../server_defaults'
 
     export default {
-        //TODO Сделать модуль авторизации vuex с state isAuthorized true/false
         name: "ModalAuthorizationLogin",
         data() {
             return {
@@ -57,18 +56,11 @@
                         crossDomain: true
                     }).then(
                         response => {
-                            console.log(response) //Логаем ответ POST
-                            HTTP.get('/session', {withCredentials: true})
-                                .then(response => {
-                                    if (response.status === 200) { //Успешный вход
-                                        self.$store.dispatch('ModalShownStore/ToggleModalShown', '')
-                                        self.$emit('disableForm', this.isDisabled)
-                                    }
-                                    console.log(response) //Логаем ответ GET
-                                })
-                                .catch(error => {
-                                    //Ошибка get (А так бывает? o_0)
-                                })
+                            if (response.status === 200) { //Успешный вход
+                                self.$store.dispatch('ModalShownStore/ToggleModalShown', '')
+                                self.$emit('disableForm', this.isDisabled)
+                                self.$store.dispatch('AuthorizationStore/CheckAuthorize')
+                            }
                         })
                         .catch(error => {
                             //Ошибка от серва (404, 401 и тд)

@@ -71,7 +71,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for NonApiGuard {
         let uri_from_request = request.uri().path();
 
         if uri_from_request.starts_with("/api") {
-            Outcome::Failure((Status::BadRequest, Error::UnimplementedError))
+            Outcome::Forward(())
         } else {
             Outcome::Success((NonApiGuard))
         }

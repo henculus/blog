@@ -56,6 +56,10 @@
         overflow-y: auto
 
         .modal-container
+            left: 0
+            right: 0
+            margin: $content-padding-mobile
+            border-radius: $block_border_radius
             pointer-events: all
             position: absolute
             max-height: 100%
@@ -64,10 +68,8 @@
             align-items: center
             transition: $ease_transition02
             background: white
-            max-width: 560px
+            //max-width: 560px
             overflow-y: auto
-            width: 100%
-            border-radius: 0
             &:after
                 content: ''
                 transition: all .1s ease
@@ -100,11 +102,13 @@
     .modal-content-leave-active, .modal-content-enter-active
         transition: $ease_transition02
 
-    +media_screensize_mobile
+    +media_screensize_mobile_small
         .modal-wrapper
             .modal-container
-                border-radius: $block_border_radius
+                left: auto
+                right: auto
                 max-width: 400px
+                margin: 0
 
 </style>
 

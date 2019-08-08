@@ -15,7 +15,8 @@
 
 <script>
     //TODO Возможно начать сохранять состояние loading при выполнении запросов
-    import { HTTP } from '../server_defaults'
+    import {HTTP} from '../server_defaults'
+
     export default {
         name: "TopBarContextMenu",
         methods: {
@@ -47,42 +48,57 @@
         border-radius: $block_border_radius
         right: 0
         top: $menu_height + 10px
-        min-width: 100%
         background: white
         display: block
         position: absolute
+        margin: $content-padding-mobile
+        left: 0
+
         .arrow
             z-index: 1
-            right: 15px
             top: -10px
             height: 10px
+            right: 35px
             width: 0
             border-color: transparent
             border-style: dashed dashed solid
             border-width: 0 8.5px 8.5px
             border-bottom-color: #fff
             position: absolute
+
         .arrow--before
             z-index: 0
             top: -11px
             border-bottom-color: $menu_border_color
+
         .menu-list
             margin: 0
             padding: 0
             text-decoration: none
             list-style: none
+
             .menu-list__item
                 cursor: pointer
                 white-space: nowrap
                 padding: 20px 10px
                 border-bottom: 1px solid $menu_border_color
                 transition: $ease_transition02
+
                 &:hover
                     color: $rnt_green
+
                 &:last-child
                     border-bottom: none
+
+    +media_screensize_mobile_small
+        .context-menu-wrapper
+            left: auto
+            min-width: 300px
+            margin: $content-padding-mobile
     +media_screensize_mobile
         .context-menu-wrapper
+            margin: 0
             min-width: 300px
-            width: auto
+            .arrow
+                right: 15px
 </style>

@@ -5,7 +5,8 @@ export const moduleAuthorization = {
     state: {
         exp: window.localStorage.getItem('exp'),
         sub: window.localStorage.getItem('sub') || '',
-        iat: window.localStorage.getItem('iat')
+        iat: window.localStorage.getItem('iat'),
+        isLoading: false
     }
     ,
     mutations: {
@@ -13,8 +14,10 @@ export const moduleAuthorization = {
             state.exp = data.exp
             state.iat = data.iat
             state.sub = data.sub
-
         },
+        ToggleLoading(state){
+            state.isLoading = !state.isLoading
+        }
     }
     ,
     actions: {
@@ -30,13 +33,20 @@ export const moduleAuthorization = {
                     })
                     .catch(error => {
                         // eslint-disable-next-line
-                        window.localStorage.removeItem('sub')
-                        commit('CheckAuthorize', {})
-                        reject(error.response.status)
+                        if (error.response) {
+                            window.localStorage.removeItem('sub')
+                            commit('CheckAuthorize', {})
+                            reject(error.response.status)
+                        }
+                        else
+                            console.log('Упс, сервер упал') //Сервер упал(
                     })
             })
-
+        },
+        ToggleLoading({commit}) {
+            commit('ToggleLoading')
         }
+
     },
     getters: {
         isAuthorized: state => !!state.sub

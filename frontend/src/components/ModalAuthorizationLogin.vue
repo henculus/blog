@@ -31,20 +31,18 @@
         data() {
             return {
                 user: {
-                    username: '',
-                    password: ''
+                    username: undefined,
+                    password: undefined
                 },
                 error_message: undefined,
-                isDisabled: false
             }
         },
         methods: {
             /* eslint-disable */
             sendLoginData: function () {
                 if (!this.isDisabled) {
-                    this.error_message = undefined
-                    this.isDisabled = true
-                    this.$emit('disableForm', this.isDisabled)
+                    this.error_message = undefined //Очищаем поле ошибки
+                    this.$store.dispatch('AuthorizationStore/ToggleLoading') //Ставим isLoading в true
                     let self = this
                     HTTP({
                         method: 'post',
@@ -57,21 +55,28 @@
                     }).then(
                         response => {
                             if (response.status === 200) { //Успешный вход
-                                self.$store.dispatch('ModalShownStore/ToggleModalShown', '')
-                                self.$emit('disableForm', this.isDisabled)
-                                self.$store.dispatch('AuthorizationStore/CheckAuthorize')
+                                self.$store.dispatch('ModalShownStore/ToggleModalShown', '') //Отключаем отображение modal
+                                self.$store.dispatch('AuthorizationStore/CheckAuthorize').then(() =>
+                                    self.$store.dispatch('AuthorizationStore/ToggleLoading') //Ставим isLoading в false
+                                )
+                            }
+                            else { //Сюда сложно попасть (невозможно)
+                                self.$store.dispatch('AuthorizationStore/ToggleLoading') //Ставим isLoading в false (крайний случай)
                             }
                         })
                         .catch(error => {
                             //Ошибка от серва (404, 401 и тд)
-                            self.isDisabled = false
-                            self.$emit('disableForm', this.isDisabled)
-                            if (error.response.status === 404) {
-                                self.error_message = 'Такого пользователя нет'
+                            self.$store.dispatch('AuthorizationStore/ToggleLoading') //Ставим isLoading в false
+                            if(error.response) {
+                                if (error.response.status === 404) {
+                                    self.error_message = 'Такого пользователя нет'
+                                }
+                                if (error.response.status === 401) {
+                                    self.error_message = 'Неверный пароль'
+                                }
                             }
-                            if (error.response.status === 401) {
-                                self.error_message = 'Неверный пароль'
-                            }
+                            else
+                                self.error_message = 'Ошибка сервера'
                         })
                 }
             },

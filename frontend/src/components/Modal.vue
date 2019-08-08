@@ -1,9 +1,9 @@
 <template>
     <div class="modal-wrapper" @click="modalClose">
-        <div :class="{'disabled': isDisabled}" class="modal-container" @click="modalClick">
+        <div :class="{'disabled': $store.state.AuthorizationStore.isLoading}" class="modal-container" @click="modalClick">
             <modal-close-button class="close"
                                 @click.native="modalClose"></modal-close-button>
-            <component @disableForm="disableForm" :is="$store.state.ModalShownStore.ModalComponent"></component>
+            <component :is="$store.state.ModalShownStore.ModalComponent"></component>
         </div>
     </div>
 </template>
@@ -25,15 +25,12 @@
         },
         methods: {
             modalClose: function(){
-                if (!this.isDisabled)
+                if (!this.$store.state.AuthorizationStore.isLoading)
                     this.$store.dispatch('ModalShownStore/ToggleModalShown')
             },
             modalClick: function (event) {
                 event.stopPropagation()
             },
-            disableForm: function (state) {
-                this.isDisabled = state
-            }
         }
     }
 </script>
@@ -70,6 +67,7 @@
             background: white
             //max-width: 560px
             overflow-y: auto
+            min-width: 280px
             &:after
                 content: ''
                 transition: all .1s ease
@@ -107,7 +105,7 @@
             .modal-container
                 left: auto
                 right: auto
-                max-width: 400px
+                width: 400px
                 margin: 0
 
 </style>

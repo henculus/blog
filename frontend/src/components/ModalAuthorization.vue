@@ -1,7 +1,7 @@
 <template>
     <transition name="modal-content" mode="out-in">
         <keep-alive>
-            <component @disableForm = "modalDisableForm"
+            <component
                     @switch="currentComponent==='login-component' ? currentComponent='reg-component' : currentComponent='login-component'"
                     :is="currentComponent"></component>
 
@@ -26,11 +26,7 @@
                 currentComponent: 'login-component'
             }
         },
-        methods: {
-            modalDisableForm: function (state) {
-                this.$emit('disableForm', state)
-            }
-        }
+        methods: {}
 
     }
 </script>

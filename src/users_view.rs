@@ -8,9 +8,17 @@ use crate::schema::users::dsl::*;
 use crate::user::{Token, User, UserData};
 use crate::ViewResult;
 
-#[get("/users")]
-pub fn get_users(conn: Database) -> ViewResult<Vec<User>> {
-    unimplemented!()
+const OFFSET: i64 = 0;
+const LIMIT: i64 = 10;
+
+#[get("/users?<limit>&<offset>")]
+pub fn get_users(conn: Database, token: Token, limit: Option<i64>, offset: Option<i64>) -> ViewResult<Vec<User>> {
+    let all_users = users
+        .offset(offset.unwrap_or(OFFSET))
+        .limit(limit.unwrap_or(LIMIT))
+        .load::<User>(&*conn)?;
+
+    Ok(Json(all_users))
 }
 
 #[post("/users", format = "json", data = "<user_data>")]

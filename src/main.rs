@@ -131,6 +131,7 @@ fn create_app() -> Rocket {
                 users_view::new_user,
                 users_view::login,
                 users_view::get_session_info,
+                users_view::get_users,
                 users_view::logout,
             ],
         )

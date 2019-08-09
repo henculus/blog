@@ -31,6 +31,9 @@ $ease_transition02: all .2s ease-in-out
 =media_screensize_mobile
   @media (min-width: 850px)
     @content
+=media_screensize_mobile_small
+  @media (min-width: 600px)
+    @content
 
 .fade-enter-active, .fade-leave-active
   transition: opacity 0.15s

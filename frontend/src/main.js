@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import App from './App.vue'
+import App from './App'
 import {watchForHover} from './hover_watcher'
 import store from "@/storage";
 import router from "@/router";

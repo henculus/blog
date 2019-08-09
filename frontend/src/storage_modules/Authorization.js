@@ -15,7 +15,7 @@ export const moduleAuthorization = {
             state.iat = data.iat
             state.sub = data.sub
         },
-        ToggleLoading(state){
+        ToggleLoading(state) {
             state.isLoading = !state.isLoading
         }
     }
@@ -36,8 +36,7 @@ export const moduleAuthorization = {
                             window.localStorage.removeItem('sub')
                             commit('CheckAuthorize', {})
                             reject(error.response.status)
-                        }
-                        else
+                        } else
                             console.error('Упс, сервер упал')
                     })
             })
@@ -49,5 +48,57 @@ export const moduleAuthorization = {
     },
     getters: {
         isAuthorized: state => !!state.sub
+    },
+    modules: {
+        loginModule: {
+            namespaced: true,
+            state: {},
+            mutations: {},
+            actions: {
+                sendLoginData: function ({dispatch }, payload) {
+                    dispatch('AuthorizationStore/ToggleLoading', null, {root: true})
+                    function rootDispatch(target) {
+                        dispatch(target, null, {root: true})
+                    }
+                    return new Promise((resolve, reject) => {
+                        HTTP({
+                            method: 'post',
+                            url: '/session',
+                            headers: {'Content-type': 'application/json'},
+                            dataType: 'application/json',
+                            data: payload,
+                            withCredentials: true,
+                            crossDomain: true
+                        })
+                            .then(
+                                response => {
+                                    if (response.status === 200) { //Успешный вход
+                                        rootDispatch('ModalShownStore/ToggleModalShown')
+                                        rootDispatch('AuthorizationStore/CheckAuthorize').then(() =>
+                                            rootDispatch('AuthorizationStore/ToggleLoading')
+                                        )
+                                    } else { //Крайний случай
+                                        rootDispatch('AuthorizationStore/ToggleLoading')
+                                    }
+                                })
+                            .catch(
+                                error => {
+                                    dispatch('AuthorizationStore/ToggleLoading', null, {root: true})
+                                    if (error.response) {
+                                        if (error.response.status === 404) {
+                                            reject('Такого пользователя нет')
+                                        }
+                                        if (error.response.status === 401) {
+                                            reject('Неверный пароль')
+                                        }
+                                    } else
+                                        reject('Ошибка сервера')
+                                })
+                    })
+
+                }
+            },
+            getters: {}
+        }
     }
 }

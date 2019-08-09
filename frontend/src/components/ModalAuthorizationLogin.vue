@@ -24,9 +24,6 @@
 </template>
 
 <script>
-    import {HTTP} from '../server_defaults'
-
-
     export default {
         name: "ModalAuthorizationLogin",
         data() {
@@ -39,51 +36,22 @@
             }
         },
         methods: {
-            /* eslint-disable */
             sendLoginData: function () {
                 if (!this.$store.state.AuthorizationStore.isLoading) {
-                    this.error_message = undefined
-                    this.$store.dispatch('AuthorizationStore/ToggleLoading')
-                    let self = this
-                    HTTP({
-                        method: 'post',
-                        url: '/session',
-                        headers: {'Content-type': 'application/json'},
-                        dataType: 'application/json',
-                        data: this.user,
-                        withCredentials: true,
-                        crossDomain: true
-                    })
-                        .then(
-                            response => {
-                                if (response.status === 200) { //Успешный вход
-                                    self.$store.dispatch('ModalShownStore/ToggleModalShown', '')
-                                    self.$store.dispatch('AuthorizationStore/CheckAuthorize').then(() =>
-                                        self.$store.dispatch('AuthorizationStore/ToggleLoading')
-                                    )
-                                } else { //Крайний случай
-                                    self.$store.dispatch('AuthorizationStore/ToggleLoading')
-                                }
-                            })
-                        .catch(
-                            error => {
-                                self.$store.dispatch('AuthorizationStore/ToggleLoading')
-                                if (error.response) {
-                                    if (error.response.status === 404) {
-                                        self.error_message = 'Такого пользователя нет'
-                                    }
-                                    if (error.response.status === 401) {
-                                        self.error_message = 'Неверный пароль'
-                                    }
-                                } else
-                                    self.error_message = 'Ошибка сервера'
-                            })
+                    this.$store.dispatch('AuthorizationStore/loginModule/sendLoginData', this.user).then(
+                        response => {
+                            console.log('Auth done', response)
+                        },
+                        error => {
+                            this.error_message = error
+                        }
+                    )
                 }
             },
         },
         watch: {
             user: {
-                handler: function (newData, oldData) {
+                handler: function () {
                     this.error_message = undefined
                 },
                 deep: true

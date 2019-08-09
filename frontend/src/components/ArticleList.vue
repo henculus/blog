@@ -1,95 +1,41 @@
 <template>
     <div class="article-list-wrapper">
         <div class="article-block-name">Последние статьи</div>
-        <div class="article-list">
-            <article-list-item v-for="article in articles" :key="article.id" :article="article"></article-list-item>
-        </div>
+        <transition name="article-list" mode="out-in">
+            <component-loading v-if="isLoading"></component-loading>
+            <div class="article-list" v-else>
+                <article-list-item v-for="article in articles" :key="article.id"
+                                   :article="article"></article-list-item>
+            </div>
+        </transition>
     </div>
 </template>
 
 <script>
-    import ArticleListItem from "@/components/ArticleListItem";
+    import ComponentLoading from "./ComponentLoading";
+    import ArticleListItem from "./ArticleListItem";
+    import {HTTP} from "../server_defaults";
 
     export default {
         name: "ArticleList",
         components: {
-            ArticleListItem
+            ArticleListItem,
+            ComponentLoading
         },
         data() {
             return {
-                articles: [
-                    {
-                        'id': 1,
-                        'img_src': 'https://images.wallpaperscraft.ru/image/uzory_ornament_dudly_137088_1920x1080.jpg',
-                        'title': 'Заголовок первой статьи',
-                        'subtitle': 'Подзаголовок первой статьи',
-                        'content': "First article content"
-                    },
-                    {
-                        'id': 2,
-                        'img_src': 'https://images.wallpaperscraft.ru/image/uzor_simvoly_etnicheskij_130866_1920x1080.jpg',
-                        'title': 'Заголовок второй статьи',
-                        'subtitle': 'Подзаголовок второй статьи',
-                        'content': 'Second article content'
-                    },
-                    {
-                        'id': 3,
-                        'img_src': 'https://images.wallpaperscraft.ru/image/uzory_ornament_vektor_136992_1920x1080.jpg',
-                        'title': 'Заголовок третьей статьи',
-                        'subtitle': 'Подзаголовок третьей статьи',
-                        'content': 'Third article content'
-                    },
-                    {
-                        'id': 4,
-                        'img_src': 'https://images.wallpaperscraft.ru/image/uzory_tkan_fioletovyj_123846_1920x1080.jpg',
-                        'title': 'Заголовок четвёртой статьи',
-                        'subtitle': 'Подзаголовок четвёртой статьи',
-                        'content': 'Fourth article content'
-                    },
-                    {
-                        'id': 5,
-                        'img_src': 'https://images.wallpaperscraft.ru/image/uzory_dudly_pattern_136687_1920x1080.jpg',
-                        'title': 'Заголовок пятой статьи',
-                        'subtitle': 'Подзаголовок пятой статьи',
-                        'content': 'Fifth article content'
-                    },
-                    {
-                        'id': 6,
-                        'img_src': 'https://images.wallpaperscraft.ru/image/raznotsvetnyj_pestryj_psihodelicheskij_139324_1920x1080.jpg',
-                        'title': 'Заголовок шестой статьи',
-                        'subtitle': 'Подзаголовок шестой статьи',
-                        'content': 'Sixth article content'
-                    },
-                    {
-                        'id': 7,
-                        'img_src': 'https://images.wallpaperscraft.ru/image/uzory_piatna_raznotsvetnyj_123044_1920x1080.jpg',
-                        'title': 'Заголовок седьмой статьи',
-                        'subtitle': 'Подзаголовок седьмой статьи',
-                        'content': 'Seventh article content'
-                    },
-                    {
-                        'id': 8,
-                        'img_src': 'https://images.wallpaperscraft.ru/image/uzory_volnistyj_piatna_133960_1920x1080.jpg',
-                        'title': 'Заголовок восьмой статьи',
-                        'subtitle': 'Подзаголовок восьмой статьи',
-                        'content': 'Eighth article content'
-                    },
-                    {
-                        'id': 9,
-                        'img_src': 'https://images.wallpaperscraft.ru/image/uzory_fon_pyatna_linii_66020_1920x1080.jpg',
-                        'title': 'Заголовок девятой статьи',
-                        'subtitle': 'Подзаголовок девятой статьи',
-                        'content': 'Ninth article content'
-                    },
-                    {
-                        'id': 10,
-                        'img_src': 'https://images.wallpaperscraft.ru/image/uzory_fon_linii_pyatna_81511_1920x1080.jpg',
-                        'title': 'Заголовок десятой статьи',
-                        'subtitle': 'Подзаголовок десятой статьи',
-                        'content': 'Tenth article content'
-                    },
-                ]
+                isLoading: true,
+                articles: []
             }
+        },
+        mounted() {
+            HTTP.get('/posts', {withCredentials: true}).then(
+                response => {
+                    this.isLoading = false
+                    this.articles = response.data
+                    console.log(this.articles)
+                }
+            )
         }
     }
 </script>
@@ -109,6 +55,7 @@
             font-size: 1.8em
 
             margin-bottom: 20px
+
         .article-list
             //width: 50%
             position: relative
@@ -119,6 +66,13 @@
             position: relative
             width: $content-width
             padding: 20px 0
+
             .article-block-name
                 font-size: 2em
+    .article-list-enter, .article-list-leave-to
+        opacity: 0
+    .article-list-leave, .article-list-enter-to
+        opacity: 1
+    .article-list-enter-active, .article-list-leave-active
+        transition: $ease_transition02
 </style>

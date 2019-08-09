@@ -32,14 +32,13 @@ export const moduleAuthorization = {
                         }
                     })
                     .catch(error => {
-                        // eslint-disable-next-line
                         if (error.response) {
                             window.localStorage.removeItem('sub')
                             commit('CheckAuthorize', {})
                             reject(error.response.status)
                         }
                         else
-                            console.log('Упс, сервер упал') //Сервер упал(
+                            console.error('Упс, сервер упал')
                     })
             })
         },

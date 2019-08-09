@@ -26,6 +26,7 @@
 <script>
     import {HTTP} from '../server_defaults'
 
+
     export default {
         name: "ModalAuthorizationLogin",
         data() {
@@ -41,8 +42,8 @@
             /* eslint-disable */
             sendLoginData: function () {
                 if (!this.isDisabled) {
-                    this.error_message = undefined //Очищаем поле ошибки
-                    this.$store.dispatch('AuthorizationStore/ToggleLoading') //Ставим isLoading в true
+                    this.error_message = undefined
+                    this.$store.dispatch('AuthorizationStore/ToggleLoading')
                     let self = this
                     HTTP({
                         method: 'post',
@@ -55,18 +56,17 @@
                     }).then(
                         response => {
                             if (response.status === 200) { //Успешный вход
-                                self.$store.dispatch('ModalShownStore/ToggleModalShown', '') //Отключаем отображение modal
+                                self.$store.dispatch('ModalShownStore/ToggleModalShown', '')
                                 self.$store.dispatch('AuthorizationStore/CheckAuthorize').then(() =>
-                                    self.$store.dispatch('AuthorizationStore/ToggleLoading') //Ставим isLoading в false
+                                    self.$store.dispatch('AuthorizationStore/ToggleLoading')
                                 )
                             }
-                            else { //Сюда сложно попасть (невозможно)
-                                self.$store.dispatch('AuthorizationStore/ToggleLoading') //Ставим isLoading в false (крайний случай)
+                            else { //Крайний случай
+                                self.$store.dispatch('AuthorizationStore/ToggleLoading')
                             }
                         })
-                        .catch(error => {
-                            //Ошибка от серва (404, 401 и тд)
-                            self.$store.dispatch('AuthorizationStore/ToggleLoading') //Ставим isLoading в false
+                        .catch(error => { //Ошибка
+                            self.$store.dispatch('AuthorizationStore/ToggleLoading')
                             if(error.response) {
                                 if (error.response.status === 404) {
                                     self.error_message = 'Такого пользователя нет'

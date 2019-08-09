@@ -26,7 +26,7 @@
             TopBar,
             Modal
         },
-        beforeMount: function(){
+        beforeMount: function () {
             this.authorized = window.localStorage.getItem('authorized')
             this.sub = window.localStorage.getItem('sub')
             this.$store.dispatch('AuthorizationStore/CheckAuthorize').then(
@@ -35,7 +35,7 @@
 
                 },
                 error => {
-                    console.log(error)
+                    console.error(error)
                 }
             )
         },
@@ -66,6 +66,7 @@
         text-rendering: optimizeLegibility
         font-family: $default_font
         width: 100%
+        height: 100%
 
     .modal-enter-active, .modal-leave-active
         transition: all .2s

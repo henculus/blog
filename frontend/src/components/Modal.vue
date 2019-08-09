@@ -41,33 +41,33 @@
         font-size: 16px
         position: fixed
         display: flex
-        flex-direction: row
+        flex-direction: column
         align-items: center
         justify-content: center
         z-index: 9998
         top: 0
         left: 0
-        width: 100%
-        height: 100%
+        right: 0
+        bottom: 0
+        width: 100vw
+        height: 100vh
         background-color: rgba(0, 0, 0, .8)
         overflow-y: auto
 
         .modal-container
-            left: 0
-            right: 0
+            position: relative
             margin: $content-padding-mobile
             border-radius: $block_border_radius
             pointer-events: all
-            position: absolute
             max-height: 100%
             display: flex
             flex-direction: column
             align-items: center
             transition: $ease_transition02
             background: white
-            //max-width: 560px
             overflow-y: auto
-            min-width: 280px
+            width: 90%
+            min-width: 200px
             &:after
                 content: ''
                 transition: all .1s ease
@@ -99,7 +99,10 @@
 
     .modal-content-leave-active, .modal-content-enter-active
         transition: $ease_transition02
-
+    +media_screensize_mobile
+        .modal-wrapper
+            .modal-container
+                width: 400px
     +media_screensize_mobile_small
         .modal-wrapper
             .modal-container

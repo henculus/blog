@@ -88,6 +88,8 @@
                 pointer-events: none
 
             .logo--colorful
+                top: 0
+                left: 0
                 position: absolute
                 opacity: 0
 

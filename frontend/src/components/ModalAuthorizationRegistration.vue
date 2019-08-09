@@ -75,7 +75,7 @@
                             if (error.response) {
                                 //Сделать обработку ошибок регистрации
                                 self.error_message = 'Некая ошибка'
-                                console.log(error.response)
+                                console.error(error.response)
                             } else
                                 self.error_message = 'Ошибка сервера'
                         })

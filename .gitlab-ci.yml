@@ -52,5 +52,5 @@ production:
   script:
     - docker build -t web .
     - docker login --username=$HEROKU_REGISTRY_USERNAME --password=$HEROKU_REGISTRY_PASSWORD $HEROKU_REGISTRY_URL
-    - docker tag web registry.heroku.com/lupusanay-blog/web
-    - docker push registry.heroku.com/lupusanay-blog/web
+    - docker tag web registry.heroku.com/lupusanay-blog-rust/web
+    - docker push registry.heroku.com/lupusanay-blog-rust/web

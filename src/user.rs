@@ -24,7 +24,10 @@ const JWT_EXP_TIME: i64 = 86400;
 #[table_name = "users"]
 pub struct User {
     username: String,
+
+    #[serde(skip_serializing)]
     password_hash: String,
+
     user_roles: Vec<String>,
 }
 

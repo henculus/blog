@@ -1,0 +1,12 @@
+**/target
+**/.git
+**/.idea
+.gitignore
+.gitlab-ci.yml
+blog-api.yaml
+LICENSE
+README.md
+**/node_modules
+old-frontend
+ci
+**/*.rs.bk

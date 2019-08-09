@@ -35,6 +35,7 @@
       "eslint:recommended"
     ],
     "rules": {
+      "semi": [2, "never"],
       "no-console": "off"
     },
     "parserOptions": {

@@ -41,64 +41,50 @@ export const moduleAuthorization = {
                     })
             })
         },
+        sendLoginData: function ({dispatch }, payload) {
+            return new Promise((resolve, reject) => {
+                HTTP({
+                    method: 'post',
+                    url: '/session',
+                    headers: {'Content-type': 'application/json'},
+                    dataType: 'application/json',
+                    data: payload,
+                    withCredentials: true,
+                    crossDomain: true
+                })
+                    .then(
+                        response => {
+                            if (response.status === 200) { //Успешный вход
+                                dispatch('ModalShownStore/ToggleModalShown', null, {root: true})
+                                dispatch('CheckAuthorize').then(() =>
+                                    dispatch('ToggleLoading')
+                                )
+                            } else { //Крайний случай
+                                dispatch('ToggleLoading')
+                            }
+                        })
+                    .catch(
+                        error => {
+                            dispatch('ToggleLoading')
+                            if (error.response) {
+                                if (error.response.status === 404) {
+                                    reject('Такого пользователя нет')
+                                }
+                                if (error.response.status === 401) {
+                                    reject('Неверный пароль')
+                                }
+                            } else
+                                reject('Ошибка сервера')
+                        })
+            })
+
+        },
         ToggleLoading({commit}) {
             commit('ToggleLoading')
-        }
+        },
 
     },
     getters: {
         isAuthorized: state => !!state.sub
     },
-    modules: {
-        loginModule: {
-            namespaced: true,
-            state: {},
-            mutations: {},
-            actions: {
-                sendLoginData: function ({dispatch }, payload) {
-                    dispatch('AuthorizationStore/ToggleLoading', null, {root: true})
-                    function rootDispatch(target) {
-                        dispatch(target, null, {root: true})
-                    }
-                    return new Promise((resolve, reject) => {
-                        HTTP({
-                            method: 'post',
-                            url: '/session',
-                            headers: {'Content-type': 'application/json'},
-                            dataType: 'application/json',
-                            data: payload,
-                            withCredentials: true,
-                            crossDomain: true
-                        })
-                            .then(
-                                response => {
-                                    if (response.status === 200) { //Успешный вход
-                                        rootDispatch('ModalShownStore/ToggleModalShown')
-                                        rootDispatch('AuthorizationStore/CheckAuthorize').then(() =>
-                                            rootDispatch('AuthorizationStore/ToggleLoading')
-                                        )
-                                    } else { //Крайний случай
-                                        rootDispatch('AuthorizationStore/ToggleLoading')
-                                    }
-                                })
-                            .catch(
-                                error => {
-                                    dispatch('AuthorizationStore/ToggleLoading', null, {root: true})
-                                    if (error.response) {
-                                        if (error.response.status === 404) {
-                                            reject('Такого пользователя нет')
-                                        }
-                                        if (error.response.status === 401) {
-                                            reject('Неверный пароль')
-                                        }
-                                    } else
-                                        reject('Ошибка сервера')
-                                })
-                    })
-
-                }
-            },
-            getters: {}
-        }
-    }
 }

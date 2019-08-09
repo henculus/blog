@@ -38,7 +38,7 @@
         methods: {
             sendLoginData: function () {
                 if (!this.$store.state.AuthorizationStore.isLoading) {
-                    this.$store.dispatch('AuthorizationStore/loginModule/sendLoginData', this.user).then(
+                    this.$store.dispatch('AuthorizationStore/sendLoginData', this.user).then(
                         response => {
                             console.log('Auth done', response)
                         },

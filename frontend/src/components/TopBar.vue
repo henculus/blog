@@ -13,7 +13,7 @@
                     </svg>
                     <span class="menu-item__text">Войти</span>
                 </a>
-                <div class="menu-item" v-if="$store.getters['AuthorizationStore/isAuthorized']&&!$store.state.AuthorizationStore.isLoading">
+                <div class="menu-item" v-if="$store.getters['AuthorizationStore/isAuthorized']">
                     <a ref="openContextMenuButton" class="user-name menu-item__link"
                        @click="ContextMenuShown = !ContextMenuShown">{{ $store.state.AuthorizationStore.sub }}</a>
                 </div>
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-    import TopBarContextMenu from "./TopBarContextMenu";
+    import TopBarContextMenu from "./TopBarContextMenu"
 
     export default {
         name: "TopBar",

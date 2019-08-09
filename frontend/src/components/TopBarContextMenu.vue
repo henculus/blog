@@ -19,32 +19,29 @@
 
     export default {
         name: "TopBarContextMenu",
+        data() {
+            return {}
+        },
         methods: {
             destroySession: function () {
                 this.$emit('closeContextMenu')
                 HTTP.delete('session', {withCredentials: true})
-                    .then(
-                        //eslint-disable-next-line
-                        response => {
+                    .then(response => {
+                            console.log(response, 'Ответ от удаления?')
                             this.$store.dispatch('AuthorizationStore/CheckAuthorize').then(
-                                //eslint-disable-next-line
-                                result => {
-                                },
-                                error => {
-                                    console.error(error)
-                                }
+                                response => console.log(response, 'Отвеи от проверки авторизации?'),
+                                error => console.error(error)
                             )
-                        })
+                        },
+                        error => {
+                            console.error('Ошибка удаления ', error)
+                        }
+                    )
                     .catch(error => {
-                        console.error(error)
-                        this.$store.dispatch('AuthorizationStore/CheckAuthorize').then(
-                            //eslint-disable-next-line
-                            result => {
-                            },
-                            error => {
-                                console.error(error)
-                            })
+                        console.error('Большая ошибка удаления ', error)
+                        this.$store.dispatch('AuthorizationStore/CheckAuthorize').then()
                     })
+
             }
         }
     }

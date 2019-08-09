@@ -31,26 +31,22 @@ test:
       - cargo/
       - target/
 
-production:dev:
+migrations:
   stage: deploy
+
+  script:
+    - DATABASE_URL=$HEROKU_DATABASE_URL diesel migration run
+
+production:
+  image: docker:latest
+  stage: deploy
+  services:
+    - docker:dind
   only:
     - dev
-  script:
-    - cd frontend/
-    - npm install --progress=false
-    - npm run build
-    - cd ../
-    - rm -rf cargo/ target/ ci/ old-frontend/
-    - dpl --provider=heroku --app=lupusanay-blog-rust --api-key=$HEROKU_PRODUCTION_API_KEY --skip_cleanup
-
-production:master:
-  stage: deploy
-  only:
     - master
   script:
-    - cd frontend/
-    - npm install --progress=false
-    - npm run build
-    - cd ../
-    - rm -rf cargo/ target/ ci/
-    - dpl --provider=heroku --app=lupusanay-blog-rust --api-key=$HEROKU_PRODUCTION_API_KEY --skip_cleanup
+    - docker build -t web .
+    - docker login --username=$HEROKU_REGISTRY_USERNAME --password=$HEROKU_REGISTRY_PASSWORD $HEROKU_REGISTRY_URL
+    - docker tag web registry.heroku.com/lupusanay-blog/web
+    - docker push registry.heroku.com/lupusanay-blog/web

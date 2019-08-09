@@ -21,6 +21,8 @@ test:
     DATABASE_URL: postgres://lupusanay:qwerty@postgres/blog
     ROCKET_DATABASES: "{blog={url=postgres://lupusanay:qwerty@postgres/blog}}"
   script:
+    - cd backend
+    - cd ..
     - diesel migration run
     - rustc --version
     - cargo --version
@@ -33,8 +35,11 @@ test:
 
 migrations:
   stage: deploy
-
+  only:
+    - dev
+    - master
   script:
+    - cd backend
     - DATABASE_URL=$HEROKU_DATABASE_URL diesel migration run
 
 production:

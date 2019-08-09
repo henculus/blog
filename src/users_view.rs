@@ -9,8 +9,11 @@ use crate::user::{Token, User, UserData};
 use crate::ViewResult;
 
 #[get("/users")]
-pub fn get_users(conn: Database) -> ViewResult<Vec<User>> {
-    unimplemented!()
+pub fn get_users(conn: Database, token: Token) -> ViewResult<Vec<User>> {
+    let all_users = users
+        .load::<User>(&*conn)?;
+
+    Ok(Json(all_users))
 }
 
 #[post("/users", format = "json", data = "<user_data>")]

@@ -1,7 +1,7 @@
 <template>
     <div class="article-list-wrapper">
         <div class="article-block-name">Последние статьи</div>
-        <transition name="article-list" mode="out-in">
+        <transition name="component-load" mode="out-in">
             <component-loading v-if="isLoading"></component-loading>
             <div class="article-list" v-else>
                 <article-list-item v-for="article in articles" :key="article.id"
@@ -69,10 +69,4 @@
 
             .article-block-name
                 font-size: 2em
-    .article-list-enter, .article-list-leave-to
-        opacity: 0
-    .article-list-leave, .article-list-enter-to
-        opacity: 1
-    .article-list-enter-active, .article-list-leave-active
-        transition: $ease_transition02
 </style>

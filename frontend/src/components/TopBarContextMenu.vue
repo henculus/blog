@@ -22,19 +22,29 @@
         methods: {
             destroySession: function () {
                 this.$emit('closeContextMenu')
-                HTTP.delete('session', {withCredentials: true}).then(
-                    //eslint-disable-next-line
-                    response => {
+                HTTP.delete('session', {withCredentials: true})
+                    .then(
+                        //eslint-disable-next-line
+                        response => {
+                            this.$store.dispatch('AuthorizationStore/CheckAuthorize').then(
+                                //eslint-disable-next-line
+                                result => {
+                                },
+                                error => {
+                                    console.log(error)
+                                }
+                            )
+                        })
+                    .catch(error => {
+                        console.log(error)
                         this.$store.dispatch('AuthorizationStore/CheckAuthorize').then(
                             //eslint-disable-next-line
                             result => {
                             },
                             error => {
                                 console.log(error)
-                            }
-                        )
-                    }
-                )
+                            })
+                    })
             }
         }
     }
@@ -95,10 +105,12 @@
             left: auto
             min-width: 300px
             margin: $content-padding-mobile
+
     +media_screensize_mobile
         .context-menu-wrapper
             margin: 0
             min-width: 300px
+
             .arrow
                 right: 15px
 </style>

@@ -23,7 +23,6 @@ test:
   script:
     - cd backend
     - diesel migration run
-    - cd ..
     - rustc --version
     - cargo --version
     - cargo test --verbose

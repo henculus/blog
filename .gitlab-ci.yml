@@ -38,6 +38,7 @@ migrations:
     - DATABASE_URL=$HEROKU_DATABASE_URL diesel migration run
 
 production:
+  image: docker:latest
   stage: deploy
   only:
     - dev

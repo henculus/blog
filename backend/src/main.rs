@@ -18,13 +18,8 @@ extern crate rocket;
 extern crate rocket_contrib;
 extern crate serde;
 
-use std::io;
-use std::path::{Path, PathBuf};
-
-use rocket::{Request, Response, Rocket};
-use rocket::http::{Method, Status};
-use rocket::response::{NamedFile, Responder};
-use rocket::request::{FromRequest, Outcome};
+use rocket::Rocket;
+use rocket::http::Method;
 use rocket_contrib::helmet::{Hsts, SpaceHelmet};
 use rocket_contrib::json::Json;
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors};

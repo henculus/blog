@@ -39,9 +39,11 @@ pub fn update_user(
     unimplemented!()
 }
 
-#[delete("/users/<user_id>")]
-pub fn delete_user(user_id: Id, conn: Database, token: Token) -> ViewResult<String> {
-    unimplemented!()
+#[delete("/users")]
+pub fn delete_user(conn: Database, token: Token) -> ViewResult<usize> {
+    let user = users.filter(username.eq(token.username()));
+    let query_result = diesel::delete(user).execute(&*conn)?;
+    Ok(Json(query_result))
 }
 
 #[get("/session")]

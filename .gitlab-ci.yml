@@ -40,6 +40,8 @@ migrations:
 production:
   image: docker:latest
   stage: deploy
+  services:
+    - docker:dind
   only:
     - dev
     - master

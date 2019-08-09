@@ -41,7 +41,7 @@
         methods: {
             /* eslint-disable */
             sendLoginData: function () {
-                if (!this.isDisabled) {
+                if (!this.$store.state.AuthorizationStore.isLoading) {
                     this.error_message = undefined
                     this.$store.dispatch('AuthorizationStore/ToggleLoading')
                     let self = this
@@ -53,31 +53,31 @@
                         data: this.user,
                         withCredentials: true,
                         crossDomain: true
-                    }).then(
-                        response => {
-                            if (response.status === 200) { //Успешный вход
-                                self.$store.dispatch('ModalShownStore/ToggleModalShown', '')
-                                self.$store.dispatch('AuthorizationStore/CheckAuthorize').then(() =>
+                    })
+                        .then(
+                            response => {
+                                if (response.status === 200) { //Успешный вход
+                                    self.$store.dispatch('ModalShownStore/ToggleModalShown', '')
+                                    self.$store.dispatch('AuthorizationStore/CheckAuthorize').then(() =>
+                                        self.$store.dispatch('AuthorizationStore/ToggleLoading')
+                                    )
+                                } else { //Крайний случай
                                     self.$store.dispatch('AuthorizationStore/ToggleLoading')
-                                )
-                            }
-                            else { //Крайний случай
+                                }
+                            })
+                        .catch(
+                            error => {
                                 self.$store.dispatch('AuthorizationStore/ToggleLoading')
-                            }
-                        })
-                        .catch(error => { //Ошибка
-                            self.$store.dispatch('AuthorizationStore/ToggleLoading')
-                            if(error.response) {
-                                if (error.response.status === 404) {
-                                    self.error_message = 'Такого пользователя нет'
-                                }
-                                if (error.response.status === 401) {
-                                    self.error_message = 'Неверный пароль'
-                                }
-                            }
-                            else
-                                self.error_message = 'Ошибка сервера'
-                        })
+                                if (error.response) {
+                                    if (error.response.status === 404) {
+                                        self.error_message = 'Такого пользователя нет'
+                                    }
+                                    if (error.response.status === 401) {
+                                        self.error_message = 'Неверный пароль'
+                                    }
+                                } else
+                                    self.error_message = 'Ошибка сервера'
+                            })
                 }
             },
         },

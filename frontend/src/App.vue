@@ -60,6 +60,7 @@
     @import "normalize/normalize.css"
     @import "variables"
     html, body, #app
+        background: white
         position: relative
         display: block
         top: 0
@@ -69,7 +70,7 @@
         height: 100%
 
     .modal-enter-active, .modal-leave-active
-        transition: all .2s
+        transition: $ease_transition02
 
     .modal-enter, .modal-leave-to
         opacity: 0

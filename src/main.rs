@@ -133,6 +133,7 @@ fn create_app() -> Rocket {
                 users_view::get_session_info,
                 users_view::get_users,
                 users_view::logout,
+                users_view::delete_user
             ],
         )
         .mount("/", routes![index, files,])

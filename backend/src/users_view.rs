@@ -12,7 +12,7 @@ const OFFSET: i64 = 0;
 const LIMIT: i64 = 10;
 
 #[get("/users?<limit>&<offset>")]
-pub fn get_users(conn: Database, token: Token, limit: Option<i64>, offset: Option<i64>) -> ViewResult<Vec<User>> {
+pub fn get_users(conn: Database, _token: Token, limit: Option<i64>, offset: Option<i64>) -> ViewResult<Vec<User>> {
     let all_users = users
         .offset(offset.unwrap_or(OFFSET))
         .limit(limit.unwrap_or(LIMIT))
@@ -47,7 +47,7 @@ pub fn delete_user(conn: Database, token: Token) -> ViewResult<usize> {
 }
 
 #[get("/session")]
-pub fn get_session_info(token: Token, conn: Database) -> ViewResult<Token> {
+pub fn get_session_info(token: Token) -> ViewResult<Token> {
     Ok(Json(token))
 }
 
@@ -68,7 +68,7 @@ pub fn login(user_data: Json<UserData>, conn: Database, mut cookies: Cookies) ->
 }
 
 #[delete("/session")]
-pub fn logout(token: Token, mut cookies: Cookies) -> Result<(), Error> {
+pub fn logout(_token: Token, mut cookies: Cookies) -> Result<(), Error> {
     cookies.remove_private(
         Cookie::named("token")
     );

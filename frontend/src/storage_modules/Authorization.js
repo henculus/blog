@@ -42,6 +42,7 @@ export const moduleAuthorization = {
             })
         },
         sendLoginData: function ({dispatch }, payload) {
+            dispatch('ToggleLoading')
             return new Promise((resolve, reject) => {
                 HTTP({
                     method: 'post',

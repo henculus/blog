@@ -15,7 +15,7 @@ export const moduleAuthorization = {
             state.iat = data.iat
             state.sub = data.sub
         },
-        ToggleLoading(state){
+        ToggleLoading(state) {
             state.isLoading = !state.isLoading
         }
     }
@@ -36,18 +36,56 @@ export const moduleAuthorization = {
                             window.localStorage.removeItem('sub')
                             commit('CheckAuthorize', {})
                             reject(error.response.status)
-                        }
-                        else
+                        } else
                             console.error('Упс, сервер упал')
                     })
             })
         },
+        sendLoginData: function ({dispatch }, payload) {
+            dispatch('ToggleLoading')
+            return new Promise((resolve, reject) => {
+                HTTP({
+                    method: 'post',
+                    url: '/session',
+                    headers: {'Content-type': 'application/json'},
+                    dataType: 'application/json',
+                    data: payload,
+                    withCredentials: true,
+                    crossDomain: true
+                })
+                    .then(
+                        response => {
+                            if (response.status === 200) { //Успешный вход
+                                dispatch('ModalShownStore/ToggleModalShown', null, {root: true})
+                                dispatch('CheckAuthorize').then(() =>
+                                    dispatch('ToggleLoading')
+                                )
+                            } else { //Крайний случай
+                                dispatch('ToggleLoading')
+                            }
+                        })
+                    .catch(
+                        error => {
+                            dispatch('ToggleLoading')
+                            if (error.response) {
+                                if (error.response.status === 404) {
+                                    reject('Такого пользователя нет')
+                                }
+                                if (error.response.status === 401) {
+                                    reject('Неверный пароль')
+                                }
+                            } else
+                                reject('Ошибка сервера')
+                        })
+            })
+
+        },
         ToggleLoading({commit}) {
             commit('ToggleLoading')
-        }
+        },
 
     },
     getters: {
         isAuthorized: state => !!state.sub
-    }
+    },
 }

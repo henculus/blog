@@ -29,14 +29,24 @@ pub fn new_user(user_data: Json<UserData>, conn: Database) -> ViewResult<User> {
     Ok(Json(query_result))
 }
 
-#[patch("/users/<user_id>", format = "json", data = "<user_data>")]
+#[patch("/users", format = "application/json", data = "<user_data>")]
 pub fn update_user(
-    user_id: Id,
-    user_data: Json<UserData>,
+    ser_data: Json<UserData>,
     conn: Database,
     token: Token,
-) -> ViewResult<String> {
-    unimplemented!()
+    mut cookies: Cookies,
+) -> ViewResult<User> {
+    let updated_user_data: User = user_data.into_inner().into();
+    let current_user = users.filter(username.eq(token.username()));
+    let query_result = diesel::update(current_user)
+        .set(updated_user_data)
+        .get_result(&*conn)?;
+
+    cookies.remove_private(
+        Cookie::named("token")
+    );
+
+    Ok(Json(query_result))
 }
 
 #[delete("/users")]

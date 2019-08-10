@@ -29,7 +29,7 @@
                     .then(response => {
                             console.log(response, 'Ответ от удаления?')
                             this.$store.dispatch('AuthorizationStore/CheckAuthorize').then(
-                                response => console.log(response, 'Отвеи от проверки авторизации?'),
+                                response => console.log(response, 'Ответ от проверки авторизации?'),
                                 error => console.error(error)
                             )
                         },

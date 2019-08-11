@@ -35,7 +35,7 @@
 
                 },
                 error => {
-                    console.error(error)
+                    console.error(error, 'Не авторизован')
                 }
             )
         },
@@ -47,9 +47,9 @@
         watch: {
             ModalShown: function (newState) {
                 if (newState)
-                    document.body.style.overflow = 'hidden';
+                    document.body.style.overflow = 'hidden'
                 else
-                    document.body.style.overflow = 'visible';
+                    document.body.style.overflow = 'visible'
             },
         }
     }

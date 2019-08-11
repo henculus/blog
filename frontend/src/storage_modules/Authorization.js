@@ -7,8 +7,7 @@ export const moduleAuthorization = {
         sub: window.localStorage.getItem('sub') || '',
         iat: window.localStorage.getItem('iat'),
         isLoading: false
-    }
-    ,
+    },
     mutations: {
         CheckAuthorize(state, data) {
             state.exp = data.exp
@@ -41,8 +40,7 @@ export const moduleAuthorization = {
                     })
             })
         },
-        sendLoginData: function ({dispatch }, payload) {
-            dispatch('ToggleLoading')
+        login: function (undefined, payload) {
             return new Promise((resolve, reject) => {
                 HTTP({
                     method: 'post',
@@ -55,40 +53,20 @@ export const moduleAuthorization = {
                 })
                     .then(
                         response => {
-                            if (response.status === 200) { //Успешный вход
-                                dispatch('ModalShownStore/ToggleModalShown', null, {root: true})
-                                dispatch('CheckAuthorize').then(() =>
-                                    dispatch('ToggleLoading')
-                                )
-                            } else { //Крайний случай
-                                dispatch('ToggleLoading')
-                            }
+                            resolve(response)
                         })
                     .catch(
                         error => {
-                            dispatch('ToggleLoading')
-                            if (error.response) {
-                                if (error.response.status === 404) {
-                                    reject('Такого пользователя нет')
-                                }
-                                if (error.response.status === 401) {
-                                    reject('Неверный пароль')
-                                }
-                            } else
-                                reject('Ошибка сервера')
+                            reject(error)
                         })
             })
 
         },
-        logout: function({dispatch}){
-            return new Promise ((resolve, reject) => {
+        logout: function () {
+            return new Promise((resolve, reject) => {
                 HTTP.delete('session', {withCredentials: true})
                     .then(response => {
-                            console.log(response, 'Ответ от удаления?')
-                            dispatch('CheckAuthorize').then(
-                                response => resolve(response),
-                                error => reject(error)
-                            )
+                            resolve(response)
                         },
                         error => { //Уже разлогинен
                             reject(error)
@@ -96,10 +74,6 @@ export const moduleAuthorization = {
                     )
                     .catch(error => {
                         reject(error)
-                        dispatch('CheckAuthorize').then(
-                            response => console.log(response),
-                            error => console.log(error)
-                        )
                     })
             })
         },

@@ -15,7 +15,6 @@
 
 <script>
     //TODO Возможно начать сохранять состояние loading при выполнении запросов
-    import {HTTP} from '../server_defaults'
 
     export default {
         name: "TopBarContextMenu",
@@ -26,8 +25,20 @@
             logout: function () {
                 this.$emit('closeContextMenu')
                 this.$store.dispatch('AuthorizationStore/logout').then(
-                    response => console.log(response),
-                    error => console.log(error)
+                    response => {
+                        console.log(response, 'Результат удаления')
+                        this.$store.dispatch('AuthorizationStore/CheckAuthorize').then(
+                            response => console.log(response),
+                            error => console.log(error, 'Успешный выход')
+                        )
+                    },
+                    error => {
+                        console.log(error, 'Ошибка удаления')
+                        this.$store.dispatch('AuthorizationStore/CheckAuthorize').then(
+                            response => console.log(response),
+                            error => console.error(error)
+                        )
+                    }
                 )
             }
         }

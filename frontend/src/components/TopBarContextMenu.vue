@@ -7,7 +7,7 @@
                 <li class="menu-list__item">Пункт 1</li>
                 <li class="menu-list__item">Пункт 2</li>
                 <li class="menu-list__item">Пункт 3</li>
-                <li class="menu-list__item" @click.once="destroySession">Выход</li>
+                <li class="menu-list__item" @click.once="logout">Выход</li>
             </ul>
         </nav>
     </div>
@@ -23,25 +23,12 @@
             return {}
         },
         methods: {
-            destroySession: function () {
+            logout: function () {
                 this.$emit('closeContextMenu')
-                HTTP.delete('session', {withCredentials: true})
-                    .then(response => {
-                            console.log(response, 'Ответ от удаления?')
-                            this.$store.dispatch('AuthorizationStore/CheckAuthorize').then(
-                                response => console.log(response, 'Ответ от проверки авторизации?'),
-                                error => console.error(error)
-                            )
-                        },
-                        error => {
-                            console.error('Ошибка удаления ', error)
-                        }
-                    )
-                    .catch(error => {
-                        console.error('Большая ошибка удаления ', error)
-                        this.$store.dispatch('AuthorizationStore/CheckAuthorize').then()
-                    })
-
+                this.$store.dispatch('AuthorizationStore/logout').then(
+                    response => console.log(response),
+                    error => console.log(error)
+                )
             }
         }
     }

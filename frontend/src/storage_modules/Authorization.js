@@ -80,6 +80,29 @@ export const moduleAuthorization = {
             })
 
         },
+        logout: function({dispatch}){
+            return new Promise ((resolve, reject) => {
+                HTTP.delete('session', {withCredentials: true})
+                    .then(response => {
+                            console.log(response, 'Ответ от удаления?')
+                            dispatch('CheckAuthorize').then(
+                                response => resolve(response),
+                                error => reject(error)
+                            )
+                        },
+                        error => { //Уже разлогинен
+                            reject(error)
+                        }
+                    )
+                    .catch(error => {
+                        reject(error)
+                        dispatch('CheckAuthorize').then(
+                            response => console.log(response),
+                            error => console.log(error)
+                        )
+                    })
+            })
+        },
         ToggleLoading({commit}) {
             commit('ToggleLoading')
         },

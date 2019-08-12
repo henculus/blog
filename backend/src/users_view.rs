@@ -31,16 +31,16 @@ pub fn new_user(user_data: Json<UserData>, conn: Database) -> ViewResult<User> {
     Ok(Json(query_result))
 }
 
-#[patch("/users/<updated_user>", format = "application/json", data = "<user_data>")]
+#[patch("/users/<user_id>", format = "application/json", data = "<user_data>")]
 pub fn update_user(
-    updated_user: Username,
+    user_id: Username,
     user_data: Json<UserData>,
     conn: Database,
     _token: Token,
     mut cookies: Cookies,
 ) -> ViewResult<User> {
     let updated_user_data: User = user_data.into_inner().into();
-    let current_user = users.filter(username.eq(&updated_user));
+    let current_user = users.filter(username.eq(&user_id));
     let query_result = diesel::update(current_user)
         .set(updated_user_data)
         .get_result(&*conn)?;

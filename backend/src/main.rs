@@ -87,7 +87,6 @@ fn create_app() -> Rocket {
             "/",
             routes![
                 posts_view::new_post,
-                posts_view::get_users_post,
                 posts_view::get_post,
                 posts_view::get_posts,
                 posts_view::delete_post,

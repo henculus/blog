@@ -36,7 +36,7 @@ pub fn update_user(
     updated_username: Username,
     user_data: Json<UserData>,
     conn: Database,
-    token: Token,
+    _token: Token,
     mut cookies: Cookies,
 ) -> ViewResult<User> {
     let updated_user_data: User = user_data.into_inner().into();

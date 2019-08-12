@@ -1,7 +1,6 @@
 #![feature(
 proc_macro_hygiene,
 decl_macro,
-type_alias_enum_variants,
 type_ascription
 )]
 

@@ -2,7 +2,8 @@
     <router-link :to="{ name: 'article', params: { id: article.id } }" tag="div" class="list-item">
         <div class="top-image-wrapper">
             <div class="top-image-placeholder"></div>
-            <img class="top-image" :src="article.img_src"/>
+            <!--<img class="top-image" :src="article.img_src"/>-->
+            <img class="top-image" src="../assets/cards_images/desktop2.png"/>
         </div>
         <div class="article-text-items">
             <div class="title">{{article.title}}</div>
@@ -48,17 +49,16 @@
             //padding-bottom: 25%
 
         .top-image-wrapper
-            display: none
+            //display: none
             position: relative
             overflow: hidden
             border-top-right-radius: $block_border_radius
             border-top-left-radius: $block_border_radius
-            max-height: 200px
 
             .top-image-placeholder
                 display: block
                 position: relative
-                padding-bottom: 25%
+                padding-bottom: 30.56234718826406%
 
             .top-image
                 transform: translateZ(0)
@@ -67,10 +67,11 @@
                 position: absolute
                 pointer-events: none
                 top: 0
+                bottom: 0
                 left: 0
 
         .article-text-items
-            padding: 30px
+            padding: 20px
             display: flex
             flex-direction: column
             .title
@@ -98,6 +99,7 @@
             font-size: 16px
             .top-image-wrapper
                 display: block
+                max-height: 250px
         .no-touch .list-item:hover
             border: 1px solid $menu_border_color
             box-shadow: none

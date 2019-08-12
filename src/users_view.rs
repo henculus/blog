@@ -31,7 +31,7 @@ pub fn new_user(user_data: Json<UserData>, conn: Database) -> ViewResult<User> {
 
 #[patch("/users", format = "application/json", data = "<user_data>")]
 pub fn update_user(
-    ser_data: Json<UserData>,
+    user_data: Json<UserData>,
     conn: Database,
     token: Token,
     mut cookies: Cookies,

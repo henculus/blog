@@ -11,6 +11,8 @@ use crate::ViewResult;
 const OFFSET: i64 = 0;
 const LIMIT: i64 = 10;
 
+type Username = String;
+
 #[get("/users?<limit>&<offset>")]
 pub fn get_users(conn: Database, token: Token, limit: Option<i64>, offset: Option<i64>) -> ViewResult<Vec<User>> {
     let all_users = users
@@ -29,15 +31,16 @@ pub fn new_user(user_data: Json<UserData>, conn: Database) -> ViewResult<User> {
     Ok(Json(query_result))
 }
 
-#[patch("/users", format = "application/json", data = "<user_data>")]
+#[patch("/users/<username>", format = "application/json", data = "<user_data>")]
 pub fn update_user(
+    username: Username,
     user_data: Json<UserData>,
     conn: Database,
     token: Token,
     mut cookies: Cookies,
 ) -> ViewResult<User> {
     let updated_user_data: User = user_data.into_inner().into();
-    let current_user = users.filter(username.eq(token.username()));
+    let current_user = users.filter(username.eq(&username));
     let query_result = diesel::update(current_user)
         .set(updated_user_data)
         .get_result(&*conn)?;

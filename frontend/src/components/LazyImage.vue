@@ -48,7 +48,7 @@
                     opacity: 1
                     .low-res-img
                         filter: blur(20px)
-                        transform: scale(1.03)
+                        transform: scale(1.1)
                         position: absolute
                         width: 100%
                         left: 0

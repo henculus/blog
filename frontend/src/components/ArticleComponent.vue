@@ -3,8 +3,7 @@
         <component-loading v-if="isLoading"></component-loading>
         <div v-else id="content-wrapper">
             <div id="top-card-wrapper">
-                <div id="top-card">
-                </div>
+                <lazy-image :img-padding="15"></lazy-image>
             </div>
             <div id="content">
                 <article class="article">
@@ -25,11 +24,13 @@
 
 <script>
     import {HTTP} from '../server_defaults'
-    import ComponentLoading from "./ComponentLoading";
+    import ComponentLoading from "./ComponentLoading"
+    import LazyImage from "./LazyImage"
 
     export default {
         name: "ArticleComponent",
         components: {
+            LazyImage,
             ComponentLoading
         },
         data() {
@@ -58,8 +59,6 @@
         flex-direction: column
         align-items: center
         width: 100%
-        //top: 70px //Выключено чтобы под меню не было лага
-        //Если буду делать fixed
         position: relative
 
         #top-card-wrapper
@@ -67,9 +66,6 @@
             position: relative
             background: lightgray
             width: 100%
-            //max-height: 50vh
-            height: $banner_height
-        //min-height: 45vh
         #top-card
             display: block
             overflow: hidden
@@ -86,7 +82,7 @@
                 top: 0
                 content: ''
                 position: absolute
-                box-shadow: inset 0 6px 6px rgba(0, 0, 0, 0.5), inset 0 -6px 6px rgba(0, 0, 0, 0.5)
+                //shadow: inset 0 6px 6px rgba(0, 0, 0, 0.5), inset 0 -6px 6px rgba(0, 0, 0, 0.5)
 
         #content
             width: 100%

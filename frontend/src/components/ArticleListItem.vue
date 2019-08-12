@@ -29,7 +29,6 @@
         +deselect
         min-width: 200px
         position: relative
-        //box-shadow: 0 0 4px rgba(0, 0, 0, 0.4)
         border: 1px solid $menu_border_color
         margin-bottom: 20px
         display: flex
@@ -45,11 +44,8 @@
         transform: scale(1)
         font-size: 14px
         transition: all 0.15s ease-in-out
-        //.top-image-placeholder
-            //padding-bottom: 25%
 
         .top-image-wrapper
-            //display: none
             position: relative
             overflow: hidden
             border-top-right-radius: $block_border_radius

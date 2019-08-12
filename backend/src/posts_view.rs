@@ -25,13 +25,24 @@ pub fn new_post(post_form: JsonForm<NewPostData>, conn: Database, token: Token) 
 }
 
 #[get("/posts?<limit>&<offset>")]
-pub fn get_posts(conn: Database, limit: Option<i64>, offset: Option<i64>) -> ViewResult<Vec<Post>> {
-    let query_result = posts
-        .filter(published.eq(true))
-        .offset(offset.unwrap_or(OFFSET))
-        .limit(limit.unwrap_or(LIMIT))
-        .load::<Post>(&*conn)?;
-
+pub fn get_posts(conn: Database, limit: Option<i64>, offset: Option<i64>, token: Option<Token>) -> ViewResult<Vec<Post>> {
+    let query_result;
+    match token {
+        Some(t) => {
+            query_result = posts
+                .filter(published.eq(true).or(author.eq(t.username())))
+                .offset(offset.unwrap_or(OFFSET))
+                .limit(limit.unwrap_or(LIMIT))
+                .load::<Post>(&*conn)?;
+        }
+        None => {
+            query_result = posts
+                .filter(published.eq(true))
+                .offset(offset.unwrap_or(OFFSET))
+                .limit(limit.unwrap_or(LIMIT))
+                .load::<Post>(&*conn)?;
+        }
+    }
     Ok(Json(query_result))
 }
 

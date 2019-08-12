@@ -18,7 +18,7 @@ const JWT_X: &[u8] = b"";
 const HASH_SALT_LEN: usize = 10;
 const JWT_EXP_TIME: i64 = 86400;
 
-#[derive(Queryable, Identifiable, Insertable, Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Queryable, Identifiable, Insertable, Serialize, Deserialize, PartialEq, Debug, AsChangeset)]
 #[primary_key(username)]
 #[table_name = "users"]
 pub struct User {
@@ -27,6 +27,7 @@ pub struct User {
     #[serde(skip_serializing)]
     password_hash: String,
 
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     user_roles: Vec<String>,
 }
 

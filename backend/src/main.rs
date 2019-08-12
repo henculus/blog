@@ -1,7 +1,6 @@
 #![feature(
 proc_macro_hygiene,
 decl_macro,
-type_alias_enum_variants,
 type_ascription
 )]
 
@@ -98,7 +97,8 @@ fn create_app() -> Rocket {
                 users_view::get_session_info,
                 users_view::get_users,
                 users_view::logout,
-                users_view::delete_user
+                users_view::delete_user,
+                users_view::update_user,
             ],
         )
         .attach(cors)

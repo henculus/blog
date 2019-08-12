@@ -2,7 +2,7 @@ use diesel::prelude::*;
 use rocket::http::{Cookie, Cookies, SameSite};
 use rocket_contrib::json::Json;
 
-use crate::{Database, Id};
+use crate::{Database};
 use crate::error::Error;
 use crate::schema::users::dsl::*;
 use crate::user::{Token, User, UserData};

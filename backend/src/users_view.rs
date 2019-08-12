@@ -2,7 +2,7 @@ use diesel::prelude::*;
 use rocket::http::{Cookie, Cookies, SameSite};
 use rocket_contrib::json::Json;
 
-use crate::{Database};
+use crate::Database;
 use crate::error::Error;
 use crate::schema::users::dsl::*;
 use crate::user::{Token, User, UserData};
@@ -31,16 +31,16 @@ pub fn new_user(user_data: Json<UserData>, conn: Database) -> ViewResult<User> {
     Ok(Json(query_result))
 }
 
-#[patch("/users/<updated_username>", format = "application/json", data = "<user_data>")]
+#[patch("/users/<updated_user>", format = "application/json", data = "<user_data>")]
 pub fn update_user(
-    updated_username: Username,
+    updated_user: Username,
     user_data: Json<UserData>,
     conn: Database,
     _token: Token,
     mut cookies: Cookies,
 ) -> ViewResult<User> {
     let updated_user_data: User = user_data.into_inner().into();
-    let current_user = users.filter(username.eq(&updated_username));
+    let current_user = users.filter(username.eq(&updated_user));
     let query_result = diesel::update(current_user)
         .set(updated_user_data)
         .get_result(&*conn)?;

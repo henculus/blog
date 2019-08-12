@@ -54,7 +54,7 @@
                     width: 100%
                     overflow: hidden
                     transform: translateZ(0)
-                    transition: opacity .4s ease .4s
+                    transition: opacity .3s ease-in .4s
                     opacity: 1
                     z-index: 2
                     .low-res-img
@@ -77,7 +77,7 @@
                     top: 0
                     left: 0
                     opacity: 0
-                    transition: opacity .4s ease 0s
+                    transition: opacity .3s ease-in 0s
                     &.visible
                         opacity: 1
 </style>

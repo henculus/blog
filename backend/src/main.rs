@@ -18,13 +18,8 @@ extern crate rocket;
 extern crate rocket_contrib;
 extern crate serde;
 
-use std::io;
-use std::path::{Path, PathBuf};
-
-use rocket::{Request, Response, Rocket};
-use rocket::http::{Method, Status};
-use rocket::response::{NamedFile, Responder};
-use rocket::request::{FromRequest, Outcome};
+use rocket::Rocket;
+use rocket::http::Method;
 use rocket_contrib::helmet::{Hsts, SpaceHelmet};
 use rocket_contrib::json::Json;
 use rocket_cors::{AllowedHeaders, AllowedOrigins, Cors};
@@ -47,36 +42,6 @@ type ViewResult<T> = std::result::Result<Json<T>, Error>;
 
 #[database("blog")]
 pub struct Database(diesel::PgConnection);
-
-pub struct NonApiGuard;
-
-#[get("/", rank = 10)]
-pub fn index(non_api_guard: NonApiGuard) -> io::Result<NamedFile> {
-    NamedFile::open("frontend/dist/index.html")
-}
-
-// TODO: Handle forwarding to this request from /api routes, may be with request guard
-#[get("/<file..>", rank = 10)]
-pub fn files(file: PathBuf, non_api_guard: NonApiGuard) -> Option<NamedFile> {
-    match NamedFile::open(Path::new("frontend/dist/").join(file)) {
-        Ok(file) => Some(file),
-        Err(_) => NamedFile::open("frontend/dist/index.html").ok(),
-    }
-}
-
-impl<'a, 'r> FromRequest<'a, 'r> for NonApiGuard {
-    type Error = Error;
-
-    fn from_request(request: &'a Request<'r>) -> Outcome<Self, Self::Error> {
-        let uri_from_request = request.uri().path();
-
-        if uri_from_request.starts_with("/api") {
-            Outcome::Forward(())
-        } else {
-            Outcome::Success((NonApiGuard))
-        }
-    }
-}
 
 fn configure_cors() -> Cors {
     let allowed_origins =
@@ -120,7 +85,7 @@ fn create_app() -> Rocket {
 
     rocket::ignite()
         .mount(
-            "/api",
+            "/",
             routes![
                 posts_view::new_post,
                 posts_view::get_users_post,
@@ -137,7 +102,6 @@ fn create_app() -> Rocket {
                 users_view::update_user,
             ],
         )
-        .mount("/", routes![index, files,])
         .attach(cors)
         .attach(SpaceHelmet::default().enable(Hsts::IncludeSubDomains(Duration::days(30))))
         .attach(Database::fairing())

@@ -94,7 +94,7 @@ fn test_get_user_post() {
     let mut context = TestContext::new();
 
     let response = context
-        .authorized_request(Method::Get, "/api/posts".to_string())
+        .authorized_request(Method::Get, "/posts".to_string())
         .dispatch();
 
     println!("{:?}", response);
@@ -107,7 +107,7 @@ fn test_create_post() {
 
     let post_serialized = r#"{"title": "test", "body": "test"}"#;
     let response = context
-        .authorized_request(Method::Post, "/api/posts".to_string())
+        .authorized_request(Method::Post, "/posts".to_string())
         .body(post_serialized)
         .header(ContentType::JSON)
         .dispatch();
@@ -132,7 +132,7 @@ fn test_create_post_with_invalid_values() {
 
     for (description, data) in invalid_data {
         let response = context
-            .authorized_request(Method::Post, "/api/posts".into())
+            .authorized_request(Method::Post, "/posts".into())
             .body(data)
             .header(ContentType::JSON)
             .dispatch();

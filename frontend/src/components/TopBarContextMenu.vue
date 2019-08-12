@@ -7,7 +7,7 @@
                 <li class="menu-list__item">Пункт 1</li>
                 <li class="menu-list__item">Пункт 2</li>
                 <li class="menu-list__item">Пункт 3</li>
-                <li class="menu-list__item" @click.once="destroySession">Выход</li>
+                <li class="menu-list__item" @click.once="logout">Выход</li>
             </ul>
         </nav>
     </div>
@@ -15,23 +15,28 @@
 
 <script>
     //TODO Возможно начать сохранять состояние loading при выполнении запросов
-    import {HTTP} from '../server_defaults'
 
     export default {
         name: "TopBarContextMenu",
+        data() {
+            return {}
+        },
         methods: {
-            destroySession: function () {
+            logout: function () {
                 this.$emit('closeContextMenu')
-                HTTP.delete('session', {withCredentials: true}).then(
-                    //eslint-disable-next-line
+                this.$store.dispatch('AuthorizationStore/logout').then(
                     response => {
+                        console.log(response, 'Результат удаления')
                         this.$store.dispatch('AuthorizationStore/CheckAuthorize').then(
-                            //eslint-disable-next-line
-                            result => {
-                            },
-                            error => {
-                                console.log(error)
-                            }
+                            response => console.log(response),
+                            error => console.log(error, 'Успешный выход')
+                        )
+                    },
+                    error => {
+                        console.log(error, 'Ошибка удаления')
+                        this.$store.dispatch('AuthorizationStore/CheckAuthorize').then(
+                            response => console.log(response),
+                            error => console.error(error)
                         )
                     }
                 )
@@ -47,12 +52,13 @@
         border: 1px solid $menu_border_color
         border-radius: $block_border_radius
         right: 0
+        left: 0
         top: $menu_height + 10px
         background: white
         display: block
         position: absolute
         margin: $content-padding-mobile
-        left: 0
+        transition: $ease_transition02
 
         .arrow
             z-index: 1
@@ -95,10 +101,12 @@
             left: auto
             min-width: 300px
             margin: $content-padding-mobile
+
     +media_screensize_mobile
         .context-menu-wrapper
             margin: 0
             min-width: 300px
+
             .arrow
                 right: 15px
 </style>

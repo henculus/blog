@@ -7,6 +7,7 @@
         <div class="article-text-items">
             <div class="title">{{article.title}}</div>
             <div class="subtitle">{{article.subtitle}}</div>
+            <div class="author">{{article.author}}</div> <!--TODO сделать ссылку на страницу автора-->
             <!--<div class="article-content"></div>-->
         </div>
     </router-link>
@@ -70,7 +71,8 @@
 
         .article-text-items
             padding: 30px
-
+            display: flex
+            flex-direction: column
             .title
                 font-size: 1.8em
                 margin-bottom: 15px
@@ -84,6 +86,9 @@
             .article-content
                 position: relative
                 font-family: $default_font
+            .author
+                justify-self: flex-end
+                font-size: 0.9em
     .no-touch .list-item:hover
         border: 1px solid $rnt_green
         box-shadow: 0 0 4px $rnt_green

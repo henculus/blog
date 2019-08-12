@@ -4,7 +4,7 @@
             <span class="header-text">Вход</span>
         </div>
         <div class="modal-body modal-element">
-            <form class="authorization" name="authorization" @submit.prevent @keyup.enter="sendLoginData">
+            <form class="authorization" name="authorization" @submit.prevent @keyup.enter="login">
                 <div class="form-item form-item--login">
                     <input class="input" v-model="user.username" type="text" id="blog-login" placeholder="Логин"
                            autocomplete="off"/>
@@ -14,7 +14,7 @@
                            placeholder="Пароль" autocomplete="off"/>
                 </div>
                 <span v-if="error_message" class="error_message">{{ error_message }}</span>
-                <input class="button button-authorize" value="Войти" type="submit" @mousedown="sendLoginData">
+                <input class="button button-authorize" value="Войти" type="submit" @mousedown="login">
             </form>
         </div>
         <div class="modal-footer modal-element">
@@ -24,61 +24,63 @@
 </template>
 
 <script>
-    import {HTTP} from '../server_defaults'
-
     export default {
         name: "ModalAuthorizationLogin",
         data() {
             return {
                 user: {
-                    username: '',
-                    password: ''
+                    username: undefined,
+                    password: undefined
                 },
                 error_message: undefined,
-                isDisabled: false
             }
         },
         methods: {
-            /* eslint-disable */
-            sendLoginData: function () {
-                if (!this.isDisabled) {
-                    this.error_message = undefined
-                    this.isDisabled = true
-                    this.$emit('disableForm', this.isDisabled)
-                    let self = this
-                    HTTP({
-                        method: 'post',
-                        url: '/session',
-                        headers: {'Content-type': 'application/json'},
-                        dataType: 'application/json',
-                        data: this.user,
-                        withCredentials: true,
-                        crossDomain: true
-                    }).then(
+            login: function () {
+                if (!this.$store.state.AuthorizationStore.isLoading&&!this.$store.getters['AuthorizationStore/isAuthorized']) {
+                    this.$store.dispatch('AuthorizationStore/ToggleLoading')
+                    this.$store.dispatch('AuthorizationStore/login', this.user).then(
                         response => {
-                            if (response.status === 200) { //Успешный вход
-                                self.$store.dispatch('ModalShownStore/ToggleModalShown', '')
-                                self.$emit('disableForm', this.isDisabled)
-                                self.$store.dispatch('AuthorizationStore/CheckAuthorize')
-                            }
-                        })
-                        .catch(error => {
-                            //Ошибка от серва (404, 401 и тд)
-                            self.isDisabled = false
-                            self.$emit('disableForm', this.isDisabled)
-                            if (error.response.status === 404) {
-                                self.error_message = 'Такого пользователя нет'
-                            }
-                            if (error.response.status === 401) {
-                                self.error_message = 'Неверный пароль'
-                            }
-                        })
+                            console.log(response)
+                            this.$store.dispatch('AuthorizationStore/CheckAuthorize')
+                                .then(
+                                    response => {
+                                        console.log(response)
+                                        this.$store.dispatch('AuthorizationStore/ToggleLoading')
+                                        this.$store.dispatch('ModalShownStore/ToggleModalShown')
+                                    },
+                                    error => {
+                                        console.error(error)
+                                        this.error_message = 'Ошибка создания сессии'
+                                        this.$store.dispatch('AuthorizationStore/ToggleLoading')
+                                    }
+                                ).catch(
+                                error => {
+                                    console.error(error)
+                                    this.error_message = 'Сервер не доступен'
+                                    this.$store.dispatch('AuthorizationStore/ToggleLoading')
+                                }
+                            )
+                        },
+                        error => {
+                            this.$store.dispatch('AuthorizationStore/ToggleLoading')
+                            if (error.response) {
+                                if (error.response.status === 404) {
+                                    this.error_message = 'Такого пользователя нет'
+                                }
+                                if (error.response.status === 401) {
+                                    this.error_message = 'Неверный пароль'
+                                }
+                            } else
+                                this.error_message = 'Ошибка сервера'
+                        }
+                    )
                 }
             },
         },
         watch: {
             user: {
-                handler: function (newData, oldData) {
+                handler: function () {
                     this.error_message = undefined
                 },
                 deep: true

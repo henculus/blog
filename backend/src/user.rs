@@ -8,7 +8,6 @@ use rocket::http::Status;
 use rocket::request::{FromRequest, Outcome};
 use rocket::Request;
 use serde::{Deserialize, Serialize};
-use serde_json::to_string;
 
 use crate::Error;
 use crate::schema::users;

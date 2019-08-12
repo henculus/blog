@@ -26,7 +26,7 @@
             TopBar,
             Modal
         },
-        beforeMount: function(){
+        beforeMount: function () {
             this.authorized = window.localStorage.getItem('authorized')
             this.sub = window.localStorage.getItem('sub')
             this.$store.dispatch('AuthorizationStore/CheckAuthorize').then(
@@ -35,7 +35,7 @@
 
                 },
                 error => {
-                    console.log(error)
+                    console.error(error, 'Не авторизован')
                 }
             )
         },
@@ -47,9 +47,9 @@
         watch: {
             ModalShown: function (newState) {
                 if (newState)
-                    document.body.style.overflow = 'hidden';
+                    document.body.style.overflow = 'hidden'
                 else
-                    document.body.style.overflow = 'visible';
+                    document.body.style.overflow = 'visible'
             },
         }
     }
@@ -60,15 +60,17 @@
     @import "normalize/normalize.css"
     @import "variables"
     html, body, #app
+        background: white
         position: relative
         display: block
         top: 0
         text-rendering: optimizeLegibility
         font-family: $default_font
         width: 100%
+        height: 100%
 
     .modal-enter-active, .modal-leave-active
-        transition: all .2s
+        transition: $ease_transition02
 
     .modal-enter, .modal-leave-to
         opacity: 0

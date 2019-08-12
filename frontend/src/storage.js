@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { moduleModalShown } from './storage_modules/ModalShown'
-import { moduleAuthorization } from "./storage_modules/Authorization";
+import { moduleAuthorization } from "./storage_modules/Authorization"
 
 Vue.use(Vuex)
 

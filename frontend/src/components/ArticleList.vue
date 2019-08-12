@@ -12,9 +12,9 @@
 </template>
 
 <script>
-    import ComponentLoading from "./ComponentLoading";
-    import ArticleListItem from "./ArticleListItem";
-    import {HTTP} from "../server_defaults";
+    import ComponentLoading from "./ComponentLoading"
+    import ArticleListItem from "./ArticleListItem"
+    import {HTTP} from "../server_defaults"
 
     export default {
         name: "ArticleList",

@@ -3,7 +3,7 @@
         <component-loading v-if="isLoading"></component-loading>
         <div v-else id="content-wrapper">
             <div id="top-card-wrapper">
-                <lazy-image :img-padding="15"></lazy-image>
+                <lazy-image :img-padding="30" :low-res-img-path="`https://i.imgur.com/QWbnFgn.jpg`" :high-res-img-path="`https://i.imgur.com/cpo8HZe.jpg`"></lazy-image>
             </div>
             <div id="content">
                 <article class="article">
@@ -66,23 +66,6 @@
             position: relative
             background: lightgray
             width: 100%
-        #top-card
-            display: block
-            overflow: hidden
-            width: 100%
-            height: 100%
-            background: url("../assets/banner/banner.jpg") no-repeat bottom
-            background-size: cover
-
-            &:after
-                display: block
-                left: 0
-                right: 0
-                bottom: 0
-                top: 0
-                content: ''
-                position: absolute
-                //shadow: inset 0 6px 6px rgba(0, 0, 0, 0.5), inset 0 -6px 6px rgba(0, 0, 0, 0.5)
 
         #content
             width: 100%

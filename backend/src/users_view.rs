@@ -12,7 +12,7 @@ const OFFSET: i64 = 0;
 const LIMIT: i64 = 10;
 
 #[get("/users?<limit>&<offset>")]
-pub fn get_users(conn: Database, _token: Token, limit: Option<i64>, offset: Option<i64>) -> ViewResult<Vec<User>> {
+pub fn get_users(conn: Database, limit: Option<i64>, offset: Option<i64>) -> ViewResult<Vec<User>> {
     let all_users = users
         .offset(offset.unwrap_or(OFFSET))
         .limit(limit.unwrap_or(LIMIT))

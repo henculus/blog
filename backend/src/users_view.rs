@@ -53,9 +53,14 @@ pub fn update_user(
 }
 
 #[delete("/users")]
-pub fn delete_user(conn: Database, token: Token) -> ViewResult<usize> {
+pub fn delete_user(conn: Database, token: Token, mut cookies: Cookies) -> ViewResult<usize> {
     let user = users.filter(username.eq(token.username()));
     let query_result = diesel::delete(user).execute(&*conn)?;
+
+    cookies.remove_private(
+        Cookie::named("token")
+    );
+
     Ok(Json(query_result))
 }
 

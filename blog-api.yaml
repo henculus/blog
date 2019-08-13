@@ -118,6 +118,30 @@ paths:
               schema:
                 $ref: '#/components/schemas/Post'
   /users:
+    get:
+      summary: Returns array of users
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: offset
+          required: false
+          schema:
+            type: integer
+      tags:
+        - Users
+      responses:
+        200:
+          description: Users array with selected limit and offset
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
     post:
       tags:
         - Users

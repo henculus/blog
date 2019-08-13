@@ -48,8 +48,9 @@
             ModalShown: function (newState) {
                 if (newState)
                     document.body.style.overflow = 'hidden'
-                else
-                    document.body.style.overflow = 'visible'
+                else {
+                    document.body.style.overflow = 'visible scroll'
+                }
             },
         }
     }
@@ -68,8 +69,13 @@
         font-family: $default_font
         width: 100%
         height: 100%
+
+    body
+        overflow-y: scroll
+
     .top-bar
         z-index: 1
+
     .page-content
         z-index: 0
 

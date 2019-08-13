@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <top-bar></top-bar>
+        <top-bar class="top-bar"></top-bar>
         <transition name="fade" mode="out-in" appear>
             <router-view class="page-content"></router-view>
         </transition>
@@ -68,6 +68,10 @@
         font-family: $default_font
         width: 100%
         height: 100%
+    .top-bar
+        z-index: 1
+    .page-content
+        z-index: 0
 
     .modal-enter-active, .modal-leave-active
         transition: $ease_transition02

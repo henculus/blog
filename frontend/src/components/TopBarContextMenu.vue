@@ -59,7 +59,7 @@
         position: absolute
         margin: $content-padding-mobile
         transition: $ease_transition02
-
+        z-index: 9999
         .arrow
             z-index: 1
             top: -10px

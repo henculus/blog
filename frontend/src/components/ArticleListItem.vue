@@ -3,7 +3,7 @@
         <div class="top-image-wrapper">
             <div class="top-image-placeholder"></div>
             <!--<img class="top-image" :src="article.img_src"/>-->
-            <img class="top-image" src="../assets/cards_images/desktop2.png"/>
+            <img class="top-image" src="https://i.imgur.com/h5e29Fw.png"/>
         </div>
         <div class="article-text-items">
             <div class="title">{{article.title}}</div>

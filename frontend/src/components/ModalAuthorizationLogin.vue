@@ -14,7 +14,7 @@
                            placeholder="Пароль" autocomplete="off"/>
                 </div>
                 <span v-if="error_message" class="error_message">{{ error_message }}</span>
-                <input class="button button-authorize" value="Войти" type="submit" @mousedown="login">
+                <input :disabled="!inputFilled" class="button button-authorize" value="Войти" type="submit" @mousedown="login">
             </form>
         </div>
         <div class="modal-footer modal-element">
@@ -77,6 +77,11 @@
                     )
                 }
             },
+        },
+        computed: {
+            inputFilled: function () {
+                return !!this.user.username&&this.user.password
+            }
         },
         watch: {
             user: {

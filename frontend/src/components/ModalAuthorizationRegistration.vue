@@ -28,7 +28,6 @@
 </template>
 
 <script>
-    import {HTTP} from '../server_defaults'
 
     export default {
         name: "ModalAuthorizationRegistration",
@@ -48,37 +47,25 @@
                 let self = this
                 self.$store.dispatch('AuthorizationStore/ToggleLoading')
                 if (this.all_right) {
-                    HTTP({
-                        method: 'post',
-                        url: '/users',
-                        headers: {'Content-type': 'application/json'},
-                        dataType: 'application/json',
-                        data: {username: this.user.username, password: this.user.password},
-                        withCredentials: true,
-                        crossDomain: true
-                    }).then(
+                    this.$store.dispatch('AuthorizationStore/registration', {username: this.user.username, password: this.user.password}).then(
                         response => {
-                            if (response.status === 200) {
-                                self.$store.dispatch('ModalShownStore/ToggleModalShown', '') //Убрать от сюда в будущем
-                                self.$store.dispatch('AuthorizationStore/ToggleLoading') //Убрать от сюда в будущем
-                                // self.$store.dispatch('AuthorizationStore/CheckAuthorize').then(() =>
-                                //     //self.$store.dispatch('ModalShownStore/ToggleModalShown', '') // Отключать модальное окно
-                                //     self.$store.dispatch('AuthorizationStore/ToggleLoading') //Ставим isLoading в false
-                                // )
-                            } else { //Сюда сложно попасть (невозможно)
-                                self.$store.dispatch('AuthorizationStore/ToggleLoading') //Ставим isLoading в false (крайний случай)
-                            }
-                        })
-                        .catch(error => {
-                            //Ошибка от серва
-                            self.$store.dispatch('AuthorizationStore/ToggleLoading') //Ставим isLoading в false
+                            console.log(response)
+                            self.$store.dispatch('ModalShownStore/ToggleModalShown', '')
+                            self.$store.dispatch('AuthorizationStore/ToggleLoading')
+                        },
+                        error => {
+                            console.error(error)
+                            self.$store.dispatch('AuthorizationStore/ToggleLoading')
                             if (error.response) {
-                                //Сделать обработку ошибок регистрации
-                                self.error_message = 'Некая ошибка'
+                                if (error.response.status === 409)
+                                    self.error_message = 'Такой пользователь уже есть'
+                                else
+                                    self.error_message = 'Некая ошибка' //TODO Сделать полную обработку ошибок
                                 console.error(error.response)
                             } else
                                 self.error_message = 'Ошибка сервера'
-                        })
+                        }
+                    )
                 }
 
             },
@@ -95,7 +82,7 @@
                 return this.user.password === this.user.password_repeat
             },
             all_right: function () {
-                return !!(this.passwords_match && this.user.username && this.user.password);
+                return !!(this.passwords_match && this.user.username && this.user.password)
             }
         },
         watch: {

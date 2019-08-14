@@ -176,6 +176,8 @@ paths:
         schema:
           type: String
     patch:
+      security:
+        - BearerAuth: [user]
       summary: Update user
       tags:
         - Users
@@ -193,6 +195,8 @@ paths:
           $ref: '#/components/responses/Unauthorized'
   /session:
     get:
+      security:
+        - BearerAuth: [user]
       summary: Returns session object
       tags:
         - Session

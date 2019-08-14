@@ -9,8 +9,8 @@
 </template>
 
 <script>
-    import ModalCloseButton from "@/components/ModalCloseButton";
-    import ModalAuthorization from "@/components/ModalAuthorization";
+    import ModalCloseButton from "@/components/ModalCloseButton"
+    import ModalAuthorization from "@/components/ModalAuthorization"
 
     export default {
         name: "Modal",

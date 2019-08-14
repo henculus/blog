@@ -244,7 +244,7 @@ components:
         - body
   responses:
     Unauthorized:
-      description: Login successful
+      description: Token missing
     NotFound:
       description: Not found
     Conflict:

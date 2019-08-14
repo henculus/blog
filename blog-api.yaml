@@ -186,6 +186,20 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/UserResponse'
+  /session:
+    get:
+      summary: Returns session object
+      tags:
+        - Session
+      responses:
+        200:
+          description: Session info from token
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#components/schemas/Session'
 
 components:
   securitySchemes:

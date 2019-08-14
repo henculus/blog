@@ -68,13 +68,14 @@
             width: 100%
 
         #content
+            max-width: $article-width
             width: 100%
             margin: 20px auto
             padding: $content-padding-mobile
 
             .article
                 word-wrap: break-word
-                font-size: 13px
+                font-size: 14px
 
                 .headline
                     .title
@@ -96,7 +97,7 @@
                 .article-content
                     margin: 30px auto
                     line-height: 1.6
-                    font-size: 1.3em
+                    font-size: 1.2em
                     word-wrap: normal
                     //font-family: $article_font
                     font-family: $default_font
@@ -126,13 +127,17 @@
                 //grid-template-columns: repeat(3, minmax(300px, 1fr))
                 grid-gap: 20px
 
+        +media_screensize_mobile_small
+            #content
+                .article
+                    font-size: 15px
+
         +media_screensize_mobile
             #content
-                max-width: $content-width
                 margin: 30px auto
-
                 .article
                     font-size: 16px
+
             #top-card-wrapper
                 display: block
     //чтобы был нормальный отступ на мобилке

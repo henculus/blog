@@ -166,21 +166,6 @@ paths:
                 $ref: '#/components/schemas/User'
         409:
           $ref: '#/components/responses/Conflict'
-  /users/login:
-    post:
-      requestBody:
-        $ref: '#/components/requestBodies/UserBody'
-      tags:
-        - Users
-      responses:
-        200:
-          description: Login successful
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserResponse'
-        404:
-          $ref: '#/components/responses/NotFound'
 
 components:
   securitySchemes:

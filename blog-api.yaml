@@ -201,7 +201,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Session'
+                  $ref: '#/components/schemas/SessionResponse'
         401:
           $ref: '#/components/responses/Unauthorized'
     post:
@@ -242,7 +242,7 @@ components:
             $ref: '#/components/schemas/Post'
 
   schemas:
-    Session:
+    SessionResponse:
       properties:
         iat:
           type: int

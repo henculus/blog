@@ -221,6 +221,8 @@ paths:
       security:
         - BearerAuth: [user]
       summary: Logout
+      tags:
+        - Session
       responses:
         200:
           description: Remove token from cookie

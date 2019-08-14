@@ -217,6 +217,15 @@ paths:
       responses:
         200:
           description: Login successful
+    delete:
+      security:
+        - BearerAuth: [user]
+      summary: Logout
+      responses:
+        200:
+          description: Remove token from cookie
+        401:
+          $ref: '#/components/responses/Unauthorized'
 
 
 components:

@@ -215,9 +215,6 @@ components:
         username:
           type: string
           example: "JohnDoe"
-        password_hash:
-          type: string
-          example: "asd2334sFD5234"
       required:
         - username
     User:

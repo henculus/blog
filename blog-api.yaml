@@ -166,6 +166,26 @@ paths:
                 $ref: '#/components/schemas/User'
         409:
           $ref: '#/components/responses/Conflict'
+  /users/{user_id}:
+    parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: String
+    patch:
+      tags:
+        - Users
+      description: Update fields of selected user
+      responses:
+        200:
+          description: User object
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
 
 components:
   securitySchemes:

@@ -142,6 +142,16 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
+    delete:
+      security:
+        - BearerAuth: [user]
+      tags:
+        - Users
+      responses:
+        200:
+          description: User deleted
+        401:
+          $ref: '#/components/responses/Unauthorized'
     post:
       tags:
         - Users

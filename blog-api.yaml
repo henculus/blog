@@ -186,6 +186,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/UserResponse'
+        401:
+          $ref: '#/components/responses/Unauthorized'
   /session:
     get:
       summary: Returns session object
@@ -255,7 +257,7 @@ components:
         - body
   responses:
     Unauthorized:
-      description: Token missing
+      description: Unauthorized
     NotFound:
       description: Not found
     Conflict:

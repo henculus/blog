@@ -208,8 +208,6 @@ paths:
         401:
           $ref: '#/components/responses/Unauthorized'
     post:
-      security:
-        - BearerAuth: [user]
       summary: Create session
       description: Accepts a json post body
       tags:

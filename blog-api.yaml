@@ -143,6 +143,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/User'
     delete:
+      summary: Delete user
       security:
         - BearerAuth: [user]
       tags:
@@ -153,6 +154,7 @@ paths:
         401:
           $ref: '#/components/responses/Unauthorized'
     post:
+      summary: Create user
       tags:
         - Users
       requestBody:
@@ -174,6 +176,7 @@ paths:
         schema:
           type: String
     patch:
+      summary: Update user
       tags:
         - Users
       description: Update fields of selected user
@@ -211,7 +214,6 @@ paths:
       description: Accepts a json post body
       tags:
         - Session
-        - Users
       requestBody:
         $ref: '#/components/requestBodies/UserBody'
       responses:

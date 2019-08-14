@@ -202,6 +202,22 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Session'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      security:
+        - BearerAuth: [user]
+      summary: Create session
+      description: Accepts a json post body
+      tags:
+        - Session
+        - Users
+      requestBody:
+        $ref: '#/components/requestBodies/UserBody'
+      responses:
+        200:
+          description: Login successful
+
 
 components:
   securitySchemes:

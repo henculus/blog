@@ -201,7 +201,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#components/schemas/Session'
+                  $ref: '#/components/schemas/Session'
 
 components:
   securitySchemes:
@@ -226,6 +226,21 @@ components:
             $ref: '#/components/schemas/Post'
 
   schemas:
+    Session:
+      properties:
+        iat:
+          type: int
+          example: 1565788311
+        exp:
+          type: int
+          example: 1565874711
+        sub:
+          type: String
+          example: "JohnDoe"
+      required:
+        - iat
+        - exp
+        - sub
     UserResponse:
       properties:
         username:

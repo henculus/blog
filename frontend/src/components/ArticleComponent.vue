@@ -74,7 +74,7 @@
         #content
             max-width: $article-width
             width: 100%
-            margin: 20px auto
+            //margin: 20px auto
             padding: $content-padding-mobile
 
             .article
@@ -139,7 +139,7 @@
         +media_screensize_mobile
             #content
                 margin: 30px auto
-
+                padding: 0
                 .article
                     font-size: 16px
 

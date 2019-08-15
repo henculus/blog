@@ -63,6 +63,8 @@
         position: relative
         width: $content-width
         padding: $content-padding-mobile
+        padding-top: 0
+        padding-bottom: 0
         max-width: $content-width
         display: flex
         flex-direction: row
@@ -95,7 +97,7 @@
                 opacity: 0
 
         #menu-wrapper
-            margin-right: 20px
+            //margin-right: 20px
 
             .menu-item__logo
                 transition: $ease_transition02

@@ -3,7 +3,9 @@
         <component-loading v-if="isLoading"></component-loading>
         <div v-else id="content-wrapper">
             <div id="top-card-wrapper">
-                <lazy-image :img-padding="30" :low-res-img-path="`https://i.imgur.com/QWbnFgn.jpg`" :high-res-img-path="`https://i.imgur.com/cpo8HZe.jpg`"></lazy-image>
+                <lazy-image v-slot:default="{ displayed }" :img-padding="30"
+                            :low-res-img-path="`https://i.imgur.com/QWbnFgn.jpg`"
+                            :high-res-img-path="`https://i.imgur.com/cpo8HZe.jpg`"></lazy-image>
             </div>
             <div id="content">
                 <article class="article">
@@ -15,6 +17,8 @@
                     <section class="article-content">
                         {{article.body}}
                     </section>
+                    <lazy-image :img-padding="56.25" :low-res-img-path="`https://i.imgur.com/xK5T9H0.jpg`"
+                                :high-res-img-path="`https://i.imgur.com/MOhedrY.jpg`"></lazy-image>
                 </article>
 
             </div>
@@ -31,7 +35,7 @@
         name: "ArticleComponent",
         components: {
             LazyImage,
-            ComponentLoading
+            ComponentLoading,
         },
         data() {
             return {
@@ -62,7 +66,7 @@
         position: relative
 
         #top-card-wrapper
-            display: none
+            //display: none
             position: relative
             background: lightgray
             width: 100%
@@ -135,6 +139,7 @@
         +media_screensize_mobile
             #content
                 margin: 30px auto
+
                 .article
                     font-size: 16px
 

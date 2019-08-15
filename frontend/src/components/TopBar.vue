@@ -2,7 +2,7 @@
     <div class="top-menu-wrapper">
         <div class="top-menu">
             <router-link tag="div" id="logo-box" to="/">
-                <img class="logo logo--colorful" src="../assets/rnt_logo.png" alt="Ranetka"/>
+                <!--<img class="logo logo--colorful" src="../assets/rnt_logo.png" alt="Ranetka"/>-->
                 <img class="logo logo--black" src="../assets/TestLogo.jpg" alt="Ranetka"/>
             </router-link>
             <nav id="menu-wrapper">

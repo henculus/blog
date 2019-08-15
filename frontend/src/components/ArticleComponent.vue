@@ -82,7 +82,7 @@
                     .title
                         font-size: 3em
                         letter-spacing: 2px
-                        //font-weight: 600 !important
+                        font-weight: 600 !important
                         font-family: $title_font
                         margin-bottom: 10px
 

@@ -71,8 +71,9 @@
             display: flex
             flex-direction: column
             .title
-                font-size: 1.8em
+                font-size: 2em
                 margin-bottom: 15px
+                font-weight: normal
                 font-family: $title_font
 
             .subtitle

@@ -1,24 +1,37 @@
 <template>
-    <div class="lazy-image-box">
-        <div class="padding-box" :style="{ paddingBottom: imgPadding + '%' }">
-            <div class="image-wrapper">
-                <div class="low-res-img-wrapper" :class="{hidden: imageLoaded}">
-                    <img class="low-res-img" :src="lowResImgPath"/>
+    <intersection-observer>
+        <template v-slot = "{ displayed }">
+            <template :displayed = "displayed">
+                <div class="lazy-image-box">
+                    <div class="padding-box" :style="{ paddingBottom: imgPadding + '%' }">
+                        <div class="image-wrapper">
+                            <div class="low-res-img-wrapper" :class="{hidden: imageLoaded}">
+                                <img class="low-res-img" :src="lowResImgPath"/>
+                            </div>
+                            <img v-if="displayed" class="high-res-img" :src="highResImgPath"
+                                 :class="{visible: imageLoaded}"
+                                 @load="imageLoaded = true"/>
+                        </div>
+                    </div>
                 </div>
-                <img class="high-res-img" :src="highResImgPath" :class="{visible: imageLoaded}"
-                     @load="imageLoaded = true"/>
-            </div>
-        </div>
-    </div>
+            </template>
+        </template>
+    </intersection-observer>
 </template>
 
 <script>
+    import IntersectionObserver from "./IntersectionObserver"
+
     export default {
         name: "LazyImage",
+        components: {
+            IntersectionObserver
+        },
         props: {
             imgPadding: Number,
             highResImgPath: String,
-            lowResImgPath: String
+            lowResImgPath: String,
+            displayed: Boolean
         },
         data() {
             return {
@@ -35,6 +48,7 @@
         position: relative
         display: block
         z-index: 1
+
         .padding-box
             .image-wrapper
                 position: absolute
@@ -57,6 +71,7 @@
                     transition: opacity .3s ease-in .4s
                     opacity: 1
                     z-index: 2
+
                     .low-res-img
                         filter: blur(20px)
                         transform: scale(1.1)
@@ -78,6 +93,7 @@
                     left: 0
                     opacity: 0
                     transition: opacity .3s ease-in 0s
+
                     &.visible
                         opacity: 1
 </style>

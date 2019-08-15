@@ -46,7 +46,7 @@
         display: flex
         flex-direction: column
         margin: 0 auto
-        padding: 20px 10px
+        padding: $content-padding-mobile
         width: 100%
 
         .article-block-name

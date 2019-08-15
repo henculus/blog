@@ -2,8 +2,8 @@
     <div class="top-menu-wrapper">
         <div class="top-menu">
             <router-link tag="div" id="logo-box" to="/">
-                <img class="logo logo--colorful" src="../assets/rnt_logo.png" alt="Ranetka"/>
-                <img class="logo logo--black" src="../assets/rnt_black.png" alt="Ranetka"/>
+                <!--<img class="logo logo--colorful" src="../assets/rnt_logo.png" alt="Ranetka"/>-->
+                <img class="logo logo--black" src="../assets/TestLogo.jpg" alt="Ranetka"/>
             </router-link>
             <nav id="menu-wrapper">
                 <a v-cloak class="menu-item menu-item__link" @click="ShowAuth"
@@ -15,10 +15,11 @@
                 </a>
                 <div class="menu-item" v-if="$store.getters['AuthorizationStore/isAuthorized']">
                     <a ref="openContextMenuButton" class="user-name menu-item__link"
-                       @click="ContextMenuShown = !ContextMenuShown">{{ $store.state.AuthorizationStore.sub }}</a>
+                       @click="!$store.state.AuthorizationStore.isLoading ? ContextMenuShown = !ContextMenuShown : ''">{{ $store.state.AuthorizationStore.sub }}</a>
                 </div>
                 <transition name="context-menu">
-                    <top-bar-context-menu v-if="ContextMenuShown" @closeContextMenu="ContextMenuShown = false"
+                    <top-bar-context-menu v-if="ContextMenuShown"
+                                          @closeContextMenu="ContextMenuShown = false"
                                           v-click-outside="{exclude: 'openContextMenuButton', isShown: 'ContextMenuShown'}"></top-bar-context-menu>
                 </transition>
             </nav>
@@ -62,6 +63,8 @@
         position: relative
         width: $content-width
         padding: $content-padding-mobile
+        padding-top: 0
+        padding-bottom: 0
         max-width: $content-width
         display: flex
         flex-direction: row
@@ -73,7 +76,7 @@
 
 
         #logo-box
-            height: 40px
+            height: 30px
             display: flex
             flex-direction: row
             align-items: center
@@ -94,7 +97,7 @@
                 opacity: 0
 
         #menu-wrapper
-            margin-right: 20px
+            //margin-right: 20px
 
             .menu-item__logo
                 transition: $ease_transition02
@@ -143,12 +146,12 @@
             .menu-item__logo
                 fill: $rnt_green
 
-    .no-touch #logo-box:hover
-        .logo
-            opacity: 0
+    /*.no-touch #logo-box:hover*/
+    /*    .logo*/
+    /*        opacity: 0*/
 
-        .logo--colorful
-            opacity: 1
+    /*    .logo--colorful*/
+    /*        opacity: 1*/
 
     +media_screensize_mobile
         .top-menu
@@ -156,10 +159,13 @@
 
     [v-cloak]
         display: none
+
     .context-menu-enter, .context-menu-leave-to
         opacity: 0
+
     .context-menu-enter-to, .context-menu-leave
         opacity: 1
+
     .context-menu-enter-active, .context-menu-leave-active
         transition: all .1s ease-in-out
 </style>

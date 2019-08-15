@@ -8,8 +8,8 @@
                             <div class="low-res-img-wrapper" :class="{hidden: imageLoaded}">
                                 <img class="low-res-img" :src="lowResImgPath"/>
                             </div>
-                            <img v-if="displayed" class="high-res-img" :src="highResImgPath"
-                                 :class="{visible: imageLoaded}"
+                            <img v-if="displayed || cached" class="high-res-img" :src="highResImgPath"
+                                 :class="{visible: imageLoaded, cached: cached}"
                                  @load="imageLoaded = true"/>
                         </div>
                     </div>
@@ -35,8 +35,15 @@
         },
         data() {
             return {
-                imageLoaded: false
+                imageLoaded: false,
+                cached: false
             }
+        },
+        beforeMount: function () {
+            let image = new Image()
+            image.src = this.highResImgPath
+            console.log(image.complete)
+            this.cached = image.complete ||  (image.width+image.height)>0
         },
         methods: {}
     }
@@ -51,6 +58,7 @@
 
         .padding-box
             .image-wrapper
+                background: #ebebeb
                 position: absolute
                 display: block
                 overflow: hidden
@@ -68,7 +76,7 @@
                     width: 100%
                     overflow: hidden
                     transform: translateZ(0)
-                    transition: opacity .3s ease-in .4s
+                    transition: opacity .2s ease-in .4s
                     opacity: 1
                     z-index: 2
 
@@ -78,7 +86,6 @@
                         position: absolute
                         width: 100%
                         left: 0
-                        bottom: 0
                         top: 0
 
                     &.hidden
@@ -92,7 +99,10 @@
                     top: 0
                     left: 0
                     opacity: 0
-                    transition: opacity .3s ease-in 0s
+                    transition: opacity .2s ease-in 0s
+                    &.cached
+                        z-index: 10 !important
+                        transition: opacity.2s ease-in .2s
 
                     &.visible
                         opacity: 1

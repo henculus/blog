@@ -19,9 +19,7 @@
                 let self = this
                 let callback = function (entries, observer) {
                     if(entries[0].isIntersecting) {
-                        console.log(entries)
                         self.displayed = true
-                        console.log(self.displayed)
                         observer.disconnect()
                     }
                 }

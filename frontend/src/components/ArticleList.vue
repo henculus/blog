@@ -33,7 +33,6 @@
                 response => {
                     this.isLoading = false
                     this.articles = response.data
-                    console.log(this.articles)
                 }
             )
         }

@@ -42,7 +42,6 @@
         beforeMount: function () {
             let image = new Image()
             image.src = this.highResImgPath
-            console.log(image.complete)
             this.cached = image.complete ||  (image.width+image.height)>0
         },
         methods: {}

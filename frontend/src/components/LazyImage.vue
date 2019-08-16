@@ -85,7 +85,7 @@
                     z-index: 2
 
                     .low-res-img
-                        filter: blur(50px)
+                        filter: blur(20px)
                         transform: scale(1.1)
                         position: absolute
                         width: 100%

@@ -1,9 +1,8 @@
 <template>
     <router-link :to="{ name: 'article', params: { id: article.id } }" tag="div" class="list-item">
         <div class="top-image-wrapper">
-            <div class="top-image-placeholder"></div>
-            <!--<img class="top-image" :src="article.img_src"/>-->
-            <img class="top-image" src="https://i.imgur.com/h5e29Fw.png"/>
+            <lazy-image class="top-image" :img-padding="30.5623" :low-res-img-path="`https://i.imgur.com/xK5T9H0.jpg`"
+                        :high-res-img-path="`https://i.imgur.com/MOhedrY.jpg`"></lazy-image>
         </div>
         <div class="article-text-items">
             <div class="title">{{article.title}}</div>
@@ -15,8 +14,10 @@
 </template>
 
 <script>
+    import LazyImage from "./LazyImage"
     export default {
         name: "ArticleListItem",
+        components: {LazyImage},
         props: {
             article: Object
         },
@@ -50,17 +51,13 @@
             overflow: hidden
             border-top-right-radius: $block_border_radius
             border-top-left-radius: $block_border_radius
-
-            .top-image-placeholder
-                display: block
-                position: relative
-                padding-bottom: 30.56234718826406%
-
+            height: 100%
             .top-image
                 transform: translateZ(0)
                 transition: all .2s ease-out
                 width: 100%
-                position: absolute
+                height: 100%
+                position: relative
                 pointer-events: none
                 top: 0
                 bottom: 0

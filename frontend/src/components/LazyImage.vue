@@ -1,7 +1,7 @@
 <template>
     <intersection-observer>
-        <template v-slot = "{ displayed }">
-            <template :displayed = "displayed">
+        <template v-slot="{ displayed }">
+            <template :displayed="displayed">
                 <div class="lazy-image-box">
                     <div class="padding-box" :style="{ paddingBottom: imgPadding + '%' }">
                         <div class="image-wrapper">
@@ -9,7 +9,7 @@
                                 <img class="low-res-img" :src="lowResImgPath"/>
                             </div>
                             <img v-if="displayed || cached" class="high-res-img" :src="highResImgPath"
-                                 :class="{visible: imageLoaded, cached: cached}"
+                                 :class="{visible: imageLoaded, cached: cached, 'ultra-high-res': ultraHighRes}"
                                  @load="imageLoaded = true"/>
                         </div>
                     </div>
@@ -31,18 +31,22 @@
             imgPadding: Number,
             highResImgPath: String,
             lowResImgPath: String,
-            displayed: Boolean
+            displayed: Boolean,
         },
         data() {
             return {
                 imageLoaded: false,
-                cached: false
+                cached: false,
+                ultraHighRes: false
             }
         },
         beforeMount: function () {
             let image = new Image()
             image.src = this.highResImgPath
-            this.cached = image.complete ||  (image.width+image.height)>0
+            this.cached = image.complete || (image.width + image.height) > 0
+            if (this.cached && (image.width+image.height > 7000)) {
+                this.ultraHighRes = true
+            }
         },
         methods: {}
     }
@@ -100,8 +104,10 @@
                     left: 0
                     opacity: 0
                     transition: opacity .2s ease-in 0s
+
                     &.cached
                         z-index: 10 !important
+                    &.ultra-high-res
                         transition: opacity .2s ease-in .2s
 
                     &.visible

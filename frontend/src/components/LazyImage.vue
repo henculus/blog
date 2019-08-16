@@ -82,7 +82,7 @@
                     z-index: 2
 
                     .low-res-img
-                        filter: blur(20px)
+                        filter: blur(50px)
                         transform: scale(1.1)
                         position: absolute
                         width: 100%
@@ -103,7 +103,7 @@
                     transition: opacity .2s ease-in 0s
                     &.cached
                         z-index: 10 !important
-                        transition: opacity.2s ease-in .2s
+                        transition: opacity .2s ease-in .2s
 
                     &.visible
                         opacity: 1

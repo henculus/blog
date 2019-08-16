@@ -52,6 +52,7 @@
 <style lang="sass" scoped>
     @import "../variables"
     .lazy-image-box
+        +deselect
         position: relative
         display: block
         z-index: 1

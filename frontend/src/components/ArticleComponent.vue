@@ -3,9 +3,8 @@
         <component-loading v-if="isLoading"></component-loading>
         <div v-else id="content-wrapper">
             <div id="top-card-wrapper">
-                <lazy-image v-slot:default="{ displayed }" :img-padding="30"
-                            :low-res-img-path="`https://i.imgur.com/QWbnFgn.jpg`"
-                            :high-res-img-path="`https://i.imgur.com/cpo8HZe.jpg`"></lazy-image>
+                <lazy-image :img-padding="25" :low-res-img-path="`https://i.imgur.com/w9sSofn.jpg`"
+                            :high-res-img-path="`https://i.imgur.com/SkWrPcM.jpg`"></lazy-image>
             </div>
             <div id="content">
                 <article class="article">
@@ -66,9 +65,7 @@
         position: relative
 
         #top-card-wrapper
-            //display: none
             position: relative
-            background: lightgray
             width: 100%
 
         #content
@@ -85,7 +82,7 @@
                     .title
                         font-size: 3em
                         letter-spacing: 2px
-                        //font-weight: 600 !important
+                        font-weight: 600 !important
                         font-family: $title_font
                         margin-bottom: 10px
 
@@ -101,7 +98,7 @@
                 .article-content
                     margin: 30px auto
                     line-height: 1.6
-                    font-size: 1.2em
+                    font-size: 1.3em
                     word-wrap: normal
                     //font-family: $article_font
                     font-family: $default_font
@@ -140,10 +137,12 @@
             #content
                 margin: 30px auto
                 padding: 0
+
                 .article
                     font-size: 16px
 
             #top-card-wrapper
                 display: block
+
     //чтобы был нормальный отступ на мобилке
 </style>

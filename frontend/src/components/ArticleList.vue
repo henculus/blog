@@ -33,7 +33,6 @@
                 response => {
                     this.isLoading = false
                     this.articles = response.data
-                    console.log(this.articles)
                 }
             )
         }
@@ -51,10 +50,8 @@
 
         .article-block-name
             +deselect
-            //align-self: center
             font-size: 1.8em
-
-            margin-bottom: 20px
+            padding-bottom: 20px
 
         .article-list
             //width: 50%

@@ -4,7 +4,7 @@
         <div class="arrow arrow--before"></div>
         <nav class="context-menu">
             <ul class="menu-list" @click="$emit('closeContextMenu')">
-                <router-link to="/my-publications" tag="li" class="menu-list__item">Публикации</router-link>
+                <router-link to="/my-publications" tag="li" class="menu-list__item">Мои публикации</router-link>
                 <li class="menu-list__item">Новая публикация</li>
                 <li class="menu-list__item" @click.once="logout">Выход</li>
             </ul>
@@ -22,7 +22,6 @@
         methods: {
             logout: function () {
                 this.$store.dispatch('AuthorizationStore/ToggleLoading')
-                this.$emit('closeContextMenu')
                 this.$store.dispatch('AuthorizationStore/logout').then(
                     response => {
                         console.log(response, 'Результат удаления')

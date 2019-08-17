@@ -5,7 +5,6 @@ use crate::{Id, ViewResult};
 use crate::Database;
 use crate::post::{NewPostData, Post, PostDataUpdate};
 use crate::schema::posts as posts_schema;
-use crate::schema::users::dsl::*;
 use crate::user::Token;
 
 const OFFSET: i64 = 0;
@@ -26,7 +25,7 @@ pub fn new_post(post_form: JsonForm<NewPostData>, conn: Database, token: Token) 
     Ok(Json(query_result))
 }
 
-#[get("/posts?<limit>&<offset>")]
+#[get("/posts?<limit>&<offset>", rank = 2)]
 pub fn get_posts(conn: Database, limit: Option<i64>, offset: Option<i64>, token: Option<Token>) -> ViewResult<Vec<Post>> {
     let query_result;
     match token {
@@ -46,6 +45,42 @@ pub fn get_posts(conn: Database, limit: Option<i64>, offset: Option<i64>, token:
         }
     }
     Ok(Json(query_result))
+}
+
+#[get("/posts?<author>&<limit>&<offset>")]
+pub fn get_posts_by_author(
+    conn: Database,
+    author: String,
+    limit: Option<i64>,
+    offset: Option<i64>,
+    token: Option<Token>
+) -> ViewResult<Vec<Post>> {
+    let query = posts_schema::table.filter(posts_schema::author.eq(&author));
+    let result;
+    match token {
+        Some(t) => {
+            if &author == t.username() {
+                result = query
+                    .offset(offset.unwrap_or(OFFSET))
+                    .limit(limit.unwrap_or(LIMIT))
+                    .load::<Post>(&*conn)?;
+            } else {
+                result = query
+                    .filter(posts_schema::published.eq(true))
+                    .offset(offset.unwrap_or(OFFSET))
+                    .limit(limit.unwrap_or(LIMIT))
+                    .load::<Post>(&*conn)?;
+            }
+        }
+        None => {
+            result = query
+                .filter(posts_schema::published.eq(true))
+                .offset(offset.unwrap_or(OFFSET))
+                .limit(limit.unwrap_or(LIMIT))
+                .load::<Post>(&*conn)?;
+        }
+    }
+    Ok(Json(result))
 }
 
 #[get("/posts/<post_id>")]

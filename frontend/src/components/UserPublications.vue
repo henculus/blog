@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <article-list></article-list>
+    <div class="article-feed-wrapper">
+        <article-list :main-feed="false"></article-list>
     </div>
 </template>
 

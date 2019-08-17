@@ -38,7 +38,7 @@ const routes = [
         path: '/my-publications',
         name: 'my-publications',
         component: UserPublications
-    }
+    },
 ]
 
 const router = new VueRouter({

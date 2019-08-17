@@ -1,6 +1,7 @@
 <template>
     <div class="article-list-wrapper">
-        <div class="article-block-name">Последние статьи</div>
+        <div class="article-block-name" v-if="mainFeed">Последние статьи</div>
+        <div class="article-block-name" v-else>Ваши статьи</div>
         <transition name="component-load" mode="out-in">
             <component-loading v-if="isLoading"></component-loading>
             <div class="article-list" v-else>
@@ -22,6 +23,9 @@
             ArticleListItem,
             ComponentLoading
         },
+        props: {
+          mainFeed: Boolean
+        },
         data() {
             return {
                 isLoading: true,
@@ -29,7 +33,9 @@
             }
         },
         mounted() {
-            HTTP.get('/posts', {withCredentials: true}).then(
+            let url
+            this.mainFeed ? url='/posts' : url='/posts?author='+this.$store.state.AuthorizationStore.sub
+            HTTP.get(url, {withCredentials: true}).then(
                 response => {
                     this.isLoading = false
                     this.articles = response.data

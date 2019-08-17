@@ -82,31 +82,33 @@
                     transform: translateZ(0)
                     transition: opacity .2s ease-in .4s
                     opacity: 1
-                    z-index: 2
+                    //z-index: 2
 
                     .low-res-img
-                        filter: blur(50px)
+                        filter: blur(20px)
                         transform: scale(1.1)
                         position: absolute
                         width: 100%
                         left: 0
                         top: 0
+                        transition: visibility 0s ease-in .4s
+                        visibility: visible
 
                     &.hidden
                         opacity: 0
+                        .low-res-img
+                            visibility: hidden
+
 
                 .high-res-img
                     display: block
-                    z-index: 1
+                    //z-index: 1
                     width: 100%
                     position: absolute
                     top: 0
                     left: 0
                     opacity: 0
                     transition: opacity .2s ease-in 0s
-
-                    &.cached
-                        z-index: 10 !important
                     &.ultra-high-res
                         transition: opacity .2s ease-in .2s
 

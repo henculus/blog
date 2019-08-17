@@ -3,10 +3,9 @@
         <div class="arrow"></div>
         <div class="arrow arrow--before"></div>
         <nav class="context-menu">
-            <ul class="menu-list">
-                <li class="menu-list__item">Пункт 1</li>
-                <li class="menu-list__item">Пункт 2</li>
-                <li class="menu-list__item">Пункт 3</li>
+            <ul class="menu-list" @click="$emit('closeContextMenu')">
+                <router-link to="/my-publications" tag="li" class="menu-list__item">Мои публикации</router-link>
+                <li class="menu-list__item">Новая публикация</li>
                 <li class="menu-list__item" @click.once="logout">Выход</li>
             </ul>
         </nav>
@@ -14,7 +13,6 @@
 </template>
 
 <script>
-    //TODO Возможно начать сохранять состояние loading при выполнении запросов
 
     export default {
         name: "TopBarContextMenu",
@@ -24,7 +22,6 @@
         methods: {
             logout: function () {
                 this.$store.dispatch('AuthorizationStore/ToggleLoading')
-                this.$emit('closeContextMenu')
                 this.$store.dispatch('AuthorizationStore/logout').then(
                     response => {
                         console.log(response, 'Результат удаления')

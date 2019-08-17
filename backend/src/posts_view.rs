@@ -4,7 +4,7 @@ use rocket_contrib::json::{Json, JsonError};
 use crate::{Id, ViewResult};
 use crate::Database;
 use crate::post::{NewPostData, Post, PostDataUpdate};
-use crate::schema::posts;
+use crate::schema::posts as posts_schema;
 use crate::schema::users::dsl::*;
 use crate::user::Token;
 
@@ -15,7 +15,7 @@ type JsonForm<'a, T> = Result<Json<T>, JsonError<'a>>;
 
 #[post("/posts", format = "json", data = "<post_form>")]
 pub fn new_post(post_form: JsonForm<NewPostData>, conn: Database, token: Token) -> ViewResult<Post> {
-    use posts::dsl::*;
+    use posts_schema::dsl::*;
 
     let post = post_form?.into_inner().validate()?;
 
@@ -31,15 +31,15 @@ pub fn get_posts(conn: Database, limit: Option<i64>, offset: Option<i64>, token:
     let query_result;
     match token {
         Some(t) => {
-            query_result = posts::table
-                .filter(posts::published.eq(true).or(posts::author.eq(t.username())))
+            query_result = posts_schema::table
+                .filter(posts_schema::published.eq(true).or(posts_schema::author.eq(t.username())))
                 .offset(offset.unwrap_or(OFFSET))
                 .limit(limit.unwrap_or(LIMIT))
                 .load::<Post>(&*conn)?;
         }
         None => {
-            query_result = posts::table
-                .filter(posts::published.eq(true))
+            query_result = posts_schema::table
+                .filter(posts_schema::published.eq(true))
                 .offset(offset.unwrap_or(OFFSET))
                 .limit(limit.unwrap_or(LIMIT))
                 .load::<Post>(&*conn)?;
@@ -50,7 +50,7 @@ pub fn get_posts(conn: Database, limit: Option<i64>, offset: Option<i64>, token:
 
 #[get("/posts/<post_id>")]
 pub fn get_post(post_id: Id, conn: Database, token: Option<Token>) -> ViewResult<Post> {
-    use posts::dsl::*;
+    use posts_schema::dsl::*;
 
     let query_result;
     match token {
@@ -76,7 +76,7 @@ pub fn update_post(
     conn: Database,
     token: Token,
 ) -> ViewResult<Post> {
-    use posts::dsl::*;
+    use posts_schema::dsl::*;
 
     let post_data = post_data.into_inner();
     let original_post = posts.filter(id.eq(post_id).and(author.eq(token.username())));
@@ -88,7 +88,7 @@ pub fn update_post(
 
 #[delete("/posts/<post_id>")]
 pub fn delete_post(post_id: Id, conn: Database, token: Token) -> ViewResult<usize> {
-    use posts::dsl::*;
+    use posts_schema::dsl::*;
 
     let post = posts.filter(id.eq(post_id).and(author.eq(token.username())));
     let query_result = diesel::delete(post).execute(&*conn)?;

@@ -5,7 +5,7 @@
         <nav class="context-menu">
             <ul class="menu-list" @click="$emit('closeContextMenu')">
                 <router-link to="/my-publications" tag="li" class="menu-list__item">Мои публикации</router-link>
-                <li class="menu-list__item">Новая публикация</li>
+                <router-link to="/editor" tag="li" class="menu-list__item">Новая публикация</router-link>
                 <li class="menu-list__item" @click.once="logout">Выход</li>
             </ul>
         </nav>

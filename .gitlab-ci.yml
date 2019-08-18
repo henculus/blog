@@ -21,6 +21,7 @@ test:
     DATABASE_URL: postgres://lupusanay:qwerty@postgres/blog
     ROCKET_DATABASES: "{blog={url=postgres://lupusanay:qwerty@postgres/blog}}"
   script:
+    - cd backend
     - diesel migration run
     - rustc --version
     - cargo --version
@@ -31,26 +32,25 @@ test:
       - cargo/
       - target/
 
-production:dev:
+migrations:
   stage: deploy
   only:
     - dev
-  script:
-    - cd frontend/
-    - npm install --progress=false
-    - npm run build
-    - cd ../
-    - rm -rf cargo/ target/ ci/ old-frontend/
-    - dpl --provider=heroku --app=lupusanay-blog-rust --api-key=$HEROKU_PRODUCTION_API_KEY --skip_cleanup
-
-production:master:
-  stage: deploy
-  only:
     - master
   script:
-    - cd frontend/
-    - npm install --progress=false
-    - npm run build
-    - cd ../
-    - rm -rf cargo/ target/ ci/
-    - dpl --provider=heroku --app=lupusanay-blog-rust --api-key=$HEROKU_PRODUCTION_API_KEY --skip_cleanup
+    - cd backend
+    - DATABASE_URL=$HEROKU_DATABASE_URL diesel migration run
+
+production:
+  image: docker:latest
+  stage: deploy
+  services:
+    - docker:dind
+  only:
+    - dev
+    - master
+  script:
+    - docker build -t web .
+    - docker login --username=$HEROKU_REGISTRY_USERNAME --password=$HEROKU_REGISTRY_PASSWORD $HEROKU_REGISTRY_URL
+    - docker tag web registry.heroku.com/lupusanay-blog-rust/web
+    - docker push registry.heroku.com/lupusanay-blog-rust/web

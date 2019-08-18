@@ -1,16 +1,16 @@
 <template>
     <div class="modal-wrapper" @click="modalClose">
-        <div :class="{'disabled': isDisabled}" class="modal-container" @click="modalClick">
+        <div :class="{'disabled': $store.state.AuthorizationStore.isLoading}" class="modal-container" @click="modalClick">
             <modal-close-button class="close"
                                 @click.native="modalClose"></modal-close-button>
-            <component @disableForm="disableForm" :is="$store.state.ModalShownStore.ModalComponent"></component>
+            <component :is="$store.state.ModalShownStore.ModalComponent"></component>
         </div>
     </div>
 </template>
 
 <script>
-    import ModalCloseButton from "@/components/ModalCloseButton";
-    import ModalAuthorization from "@/components/ModalAuthorization";
+    import ModalCloseButton from "@/components/ModalCloseButton"
+    import ModalAuthorization from "@/components/ModalAuthorization"
 
     export default {
         name: "Modal",
@@ -25,15 +25,12 @@
         },
         methods: {
             modalClose: function(){
-                if (!this.isDisabled)
+                if (!this.$store.state.AuthorizationStore.isLoading)
                     this.$store.dispatch('ModalShownStore/ToggleModalShown')
             },
             modalClick: function (event) {
                 event.stopPropagation()
             },
-            disableForm: function (state) {
-                this.isDisabled = state
-            }
         }
     }
 </script>
@@ -44,30 +41,33 @@
         font-size: 16px
         position: fixed
         display: flex
-        flex-direction: row
+        flex-direction: column
         align-items: center
         justify-content: center
         z-index: 9998
         top: 0
         left: 0
-        width: 100%
-        height: 100%
+        right: 0
+        bottom: 0
+        width: 100vw
+        height: 100vh
         background-color: rgba(0, 0, 0, .8)
         overflow-y: auto
 
         .modal-container
+            position: relative
+            margin: $content-padding-mobile
+            border-radius: $block_border_radius
             pointer-events: all
-            position: absolute
             max-height: 100%
             display: flex
             flex-direction: column
             align-items: center
             transition: $ease_transition02
             background: white
-            max-width: 560px
             overflow-y: auto
-            width: 100%
-            border-radius: 0
+            width: 90%
+            min-width: 200px
             &:after
                 content: ''
                 transition: all .1s ease
@@ -99,12 +99,17 @@
 
     .modal-content-leave-active, .modal-content-enter-active
         transition: $ease_transition02
-
     +media_screensize_mobile
         .modal-wrapper
             .modal-container
-                border-radius: $block_border_radius
-                max-width: 400px
+                width: 400px
+    +media_screensize_mobile_small
+        .modal-wrapper
+            .modal-container
+                left: auto
+                right: auto
+                width: 400px
+                margin: 0
 
 </style>
 

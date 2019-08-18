@@ -1,8 +1,9 @@
 import Vue from 'vue'
-import VueRouter from "vue-router";
-import ArticleList from "@/components/ArticleList";
-import ArticleComponent from "@/components/ArticleComponent";
-import store from "@/storage";
+import VueRouter from "vue-router"
+import ArticleComponent from "./components/ArticleComponent"
+import store from "./storage"
+import UserPublications from "./components/UserPublications"
+import ArticleFeed from "./components/ArticleFeed"
 
 Vue.use(VueRouter)
 
@@ -10,17 +11,34 @@ const routes = [
     {
         path: '/',
         redirect: '/articles',
+        beforeEnter: (to, from, next) => {
+            store.dispatch('AuthorizationStore/CheckAuthorize').then(
+                result => {
+                    console.log(result)
+                    next()
+                },
+                error => {
+                    console.error(error)
+                    next()
+                }
+            )
+        }
     },
     {
         path: '/articles',
         name: 'articles',
-        component: ArticleList
+        component: ArticleFeed,
     },
     {
         path: '/articles/:id',
         name: 'article',
         component: ArticleComponent
-    }
+    },
+    {
+        path: '/my-publications',
+        name: 'my-publications',
+        component: UserPublications
+    },
 ]
 
 const router = new VueRouter({
@@ -37,13 +55,13 @@ const router = new VueRouter({
             }, 200)
         })
     }
-});
+})
 router.beforeEach((to, from, next) => {
     if (store.state.ModalShownStore.ModalShown) {
         store.dispatch('ModalShown/ToggleModalShown')
         next(false)
     } else
         next()
-});
+})
 
 export default router

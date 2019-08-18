@@ -1,6 +1,0 @@
-[development]
-address = "0.0.0.0"
-port = 8000
-secret_key = "l5KtZcWen4XT4F77Dg2shixUzaIqdWohQf9MEbnjBi0="
-[development.databases]
-blog = {url="postgres://lupusanay:qwerty@localhost/blog"}

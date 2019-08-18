@@ -1,7 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Montserrat&display=swap')
-@import url('https://fonts.googleapis.com/css?family=Open+Sans&display=swap')
-@import url('https://fonts.googleapis.com/css?family=Playfair+Display&display=swap')
-@import url('https://fonts.googleapis.com/css?family=Lora&display=swap')
+@import url('https://fonts.googleapis.com/css?family=Comfortaa|Lora|Montserrat|Open+Sans|&display=swap')
 
 $menu_color: #1c1918
 $menu_height: 70px
@@ -9,7 +6,7 @@ $menu_text_color: #cecece
 $menu_font_size: 18px
 $bottom_box_shadow: 0 2px 4px rgba(0, 0, 0, 0.5)
 $default_font: 'Montserrat', sans-serif
-$title_font: 'Playfair Display', serif
+$title_font: 'Comfortaa', cursive
 $subtitle_font: 'Open Sans', sans-serif
 $article_font: 'Lora', serif
 $banner_height: 45vh
@@ -18,9 +15,12 @@ $block_border_radius: 8px
 $border_style: 1px solid black
 $rnt_green: #00E676
 $menu_border_color: #e6e6e6
-$content-padding-mobile: 0 10px
+$content-padding-mobile: 20px 25px
 $content-width: 820px
+$article-width: 730px
 $ease_transition02: all .2s ease-in-out
+$rnt_green_light: rgba(0, 255, 118, 0.4)
+$circle-border-radius: 50%
 
 =deselect
   -ms-user-select: none
@@ -31,6 +31,9 @@ $ease_transition02: all .2s ease-in-out
 =media_screensize_mobile
   @media (min-width: 850px)
     @content
+=media_screensize_mobile_small
+  @media (min-width: 600px)
+    @content
 
 .fade-enter-active, .fade-leave-active
   transition: opacity 0.15s
@@ -39,5 +42,11 @@ $ease_transition02: all .2s ease-in-out
 .fade-enter-to, .fade-leave
   opacity: 1
 
+.component-load-enter, .component-load-leave-to
+  opacity: 0
+.component-load-leave, .component-load-enter-to
+  opacity: 1
+.component-load-enter-active, .component-load-leave-active
+  transition: $ease_transition02
 
 

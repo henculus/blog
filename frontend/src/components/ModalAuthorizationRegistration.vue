@@ -10,9 +10,15 @@
                 </div>
                 <div class="form-item form-item--password">
                     <input class="input" v-model="user.password" type="password" id="password"
-                           placeholder="Пароль"/>
+                           placeholder="Пароль" @blur="passwordState"/>
                 </div>
-                <input class="button button-authorize" value="Зарегестрироваться" type="submit" @mousedown="sendRegData">
+                <div class="form-item form-item--password-repeat">
+                    <input class="input" v-model="user.password_repeat" type="password" id="password-repeat"
+                           placeholder="Повторите пароль" @blur="passwordState"/>
+                </div>
+                <span v-if="error_message" class="error_message">{{ error_message }}</span>
+                <input class="button button-authorize" :disabled="!all_right" value="Зарегестрироваться" type="submit"
+                       @mousedown="sendRegData">
             </form>
         </div>
         <div class="modal-footer modal-element">
@@ -22,7 +28,6 @@
 </template>
 
 <script>
-    import {HTTP} from '../server_defaults'
 
     export default {
         name: "ModalAuthorizationRegistration",
@@ -30,34 +35,64 @@
         data() {
             return {
                 user: {
-                    username: '',
-                    password: ''
-                }
+                    username: undefined,
+                    password: undefined,
+                    password_repeat: undefined
+                },
+                error_message: undefined,
             }
         },
         methods: {
             sendRegData: function () {
-                HTTP({
-                    method: 'post',
-                    url: '/session',
-                    headers: {'Content-type': 'application/json'},
-                    dataType: 'application/json',
-                    data: this.user,
-                    withCredentials: true,
-                    crossDomain: true
-                }).then(response => {
-                        /* eslint-disable */
-                        console.log(response)
-                        HTTP.get('/session', {withCredentials: true})
-                            .then(response => console.log(response))
-                    }
-                )
+                let self = this
+                self.$store.dispatch('AuthorizationStore/ToggleLoading')
+                if (this.all_right) {
+                    this.$store.dispatch('AuthorizationStore/registration', {username: this.user.username, password: this.user.password}).then(
+                        response => {
+                            console.log(response)
+                            self.$store.dispatch('ModalShownStore/ToggleModalShown', '')
+                            self.$store.dispatch('AuthorizationStore/ToggleLoading')
+                        },
+                        error => {
+                            console.error(error)
+                            self.$store.dispatch('AuthorizationStore/ToggleLoading')
+                            if (error.response) {
+                                if (error.response.status === 409)
+                                    self.error_message = 'Такой пользователь уже есть'
+                                else
+                                    self.error_message = 'Некая ошибка' //TODO Сделать полную обработку ошибок
+                                console.error(error.response)
+                            } else
+                                self.error_message = 'Ошибка сервера'
+                        }
+                    )
+                }
 
             },
-            onSubmitForm: function (event) {
-                event.preventDefault()
-            },
+            passwordState: function () {
+                if (!(this.passwords_match) && this.user.password_repeat)
+                    this.error_message = 'Пароли не совпадают'
+                else
+                    this.error_message = undefined
+            }
+
         },
+        computed: {
+            passwords_match: function () {
+                return this.user.password === this.user.password_repeat
+            },
+            all_right: function () {
+                return !!(this.passwords_match && this.user.username && this.user.password)
+            }
+        },
+        watch: {
+            user: {
+                handler: function () {
+                    this.error_message = undefined //Очищаем ошибку при вводе в поля
+                },
+                deep: true
+            },
+        }
     }
 </script>
 

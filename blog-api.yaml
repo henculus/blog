@@ -9,6 +9,7 @@ servers:
   - url: http://localhost:8000/api
     description: Development local server
 tags:
+  - name: Session
   - name: Users
   - name: Posts
 paths:
@@ -117,7 +118,43 @@ paths:
               schema:
                 $ref: '#/components/schemas/Post'
   /users:
+    get:
+      summary: Returns array of users
+      parameters:
+        - in: query
+          name: limit
+          required: false
+          schema:
+            type: integer
+        - in: query
+          name: offset
+          required: false
+          schema:
+            type: integer
+      tags:
+        - Users
+      responses:
+        200:
+          description: Users array with selected limit and offset
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    delete:
+      summary: Delete user
+      security:
+        - BearerAuth: [user]
+      tags:
+        - Users
+      responses:
+        200:
+          description: User deleted
+        401:
+          $ref: '#/components/responses/Unauthorized'
     post:
+      summary: Create user
       tags:
         - Users
       requestBody:
@@ -131,21 +168,71 @@ paths:
                 $ref: '#/components/schemas/User'
         409:
           $ref: '#/components/responses/Conflict'
-  /users/login:
-    post:
-      requestBody:
-        $ref: '#/components/requestBodies/UserBody'
+  /users/{user_id}:
+    parameters:
+      - name: user_id
+        in: path
+        required: true
+        schema:
+          type: String
+    patch:
+      security:
+        - BearerAuth: [user]
+      summary: Update user
       tags:
         - Users
+      description: Update fields of selected user
       responses:
         200:
-          description: Login successful
+          description: User object
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponse'
-        404:
-          $ref: '#/components/responses/NotFound'
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserResponse'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+  /session:
+    get:
+      security:
+        - BearerAuth: [user]
+      summary: Returns session object
+      tags:
+        - Session
+      responses:
+        200:
+          description: Session info from token
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SessionResponse'
+        401:
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      summary: Create session
+      description: Accepts a json post body
+      tags:
+        - Session
+      requestBody:
+        $ref: '#/components/requestBodies/UserBody'
+      responses:
+        200:
+          description: Login successful
+    delete:
+      security:
+        - BearerAuth: [user]
+      summary: Logout
+      tags:
+        - Session
+      responses:
+        200:
+          description: Remove token from cookie
+        401:
+          $ref: '#/components/responses/Unauthorized'
+
 
 components:
   securitySchemes:
@@ -170,14 +257,26 @@ components:
             $ref: '#/components/schemas/Post'
 
   schemas:
+    SessionResponse:
+      properties:
+        iat:
+          type: int
+          example: 1565788311
+        exp:
+          type: int
+          example: 1565874711
+        sub:
+          type: String
+          example: "JohnDoe"
+      required:
+        - iat
+        - exp
+        - sub
     UserResponse:
       properties:
         username:
           type: string
           example: "JohnDoe"
-        password_hash:
-          type: string
-          example: "asd2334sFD5234"
       required:
         - username
     User:
@@ -204,7 +303,7 @@ components:
         - body
   responses:
     Unauthorized:
-      description: Login successful
+      description: Unauthorized
     NotFound:
       description: Not found
     Conflict:

@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <top-menu></top-menu>
+        <top-bar class="top-bar"></top-bar>
         <transition name="fade" mode="out-in" appear>
             <router-view class="page-content"></router-view>
         </transition>
@@ -11,30 +11,47 @@
 </template>
 
 <script>
-    import TopMenu from './components/TopMenu'
+    import TopBar from './components/TopBar'
     import Modal from "@/components/Modal"
 
     export default {
         name: 'app',
         data() {
-            return {}
+            return {
+                authorized: false,
+                sub: undefined
+            }
         },
         components: {
-            TopMenu,
+            TopBar,
             Modal
+        },
+        beforeMount: function () {
+            this.authorized = window.localStorage.getItem('authorized')
+            this.sub = window.localStorage.getItem('sub')
+            this.$store.dispatch('AuthorizationStore/CheckAuthorize').then(
+                //eslint-disable-next-line
+                result => {
+
+                },
+                error => {
+                    console.error(error, 'Не авторизован')
+                }
+            )
         },
         computed: {
             ModalShown: function () {
                 return this.$store.state.ModalShownStore.ModalShown
-            }
+            },
         },
         watch: {
             ModalShown: function (newState) {
                 if (newState)
-                    document.body.style.overflow = 'hidden';
-                else
-                    document.body.style.overflow = 'visible';
-            }
+                    document.body.style.overflow = 'hidden'
+                else {
+                    document.body.style.overflow = 'visible scroll'
+                }
+            },
         }
     }
 
@@ -44,15 +61,26 @@
     @import "normalize/normalize.css"
     @import "variables"
     html, body, #app
+        background: white
         position: relative
         display: block
         top: 0
         text-rendering: optimizeLegibility
         font-family: $default_font
         width: 100%
+        height: 100%
+
+    body
+        overflow-y: scroll
+
+    .top-bar
+        z-index: 1
+
+    .page-content
+        z-index: 0
 
     .modal-enter-active, .modal-leave-active
-        transition: all .2s
+        transition: $ease_transition02
 
     .modal-enter, .modal-leave-to
         opacity: 0

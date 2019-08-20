@@ -24,9 +24,18 @@ pub fn get_users(conn: Database, limit: Option<i64>, offset: Option<i64>) -> Vie
 }
 
 #[post("/users", format = "json", data = "<user_data>")]
-pub fn new_user(user_data: Json<UserData>, conn: Database) -> ViewResult<User> {
+pub fn new_user(user_data: Json<UserData>, conn: Database, mut cookies: Cookies) -> ViewResult<User> {
+    let password: String = (&user_data.password).parse().unwrap();
     let user: User = user_data.into_inner().into();
-    let query_result = diesel::insert_into(users).values(user).get_result(&*conn)?;
+    let query_result: User = diesel::insert_into(users).values(&user).get_result(&*conn)?;
+    let token = user.verify_password_and_generate_jwt(password)?;
+
+    cookies.add_private(
+        Cookie::build("token", token)
+            .secure(false)
+            .same_site(SameSite::None)
+            .finish()
+    );
 
     Ok(Json(query_result))
 }

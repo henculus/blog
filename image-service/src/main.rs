@@ -65,6 +65,39 @@ pub fn process(field: Field) -> impl Future<Item=Vec<u8>, Error=Error> {
         .and_then(load_img_to_buffer)
 }
 
+pub fn upload_to_imgur(img: Vec<u8>) -> Result<String, Error> {
+    info!("Uploading image to the imgur");
+    let client = reqwest::Client::new();
+    let image = reqwest::multipart::Part::bytes(img)
+        .file_name("img.png")
+        .mime_str("image/jpg")
+        .map_err(|e| {
+            error!("Reqwest multipart error: {}", e);
+            ErrorInternalServerError(e)
+        })?;
+    let form = reqwest::multipart::Form::new()
+        .part("image", image);
+
+    let response: serde_json::Value = client
+        .post("https://api.imgur.com/3/upload")
+        .header("Authorization", "Client-ID cc27cc3925c6140")
+        .multipart(form)
+        .send()
+        .map_err(|e| {
+            error!("Request error: {}", e);
+            ErrorInternalServerError(e)
+        })?
+        .json()
+        .map_err(|e| {
+            error!("Deserialize error: {}", e);
+            ErrorInternalServerError(e)
+        })?;
+    debug!("Request body: {}", response);
+    let link = response["data"]["link"].to_string();
+    info!("Image uploaded to imgur: {}", link);
+    Ok(link)
+}
+
 pub fn upload(multipart: Multipart) -> impl Future<Item=HttpResponse, Error=Error> {
     info!("Started image processing...");
     multipart
@@ -73,8 +106,16 @@ pub fn upload(multipart: Multipart) -> impl Future<Item=HttpResponse, Error=Erro
         .collect()
         .map(|buf| {
             let img: Vec<u8> = buf.iter().cloned().flatten().collect();
+            let img_cloned = img.clone();
+            web::block(move || {
+                let _link = upload_to_imgur(img_cloned).map_err(|e| {
+                    error!("Uploading error: {}", e);
+                }).unwrap();
+                Ok(()) as Result<(), ()>
+            }).wait();
+
             info!("Writing buffer to response...");
-            let mut response = HttpResponse::with_body(StatusCode::OK, img.into());
+            let mut response = HttpResponse::with_body(StatusCode::OK, img.clone().into());
             response
                 .headers_mut()
                 .insert(CONTENT_TYPE, HeaderValue::from_static("image/jpeg"));

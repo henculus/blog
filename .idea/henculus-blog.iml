@@ -9,7 +9,12 @@
       <sourceFolder url="file://$MODULE_DIR$/backend/examples" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/backend/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/backend/benches" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/image-service/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/image-service/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/image-service/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/image-service/benches" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/backend/target" />
+      <excludeFolder url="file://$MODULE_DIR$/image-service/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

@@ -5,7 +5,7 @@
             <router-view class="page-content"></router-view>
         </transition>
         <transition name="modal">
-            <modal v-if="$store.state.ModalShownStore.ModalShown"></modal>
+            <modal v-if="$store.state.ModalStore.ModalShown"></modal>
         </transition>
     </div>
 </template>
@@ -41,7 +41,7 @@
         },
         computed: {
             ModalShown: function () {
-                return this.$store.state.ModalShownStore.ModalShown
+                return this.$store.state.ModalStore.ModalShown
             },
         },
         watch: {

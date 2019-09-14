@@ -62,12 +62,12 @@ const router = new VueRouter({
         })
     }
 })
-router.beforeEach((to, from, next) => {
-    if (store.state.ModalShownStore.ModalShown) {
-        store.dispatch('ModalShown/ToggleModalShown')
-        next(false)
-    } else
-        next()
-})
+// router.beforeEach((to, from, next) => {
+//     if (store.state.ModalShownStore.ModalShown) {
+//         store.dispatch('ModalShown/ToggleModalShown')
+//         next(false)
+//     } else
+//         next()
+// })
 
 export default router

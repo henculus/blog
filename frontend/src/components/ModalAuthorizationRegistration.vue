@@ -50,7 +50,7 @@
                     this.$store.dispatch('AuthorizationStore/registration', {username: this.user.username, password: this.user.password}).then(
                         response => {
                             console.log(response)
-                            self.$store.dispatch('ModalShownStore/ToggleModalShown', '')
+                            self.$store.dispatch('ModalStore/HideModal')
                             self.$store.dispatch('AuthorizationStore/ToggleLoading')
                         },
                         error => {

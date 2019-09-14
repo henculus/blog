@@ -5,7 +5,7 @@
              @click="$event.stopPropagation()">
             <modal-close-button class="close"
                                 @click.native="modalClose"></modal-close-button>
-            <component :is="$store.state.ModalShownStore.ModalComponent"></component>
+            <component :is="$store.state.ModalStore.ModalComponent"></component>
         </div>
     </div>
 </template>
@@ -28,7 +28,7 @@
         methods: {
             modalClose: function () {
                 if (!this.$store.state.AuthorizationStore.isLoading)
-                    this.$store.dispatch('ModalShownStore/ToggleModalShown') //TODO Разделить на 2 экшна (открыть окно/закрыть окно)
+                    this.$store.dispatch('ModalStore/HideModal') //TODO Разделить на 2 экшна (открыть окно/закрыть окно)
             },
         }
     }

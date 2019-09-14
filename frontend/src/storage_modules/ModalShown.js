@@ -1,4 +1,4 @@
-export const moduleModalShown = {
+export const moduleModal = {
     namespaced: true,// Локальное пространство имён
     state: {
         ModalShown: false,
@@ -6,15 +6,22 @@ export const moduleModalShown = {
     }
     ,
     mutations: {
-        ToggleModalShown(state, component) {
-            state.ModalShown = !state.ModalShown
+        HideModal(state){
+            state.ModalShown = false
+            state.ModalComponent = undefined
+        },
+        ShowModal(state, component) {
+            state.ModalShown = true
             state.ModalComponent = component
         },
     }
     ,
     actions: {
-        ToggleModalShown({commit}, component) {
-            commit('ToggleModalShown', component)
-        }
+        HideModal({commit}) {
+            commit('HideModal')
+        },
+        ShowModal({commit}, component) {
+            commit('ShowModal', component)
+        },
     }
 }

@@ -42,7 +42,7 @@
         },
         methods: {
             ShowAuth: function () {
-                this.$store.dispatch('ModalShownStore/ToggleModalShown', 'ModalAuthorization')
+                this.$store.dispatch('ModalStore/ShowModal', 'ModalAuthorization')
             },
 
         },

@@ -48,7 +48,7 @@
                                     response => {
                                         console.log(response)
                                         this.$store.dispatch('AuthorizationStore/ToggleLoading')
-                                        this.$store.dispatch('ModalShownStore/ToggleModalShown')
+                                        this.$store.dispatch('ModalStore/HideModal')
                                     },
                                     error => {
                                         console.error(error)

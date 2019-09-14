@@ -14,8 +14,11 @@ export const moduleAuthorization = {
             state.iat = data.iat
             state.sub = data.sub
         },
-        ToggleLoading(state) {
-            state.isLoading = !state.isLoading
+        StartLoading(state){
+            state.isLoading = true
+        },
+        EndLoading(state){
+            state.isLoading = false
         }
     }
     ,
@@ -89,6 +92,12 @@ export const moduleAuthorization = {
         ToggleLoading({commit}) {
             commit('ToggleLoading')
         },
+        StartLoading({commit}){
+            commit('StartLoading')
+        },
+        EndLoading({commit}){
+            commit('EndLoading')
+        }
 
     },
     getters: {

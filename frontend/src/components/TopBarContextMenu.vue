@@ -20,33 +20,33 @@
         },
         methods: {
             logout: function () {
-                this.$store.dispatch('AuthorizationStore/ToggleLoading')
+                this.$store.dispatch('AuthorizationStore/StartLoading')
                 this.$store.dispatch('AuthorizationStore/logout').then(
                     response => {
                         console.log(response, 'Результат удаления')
                         this.$store.dispatch('AuthorizationStore/CheckAuthorize').then(
                             response => {
-                                this.$store.dispatch('AuthorizationStore/ToggleLoading')
                                 console.log(response)
                             },
                             error => {
-                                this.$store.dispatch('AuthorizationStore/ToggleLoading')
                                 if (this.$route.name === 'my-publications') {
                                     this.$router.push({name: 'articles'})
                                 }
                                 console.log(error, 'Успешный выход')
                             }
-                        )
+                        ).finally(()=> {
+                            this.$store.dispatch('AuthorizationStore/EndLoading')
+                        })
                     },
                     error => {
                         console.log(error, 'Ошибка сервера')
                         this.$store.dispatch('AuthorizationStore/CheckAuthorize').then(
                             response => {
                                 console.log(response)
-                                this.$store.dispatch('AuthorizationStore/ToggleLoading')
+                                this.$store.dispatch('AuthorizationStore/EndLoading')
                             },
                             error => {
-                                this.$store.dispatch('AuthorizationStore/ToggleLoading')
+                                this.$store.dispatch('AuthorizationStore/EndLoading')
                                 console.error(error)
                             }
                         )

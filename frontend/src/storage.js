@@ -6,6 +6,9 @@ import { moduleAuthorization } from "./storage_modules/Authorization"
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
+
+    strict: true, // not for production
+
     modules: {
         ModalShownStore: moduleModalShown,
         AuthorizationStore: moduleAuthorization

@@ -37,7 +37,8 @@
         },
         methods: {
             login: function () {
-                if (!this.$store.state.AuthorizationStore.isLoading&&!this.$store.getters['AuthorizationStore/isAuthorized']) {
+                if (!this.$store.state.AuthorizationStore.isLoading&&
+                    !this.$store.getters['AuthorizationStore/isAuthorized']) {
                     this.$store.dispatch('AuthorizationStore/ToggleLoading')
                     this.$store.dispatch('AuthorizationStore/login', this.user).then(
                         response => {

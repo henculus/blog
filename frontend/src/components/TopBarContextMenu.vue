@@ -13,7 +13,6 @@
 </template>
 
 <script>
-
     export default {
         name: "TopBarContextMenu",
         data() {
@@ -32,6 +31,9 @@
                             },
                             error => {
                                 this.$store.dispatch('AuthorizationStore/ToggleLoading')
+                                if (this.$route.name === 'my-publications') {
+                                    this.$router.push({name: 'articles'})
+                                }
                                 console.log(error, 'Успешный выход')
                             }
                         )

@@ -12,7 +12,7 @@
 
 <script>
     import TopBar from './components/TopBar'
-    import Modal from "@/components/Modal"
+    import Modal from "./components/Modal"
 
     export default {
         name: 'app',
@@ -78,6 +78,9 @@
 
     .page-content
         z-index: 0
+        display: flex
+        flex-direction: row
+        justify-content: center
 
     .modal-enter-active, .modal-leave-active
         transition: $ease_transition02

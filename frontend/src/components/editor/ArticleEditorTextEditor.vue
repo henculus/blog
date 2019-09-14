@@ -3,7 +3,8 @@
         <div id="content-wrapper">
             <div id="content">
                 <article class="article text-editor-wrapper" contenteditable="true"
-                         ref="article_content" @click.self.prevent @keydown.enter.prevent="enterClick()" @input="inputText">
+                         ref="article_content" @click.self.prevent @keydown.enter.prevent="enterClick()"
+                         @input="inputText">
                     <section class="headline">
                         <p ref="title" placeholder="Название статьи" id="title" class="title"></p>
                         <p ref="subtitle" placeholder="Подзаголовок статьи" id="subtitle" class="subtitle"></p>
@@ -29,13 +30,15 @@
                 paragraphs: [''],
                 selectedElement: undefined,
                 selection: undefined,
-                selectionRange: undefined
+                selectionRange: undefined,
+                range: undefined
             }
         },
         mounted() {
             console.log(this.paragraphs)
             document.onselectionchange = () => {
-                this.selection = window.getSelection
+                this.selection = window.getSelection()
+                this.range = document.createRange()
                 this.selectionRange = this.selection.getRangeAt(0)
                 if (this.selectedElement) {
                     this.selectedElement.classList.remove('selected')
@@ -47,16 +50,35 @@
             }
         },
         methods: {
-            enterClick: function () {
-                if (this.selectedElement.tagName === 'P') {
-                    this.paragraphs.splice(this.selectedElement.id.replace('paragraph-', '')+1, 0, '')
-                } else {
-                    console.log(this.selectedElement.nextSibling)
-                    this.selectedElement.nextElementSibling.focus()
+            enterClick: async function () {
+                //if (this.selectedElement.tagName === 'P') {
+                let textBeforeCaret
+                this.selectionRange.deleteContents()
+                console.log(this.selectionRange.endOffset, this.selectedElement.innerText.length)
+                this.selectionRange.setStart(this.selectionRange.startContainer, this.selectionRange.endOffset)
+                this.selectionRange.setEnd(this.selectionRange.startContainer, this.selectedElement.innerText.length)
+                textBeforeCaret = this.selectionRange.toString()
+
+                this.selectionRange.deleteContents()
+                this.paragraphs[this.selectedElement.id.replace('paragraph-', '')] = this.selectedElement.innerText
+                let lastSelectedElementID = this.selectedElement.id.replace('paragraph-', '')
+                let nextParagraphID = 'paragraph-' + (Number(lastSelectedElementID) + 1)
+                await this.paragraphs.splice(Number(lastSelectedElementID) + 1, 0, '')
+
+                if (textBeforeCaret) {
+                    this.paragraphs[Number(lastSelectedElementID) + 1] = textBeforeCaret
+                    document.getElementById(nextParagraphID).innerText = textBeforeCaret
                 }
+
+                console.log(this.paragraphs)
+
+                this.range.setStart(document.getElementById(nextParagraphID), 0)
+                this.range.collapse()
+                this.selection.removeAllRanges()
+                this.selection.addRange(this.range)
             },
             inputText: function () {
-                if (this.selectedElement.tagName === 'P'){
+                if (this.selectedElement.tagName === 'P') {
                     this.paragraphs[this.selectedElement.id.replace('paragraph-', '')] = this.selectedElement.innerText
                 }
             }

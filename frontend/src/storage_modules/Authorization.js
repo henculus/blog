@@ -1,4 +1,4 @@
-import {HTTP} from '../server_defaults'
+import api from "../api"
 
 export const moduleAuthorization = {
     namespaced: true,// Локальное пространство имён
@@ -14,15 +14,18 @@ export const moduleAuthorization = {
             state.iat = data.iat
             state.sub = data.sub
         },
-        ToggleLoading(state) {
-            state.isLoading = !state.isLoading
+        StartLoading(state){
+            state.isLoading = true
+        },
+        EndLoading(state){
+            state.isLoading = false
         }
     }
     ,
     actions: {
         CheckAuthorize({commit}) {
             return new Promise((resolve, reject) => {
-                HTTP.get('/session', {withCredentials: true})
+                api.getSession()
                     .then(response => {
                         if (response.status === 200) {
                             window.localStorage.setItem('sub', response.data.sub)
@@ -42,15 +45,7 @@ export const moduleAuthorization = {
         },
         login: function (undefined, payload) {
             return new Promise((resolve, reject) => {
-                HTTP({
-                    method: 'post',
-                    url: '/session',
-                    headers: {'Content-type': 'application/json'},
-                    dataType: 'application/json',
-                    data: payload,
-                    withCredentials: true,
-                    crossDomain: true
-                })
+                api.auth(payload)
                     .then(
                         response => {
                             resolve(response)
@@ -64,15 +59,8 @@ export const moduleAuthorization = {
         },
         registration: function(undefined, payload){
             return new Promise((resolve, reject)=> {
-                HTTP({
-                    method: 'post',
-                    url: '/users',
-                    headers: {'Content-type': 'application/json'},
-                    dataType: 'application/json',
-                    data: payload,
-                    withCredentials: true,
-                    crossDomain: true
-                }).then(
+                api.registration(payload)
+                    .then(
                     response => {
                         if (response.status === 200) {
                             //TODO Изменить, когда на серве после регистрации будет создаваться сессия
@@ -88,7 +76,7 @@ export const moduleAuthorization = {
         },
         logout: function () {
             return new Promise((resolve, reject) => {
-                HTTP.delete('session', {withCredentials: true})
+                api.logout()
                     .then(response => {
                             resolve(response)
                         },
@@ -104,6 +92,12 @@ export const moduleAuthorization = {
         ToggleLoading({commit}) {
             commit('ToggleLoading')
         },
+        StartLoading({commit}){
+            commit('StartLoading')
+        },
+        EndLoading({commit}){
+            commit('EndLoading')
+        }
 
     },
     getters: {

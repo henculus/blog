@@ -37,8 +37,9 @@
         },
         methods: {
             login: function () {
-                if (!this.$store.state.AuthorizationStore.isLoading&&!this.$store.getters['AuthorizationStore/isAuthorized']) {
-                    this.$store.dispatch('AuthorizationStore/ToggleLoading')
+                if (!this.$store.state.AuthorizationStore.isLoading&&
+                    !this.$store.getters['AuthorizationStore/isAuthorized']) {
+                    this.$store.dispatch('AuthorizationStore/StartLoading')
                     this.$store.dispatch('AuthorizationStore/login', this.user).then(
                         response => {
                             console.log(response)
@@ -46,24 +47,23 @@
                                 .then(
                                     response => {
                                         console.log(response)
-                                        this.$store.dispatch('AuthorizationStore/ToggleLoading')
-                                        this.$store.dispatch('ModalShownStore/ToggleModalShown')
+                                        this.$store.dispatch('ModalStore/HideModal')
                                     },
                                     error => {
                                         console.error(error)
                                         this.error_message = 'Ошибка создания сессии'
-                                        this.$store.dispatch('AuthorizationStore/ToggleLoading')
                                     }
                                 ).catch(
                                 error => {
                                     console.error(error)
                                     this.error_message = 'Сервер не доступен'
-                                    this.$store.dispatch('AuthorizationStore/ToggleLoading')
                                 }
-                            )
+                            ).finally(()=> {
+                                this.$store.dispatch('AuthorizationStore/EndLoading')
+                            })
                         },
                         error => {
-                            this.$store.dispatch('AuthorizationStore/ToggleLoading')
+                            this.$store.dispatch('AuthorizationStore/EndLoading')
                             if (error.response) {
                                 if (error.response.status === 404) {
                                     this.error_message = 'Такого пользователя нет'

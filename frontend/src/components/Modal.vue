@@ -1,9 +1,11 @@
 <template>
     <div class="modal-wrapper" @click="modalClose">
-        <div :class="{'disabled': $store.state.AuthorizationStore.isLoading}" class="modal-container" @click="modalClick">
+        <div :class="{'disabled': $store.state.AuthorizationStore.isLoading}"
+             class="modal-container"
+             @click="$event.stopPropagation()">
             <modal-close-button class="close"
                                 @click.native="modalClose"></modal-close-button>
-            <component :is="$store.state.ModalShownStore.ModalComponent"></component>
+            <component :is="$store.state.ModalStore.ModalComponent"></component>
         </div>
     </div>
 </template>
@@ -18,18 +20,15 @@
             ModalCloseButton,
             ModalAuthorization
         },
-        data(){
-            return{
+        data() {
+            return {
                 isDisabled: false
             }
         },
         methods: {
-            modalClose: function(){
+            modalClose: function () {
                 if (!this.$store.state.AuthorizationStore.isLoading)
-                    this.$store.dispatch('ModalShownStore/ToggleModalShown')
-            },
-            modalClick: function (event) {
-                event.stopPropagation()
+                    this.$store.dispatch('ModalStore/HideModal') //TODO Разделить на 2 экшна (открыть окно/закрыть окно)
             },
         }
     }
@@ -68,11 +67,14 @@
             overflow-y: auto
             width: 90%
             min-width: 200px
+
             &:after
                 content: ''
                 transition: all .1s ease
+
             &.disabled
                 pointer-events: none
+
                 &:after
                     width: 100%
                     height: 100%
@@ -99,10 +101,12 @@
 
     .modal-content-leave-active, .modal-content-enter-active
         transition: $ease_transition02
+
     +media_screensize_mobile
         .modal-wrapper
             .modal-container
                 width: 400px
+
     +media_screensize_mobile_small
         .modal-wrapper
             .modal-container

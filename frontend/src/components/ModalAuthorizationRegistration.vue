@@ -45,17 +45,15 @@
         methods: {
             sendRegData: function () {
                 let self = this
-                self.$store.dispatch('AuthorizationStore/ToggleLoading')
+                self.$store.dispatch('AuthorizationStore/StartLoading')
                 if (this.all_right) {
                     this.$store.dispatch('AuthorizationStore/registration', {username: this.user.username, password: this.user.password}).then(
                         response => {
                             console.log(response)
-                            self.$store.dispatch('ModalShownStore/ToggleModalShown', '')
-                            self.$store.dispatch('AuthorizationStore/ToggleLoading')
+                            self.$store.dispatch('ModalStore/HideModal')
                         },
                         error => {
                             console.error(error)
-                            self.$store.dispatch('AuthorizationStore/ToggleLoading')
                             if (error.response) {
                                 if (error.response.status === 409)
                                     self.error_message = 'Такой пользователь уже есть'
@@ -65,7 +63,9 @@
                             } else
                                 self.error_message = 'Ошибка сервера'
                         }
-                    )
+                    ).finally(()=>{
+                        self.$store.dispatch('AuthorizationStore/EndLoading')
+                    })
                 }
 
             },

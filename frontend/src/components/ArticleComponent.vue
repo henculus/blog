@@ -14,7 +14,7 @@
                         <div class="author">{{article.author}}</div>
                     </section>
                     <section class="article-content">
-                        {{article.body}}
+                        <p class="paragraph">{{article.body}}</p>
                     </section>
                     <lazy-image :img-padding="56.25" :low-res-img-path="`https://i.imgur.com/xK5T9H0.jpg`"
                                 :high-res-img-path="`https://i.imgur.com/MOhedrY.jpg`"></lazy-image>
@@ -26,7 +26,7 @@
 </template>
 
 <script>
-    import {HTTP} from '../server_defaults'
+    import api from "../api"
     import ComponentLoading from "./ComponentLoading"
     import LazyImage from "./LazyImage"
 
@@ -43,7 +43,7 @@
             }
         },
         mounted: function () {
-            HTTP.get(`/posts/${this.$route.params.id}`, {withCredentials: true}).then(
+            api.getPost(this.$route.params.id).then(
                 response => {
                     this.article = response.data
                     this.isLoading = false
@@ -55,94 +55,6 @@
 </script>
 
 <style scoped lang="sass">
+    @import "../article_style"
     @import "../variables.sass"
-
-    #content-wrapper
-        display: flex
-        flex-direction: column
-        align-items: center
-        width: 100%
-        position: relative
-
-        #top-card-wrapper
-            position: relative
-            width: 100%
-
-        #content
-            max-width: $article-width
-            width: 100%
-            //margin: 20px auto
-            padding: $content-padding-mobile
-
-            .article
-                word-wrap: break-word
-                font-size: 14px
-
-                .headline
-                    .title
-                        font-size: 3em
-                        letter-spacing: 2px
-                        font-weight: 600 !important
-                        font-family: $title_font
-                        margin-bottom: 10px
-
-                    .subtitle
-                        font-size: 1.5em
-                        //font-style: italic
-                        color: $subtitle-color
-                        font-family: $subtitle_font
-
-                    .author
-                        font-size: 1.1em
-
-                .article-content
-                    margin: 30px auto
-                    line-height: 1.6
-                    font-size: 1.3em
-                    word-wrap: normal
-                    //font-family: $article_font
-                    font-family: $default_font
-                    font-weight: 400 !important
-
-                    p
-                        margin-top: 2em
-
-                    .article-image-box
-                        position: relative
-                        padding-bottom: 56.25%
-
-                        img
-                            position: absolute
-                            top: 0
-                            left: 0
-                            width: 100%
-                            height: 100%
-
-            #cards-box-wrapper
-                display: grid
-                position: relative
-                justify-content: center
-                width: 100%
-                grid-auto-rows: minmax(270px, 1fr)
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr))
-                //grid-template-columns: repeat(3, minmax(300px, 1fr))
-                grid-gap: 20px
-
-        +media_screensize_mobile_small
-            #content
-                .article
-                    font-size: 15px
-
-        +media_screensize_mobile
-            #content
-                margin: 30px auto
-                padding: 0
-
-                .article
-                    font-size: 16px
-
-            #top-card-wrapper
-                display: block
-
-    //чтобы был нормальный отступ на мобилке
 </style>

@@ -3,6 +3,7 @@ use actix_web::{web, App, HttpServer};
 mod img;
 mod error;
 mod imgur_adapter;
+mod multipart_reader;
 
 fn main() -> std::io::Result<()> {
     env_logger::init();

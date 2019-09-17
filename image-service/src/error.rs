@@ -1,6 +1,7 @@
 use image::ImageError;
 use reqwest::Error as ReqwestError;
 use actix_multipart::MultipartError;
+use actix_web::{ResponseError, HttpResponse, http::StatusCode};
 
 #[derive(Debug)]
 pub enum Error {
@@ -14,7 +15,7 @@ impl std::error::Error for Error {
         match self {
             Error::ImageError(e) => Some(e),
             Error::ReqwestError(e) => Some(e),
-            Error::MultipartError(e) => None,
+            Error::MultipartError(_e) => None,
         }
     }
 }
@@ -44,5 +45,11 @@ impl From<ReqwestError> for Error {
 impl From<MultipartError> for Error {
     fn from(multipart_error: MultipartError) -> Self {
         Error::MultipartError(multipart_error)
+    }
+}
+
+impl ResponseError for Error {
+    fn error_response(&self) -> HttpResponse {
+        HttpResponse::new(StatusCode::INTERNAL_SERVER_ERROR)
     }
 }

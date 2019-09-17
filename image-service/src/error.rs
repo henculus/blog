@@ -1,9 +1,10 @@
 use image::ImageError;
+use reqwest::Error as ReqwestError;
 
 #[derive(Debug)]
 pub enum Error {
     ImageError(ImageError),
-    ReqwestError(reqwest::Error),
+    ReqwestError(ReqwestError),
 }
 
 impl std::error::Error for Error {
@@ -30,8 +31,8 @@ impl From<ImageError> for Error {
     }
 }
 
-impl From<reqwest::Error> for Error {
-    fn from(reqwest_error: reqwest::Error) -> Self {
+impl From<ReqwestError> for Error {
+    fn from(reqwest_error: ReqwestError) -> Self {
         Error::ReqwestError(reqwest_error)
     }
 }

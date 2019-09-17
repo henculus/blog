@@ -1,10 +1,9 @@
 use crate::error::Error;
-use futures::future::{ok, result, FutureResult};
+use futures::future::result;
 use futures::Future;
 use log::*;
-use mime_guess::{from_path, Mime};
+use mime_guess::from_path;
 use reqwest::r#async::{multipart::Form, multipart::Part, *};
-use std::str::FromStr;
 
 const API_URL: &str = "https://api.imgur.com/3/upload";
 const CLIENT_ID: &str = "cc27cc3925c6140";

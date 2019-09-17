@@ -1,15 +1,30 @@
 use crate::{error::Error, img::resize, imgur_adapter::upload, multipart_reader::read_buffer};
-use log::*;
 use actix_multipart::Multipart;
-use actix_web::{HttpRequest, HttpResponse};
+use serde::Deserialize;
+use actix_web::{web::Query, HttpRequest, HttpResponse};
 use futures::Future;
+use log::*;
+
+#[derive(Debug, Deserialize)]
+pub struct ProcessImageInfo {
+    #[serde(default = "default_side")]
+    width: u32,
+    #[serde(default = "default_side")]
+    height: u32,
+}
+
+fn default_side() -> u32 {
+    300
+}
 
 pub fn process_image(
-    _req: HttpRequest,
+    Query(info): Query<ProcessImageInfo>,
+    req: HttpRequest,
     multipart: Multipart,
-) -> impl Future<Item = HttpResponse, Error = Error> {
-    let width = 10;
-    let height = 10;
+) -> impl Future<Item=HttpResponse, Error=Error> {
+    debug!("Request to resize image: {:?}", req);
+    let width = info.width;
+    let height = info.height;
     let image_name = "image.jpg".to_string();
 
     read_buffer(multipart)
@@ -25,7 +40,7 @@ pub fn index() -> HttpResponse {
     <html lang="en">
         <head><title>Upload Test</title></head>
         <body>
-            <form action="/image" method="post" enctype="multipart/form-data">
+            <form action="/image?width=100" method="post" enctype="multipart/form-data">
                 <input type="file" name="file" accept=".jpeg, .jpg"/>
                 <input type="submit" value="Submit"></button>
             </form>

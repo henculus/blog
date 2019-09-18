@@ -8,6 +8,13 @@ use reqwest::r#async::{multipart::Form, multipart::Part, *};
 const API_URL: &str = "https://api.imgur.com/3/upload";
 const CLIENT_ID: &str = "cc27cc3925c6140";
 
+pub fn get_client_id_from_env() -> String {
+    std::env::var("IMGUR_CLIENT_ID").unwrap_or_else(|_| {
+        warn!("IMGUR_CLIENT_ID variable is not set, using default value");
+        CLIENT_ID.into()
+    })
+}
+
 pub fn upload(buffer: Vec<u8>, image_name: String) -> impl Future<Item=String, Error=Error> {
     info!("Uploading image {} to imgur", &image_name);
     let client = Client::new();
@@ -17,7 +24,7 @@ pub fn upload(buffer: Vec<u8>, image_name: String) -> impl Future<Item=String, E
             let form = Form::new().part("image", part);
             client
                 .post(API_URL)
-                .header("Authorization", format!("Client-ID {}", CLIENT_ID))
+                .header("Authorization", format!("Client-ID {}", get_client_id_from_env()))
                 .multipart(form)
                 .send()
                 .from_err()

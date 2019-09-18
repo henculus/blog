@@ -1,6 +1,6 @@
 use crate::{error::Error, img::resize, imgur_adapter::upload, multipart_reader::read_buffer};
 use actix_multipart::Multipart;
-use actix_web::{web::Query, HttpRequest, HttpResponse};
+use actix_web::{web::Query, HttpResponse};
 use futures::{future::ok, future::Either, Future};
 use log::*;
 use serde::{Deserialize, Serialize};
@@ -25,7 +25,6 @@ pub struct Links {
 
 pub fn process_image(
     info: Query<ProcessImageInfo>,
-    req: HttpRequest,
     multipart: Multipart,
 ) -> impl Future<Item=HttpResponse, Error=Error> {
     info!("Request to resize image");

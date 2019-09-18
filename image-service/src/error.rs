@@ -1,13 +1,16 @@
-use image::ImageError;
-use reqwest::Error as ReqwestError;
+use actix_http::error::Error as ActixError;
 use actix_multipart::MultipartError;
-use actix_web::{ResponseError, HttpResponse, http::StatusCode};
+use actix_web::{http::StatusCode, HttpResponse, ResponseError};
+use image::ImageError;
+use log::*;
+use reqwest::Error as ReqwestError;
 
 #[derive(Debug)]
 pub enum Error {
     ImageError(ImageError),
     ReqwestError(ReqwestError),
     MultipartError(MultipartError),
+    ActixError(ActixError),
 }
 
 impl std::error::Error for Error {
@@ -16,6 +19,7 @@ impl std::error::Error for Error {
             Error::ImageError(e) => Some(e),
             Error::ReqwestError(e) => Some(e),
             Error::MultipartError(_e) => None,
+            Error::ActixError(e) => Some(e),
         }
     }
 }
@@ -26,6 +30,7 @@ impl std::fmt::Display for Error {
             Error::ImageError(e) => e.fmt(f),
             Error::ReqwestError(e) => e.fmt(f),
             Error::MultipartError(e) => e.fmt(f),
+            Error::ActixError(e) => e.fmt(f),
         }
     }
 }
@@ -48,8 +53,20 @@ impl From<MultipartError> for Error {
     }
 }
 
+impl From<ActixError> for Error {
+    fn from(actix_error: ActixError) -> Self {
+        Error::ActixError(actix_error)
+    }
+}
+
 impl ResponseError for Error {
     fn error_response(&self) -> HttpResponse {
+        match self {
+            Error::ImageError(e) => error!("Image error: {}", e),
+            Error::ReqwestError(e) => error!("Reqwest error: {}", e),
+            Error::MultipartError(e) => error!("Multipart error: {}", e),
+            Error::ActixError(e) => error!("Actix Http Error: {}", e),
+        };
         HttpResponse::new(StatusCode::INTERNAL_SERVER_ERROR)
     }
 }

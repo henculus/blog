@@ -12,7 +12,9 @@ pub fn resize(
     buffer_to_image(buffer.clone())
         .map(move |img| {
             info!("Resizing image");
-            img.resize(width, height, FilterType::Nearest)
+            let resized = img.resize(width, height, FilterType::Nearest);
+            info!("Resizing complete");
+            resized
         })
         .join(result(guess_format(buffer.as_slice())).from_err())
         .and_then(|(img, fmt)| image_to_buffer(img, fmt))

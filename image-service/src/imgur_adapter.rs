@@ -9,7 +9,7 @@ const API_URL: &str = "https://api.imgur.com/3/upload";
 const CLIENT_ID: &str = "cc27cc3925c6140";
 
 pub fn upload(buffer: Vec<u8>, image_name: String) -> impl Future<Item=String, Error=Error> {
-    info!("Uploading image to imgur");
+    info!("Uploading image {} to imgur", &image_name);
     let client = Client::new();
 
     create_part(buffer, image_name)
@@ -22,11 +22,15 @@ pub fn upload(buffer: Vec<u8>, image_name: String) -> impl Future<Item=String, E
                 .send()
                 .from_err()
         })
-        .and_then(|mut r| r.json().from_err())
+        .and_then(|mut r| {
+            info!("Uploading complete");
+            r.json().from_err()
+        })
         .map(|data: serde_json::Value| data["data"]["link"].to_string())
 }
 
 fn create_part(buffer: Vec<u8>, image_name: String) -> impl Future<Item=Part, Error=Error> {
+    info!("Creating part for image");
     let mime: String = from_path(&image_name)
         .first()
         .map_or("image/jpeg".to_string(), |m| m.to_string());

@@ -5,16 +5,16 @@ use image::{guess_format, DynamicImage, FilterType, ImageFormat};
 use log::*;
 
 pub fn resize(
-    buffer: &[u8],
+    buffer: Vec<u8>,
     width: u32,
     height: u32,
 ) -> impl Future<Item=Vec<u8>, Error=Error> {
-    buffer_to_image(buffer)
+    buffer_to_image(buffer.clone())
         .map(move |img| {
             info!("Resizing image");
             img.resize(width, height, FilterType::Nearest)
         })
-        .join(result(guess_format(buffer)).from_err())
+        .join(result(guess_format(buffer.as_slice())).from_err())
         .and_then(|(img, fmt)| image_to_buffer(img, fmt))
 }
 
@@ -29,7 +29,7 @@ fn image_to_buffer(
         .from_err()
 }
 
-fn buffer_to_image(buffer: &[u8]) -> impl Future<Item=DynamicImage, Error=Error> {
+fn buffer_to_image(buffer: Vec<u8>) -> impl Future<Item=DynamicImage, Error=Error> {
     info!("Creating DynamicImage from buffer");
-    result(image::load_from_memory(buffer)).from_err()
+    result(image::load_from_memory(buffer.as_slice())).from_err()
 }

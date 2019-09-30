@@ -37,5 +37,9 @@ export default {
 
     logout () {
         return axios.delete('/session')
+    },
+
+    sendPost () {
+        return axios.post('/posts')
     }
 }

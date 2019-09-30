@@ -3,7 +3,7 @@
         <div class="top-menu">
             <router-link tag="div" id="logo-box" to="/">
                 <!--<img class="logo logo--colorful" src="../assets/rnt_logo.png" alt="Ranetka"/>-->
-                <img class="logo logo--black" src="../assets/TestLogo.jpg" alt="Ranetka"/>
+                <img class="logo logo--black" src="../assets/CaltaiClassic.jpg" alt="Ranetka"/>
             </router-link>
             <nav id="menu-wrapper">
                 <a v-cloak class="menu-item menu-item__link" @click="ShowAuth"
@@ -76,7 +76,7 @@
 
 
         #logo-box
-            height: 30px
+            height: 40px
             display: flex
             flex-direction: row
             align-items: center

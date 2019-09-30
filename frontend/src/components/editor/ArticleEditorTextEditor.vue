@@ -36,4 +36,6 @@
 <style lang="sass">
     .CodeMirror
         z-index: 0 !important
+    .CodeMirror-fullscreen
+        z-index: 10 !important
 </style>

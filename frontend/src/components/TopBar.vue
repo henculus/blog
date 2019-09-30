@@ -68,7 +68,6 @@
         max-width: $content-width
         display: flex
         flex-direction: row
-        z-index: 1
         top: 0
         justify-content: space-between
         height: $menu_height
@@ -97,6 +96,7 @@
                 opacity: 0
 
         #menu-wrapper
+            z-index: 1
             //margin-right: 20px
 
             .menu-item__logo

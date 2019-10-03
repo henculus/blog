@@ -1,15 +1,12 @@
 <template>
     <transition name="component-load" mode="out-in">
         <div id="content-wrapper">
-            <div class="title">{{title}}</div>
+            <input placeholder="Название статьи" class="title">{{title}}</input>
             <div id="content">
                 <label for="area"></label>
                 <textarea ref="area" id="area"></textarea>
             </div>
             <span v-if="simplemde">{{htmlText}}</span>
-            <transition name="component-load" mode="out-in" appear>
-                <article-title-modal @setTitle="setTitle" v-if="!title"/>
-            </transition>
         </div>
     </transition>
 </template>
@@ -18,14 +15,9 @@
     import SimpleMDE from 'simplemde'
     import 'simplemde/dist/simplemde.min.css'
     import marked from 'marked'
-    import ArticleTitleModal from "./ArticleTitleModal"
 
     export default {
         name: "ArticleEditorTextEditor",
-
-        components: {
-            ArticleTitleModal
-        },
 
         data() {
             return {
@@ -54,7 +46,11 @@
     .title
         font-size: 1.8em
         font-family: 'Comfortaa', sans-serif
-        padding: 20px 0
+        padding: 10px
+        margin-bottom: 20px
+        width: 100%
+        border-radius: 4px
+        border: 1px solid lightgray
     .CodeMirror
         z-index: 0 !important
         .CodeMirror-fullscreen

@@ -1,11 +1,14 @@
 <template>
     <transition name="component-load" mode="out-in">
         <div id="content-wrapper">
-            <input placeholder="Название статьи" class="title">
+            <input placeholder="Название статьи" class="title" v-model="title">
             <div id="content">
                 <label for="area"></label>
                 <textarea ref="area" id="area"></textarea>
             </div>
+            <transition name="component-load" mode="out-in">
+                <button class="publish" v-if="title" @click.prevent>Опубликовать</button>
+            </transition>
             <span v-if="simplemde">{{htmlText}}</span>
         </div>
     </transition>
@@ -43,14 +46,28 @@
 </script>
 
 <style lang="sass">
-    .title
-        font-size: 1.8em
+    @import ../../variables
+
+    .title, .publish
         font-family: 'Comfortaa', sans-serif
+        border-radius: 4px
+
+    .title
         padding: 10px
+        font-size: 1.8em
         margin-bottom: 20px
         width: 100%
-        border-radius: 4px
         border: 1px solid lightgray
+
+    .publish
+        position: relative
+        float: right
+        margin-top: 20px
+        color: white
+        background: $rnt_green
+        border: none
+        padding: 20px !important
+
 
         .CodeMirror
             z-index: 0 !important

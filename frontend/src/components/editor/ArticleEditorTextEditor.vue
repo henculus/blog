@@ -1,7 +1,7 @@
 <template>
     <transition name="component-load" mode="out-in">
         <div id="content-wrapper">
-            <input placeholder="Название статьи" class="title">{{title}}</input>
+            <input placeholder="Название статьи" class="title">
             <div id="content">
                 <label for="area"></label>
                 <textarea ref="area" id="area"></textarea>
@@ -51,8 +51,10 @@
         width: 100%
         border-radius: 4px
         border: 1px solid lightgray
-    .CodeMirror
-        z-index: 0 !important
-        .CodeMirror-fullscreen
-            z-index: 10 !important
+
+        .CodeMirror
+            z-index: 0 !important
+
+            .CodeMirror-fullscreen
+                z-index: 10 !important
 </style>

@@ -64,20 +64,20 @@
         font-family: 'Comfortaa', sans-serif
         border-radius: 4px
 
-        .title
-            padding: 10px
-            font-size: 1.8em
-            margin-bottom: 20px
-            width: 100%
-            border: 1px solid lightgray
+    .title
+        padding: 10px
+        font-size: 1.8em
+        margin-bottom: 20px
+        width: 100%
+        border: 1px solid lightgray
 
-        .publish
-            position: relative
-            float: right
-            margin-top: 20px
-            color: white
-            background: $rnt_green
-            border: none
-            padding: 20px !important
+    .publish
+        position: relative
+        float: right
+        margin-top: 20px
+        color: white
+        background: $rnt_green
+        border: none
+        padding: 20px !important
 
 </style>

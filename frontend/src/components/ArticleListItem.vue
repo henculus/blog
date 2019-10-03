@@ -64,11 +64,12 @@
                 left: 0
 
         .article-text-items
-            padding: 5px 20px 20px 20px
+            padding: 20px
             display: flex
             flex-direction: column
             .title
                 font-size: 2em
+                margin-bottom: 15px
                 font-weight: normal
                 font-family: $title_font
 

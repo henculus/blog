@@ -6,7 +6,7 @@
                 <textarea ref="area"></textarea>
             </div>
             <transition name="component-load" mode="out-in">
-                <button class="publish" v-if="article.title" @click="publishArticle">Опубликовать</button>
+                <button class="publish" v-if="article.title && article.body" @click="publishArticle">Опубликовать</button>
             </transition>
         </div>
     </transition>
@@ -27,7 +27,8 @@
                 article: {
                     title: '',
                     body: '',
-                    id: ''
+                    id: '',
+                    published: false
                 },
                 delayedSave: ''
 
@@ -40,49 +41,63 @@
             htmlText: function () {
                 return marked(this.simplemde.value())
             },
-            mdText: function () {
-                this.saveArticle(this.simplemde.value())
-                return this.simplemde.value()
-            },
         },
 
 
         methods: {
             createMd: async function () {
+                let self = this
+
                 if (this.$route.params.id) {
                     await api.getPost(this.$route.params.id).then(
                         response => {
                             this.article.title = response.data.title
                             this.article.body = response.data.body
                             this.article.id = response.data.id
+                            this.article.published = response.data.published
                         }
                     )
                 }
                 this.simplemde = new SimpleMDE({
                     element: this.$refs.area,
                     spellChecker: false,
-                    initialValue: this.article.body
+                    initialValue: this.article.body,
                 })
+                this.simplemde.codemirror.on("blur", function () {
+                    self.saveArticle()
+                })
+                this.simplemde.codemirror.on("change", function () {
+                    self.article.body = self.simplemde.value()
+                    self.delayedSaveArticle()
+                })
+                // Make it as one function
             },
-            saveArticle: function (text) {
-                this.article.body = text
+            delayedSaveArticle: function () {
                 clearTimeout(this.delayedSave)
                 this.delayedSave = setTimeout(() => {
-                    api.sendPost(this.article).then(
-                        response => {
-                            this.article.id = response.id
-                        }
-                    )
+                        this.saveArticle()
                 }, 1000)
             },
+            saveArticle: function () {
+                this.article.published = true
+                if (!this.article.id) {
+                    api.sendPost(this.article).then(
+                        response => {
+                            this.article.id = response.data.id
+                        }
+                    )
+                }
+                else {
+                    api.patchPost(this.article, this.article.id).then(
+                        // eslint-disable-next-line no-unused-vars
+                        response => {
+                            this.$router.push(`/articles/${this.article.id}`)
+                        }
+                    )
+                }
+            },
             publishArticle: function () {
-                // let id = this.article.id
-                // delete this.article.id
-                api.patchPost({...this.article, published: true}, this.article.id).then(
-                    response => {
-                        this.$router.push(`/articles/${this.article.id}`)
-                    }
-                )
+                this.saveArticle(true)
             }
         },
     }

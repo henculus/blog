@@ -1,7 +1,7 @@
 <template>
     <transition name="component-load" mode="out-in">
         <div id="content-wrapper">
-            <input placeholder="Название статьи" class="title" v-model="article.title" @blur="saveArticle">
+            <input placeholder="Название статьи" class="title" v-model="article.title">
             <div id="content" :class="{ 'disabled': !article.title }">
                 <textarea ref="area"></textarea>
             </div>
@@ -64,7 +64,8 @@
                     initialValue: this.article.body,
                 })
                 this.simplemde.codemirror.on("blur", function () {
-                    self.saveArticle()
+                    // self.saveArticle() Потом сделать так, чтобы пост сразу сохранялся при потере фокуса
+                    self.delayedSaveArticle()
                 })
                 this.simplemde.codemirror.on("change", function () {
                     self.article.body = self.simplemde.value()

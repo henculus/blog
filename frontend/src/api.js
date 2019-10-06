@@ -6,9 +6,10 @@ export const HTTP = axios.create({
 
 axios.defaults.baseURL = `${ process.env.VUE_APP_API_LOCATION || '' }/api`
 axios.defaults.withCredentials = true
+axios.defaults.headers.patch['Content-Type'] = 'application/json'
+axios.defaults.headers.post['Content-Type'] = 'application/json'
+axios.defaults.headers.put['Content-Type'] = 'application/json'
 
-HTTP.defaults.headers.post['Content-Type'] = 'application/json'
-HTTP.defaults.headers.put['Content-Type'] = 'application/json'
 
 export default {
     getPost (postID) {
@@ -39,7 +40,12 @@ export default {
         return axios.delete('/session')
     },
 
-    sendPost () {
-        return axios.post('/posts')
+    sendPost (post) {
+        return axios.post('/posts', post)
+    },
+
+    patchPost (post, id){
+        console.log(post)
+        return axios.patch(`/posts/${id}`, post)
     }
 }

@@ -41,7 +41,7 @@ const routes = [
         component: UserPublications
     },
     {
-        path: '/editor',
+        path: '/editor/:id?',
         name: "articles-editor",
         component: ArticlesEditor,
         beforeEnter: function (to, from, next) {

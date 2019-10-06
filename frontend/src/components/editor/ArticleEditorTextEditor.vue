@@ -142,5 +142,8 @@
         background: $rnt_green
         border: none
         padding: 20px !important
+        transition: background-color .2s ease-out
+        &:hover
+            background: #00d777
 
 </style>

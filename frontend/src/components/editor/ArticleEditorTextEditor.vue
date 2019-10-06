@@ -1,7 +1,7 @@
 <template>
     <transition name="component-load" mode="out-in">
         <div id="content-wrapper">
-            <input placeholder="Название статьи" class="title" v-model="article.title">
+            <input placeholder="Название статьи" class="title" v-model="article.title" @blur="saveArticle">
             <div id="content" :class="{ 'disabled': !article.title }">
                 <textarea ref="area"></textarea>
             </div>

@@ -21,7 +21,7 @@ export default {
     },
 
     getAuthorPosts (author) {
-        return axios.get(`/posts?author=${author}`)
+        return axios.get(`/posts?author=${author}&limit=500`)
     },
 
     getSession () {

@@ -80,7 +80,6 @@
                 }, 1000)
             },
             saveArticle: function () {
-                this.article.published = true
                 if (!this.article.id) {
                     api.sendPost(this.article).then(
                         response => {
@@ -98,7 +97,8 @@
                 }
             },
             publishArticle: function () {
-                this.saveArticle(true)
+                this.article.published = true
+                this.saveArticle()
             }
         },
     }

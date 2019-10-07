@@ -88,16 +88,12 @@
                     )
                 }
                 else {
-                    api.patchPost(this.article, this.article.id).then(
-                        // eslint-disable-next-line no-unused-vars
-                        response => {
-                            this.$router.push(`/articles/${this.article.id}`)
-                        }
-                    )
+                    api.patchPost(this.article, this.article.id)
                 }
             },
             publishArticle: function () {
                 this.article.published = true
+                this.$router.push(`/articles/${this.article.id}`)
                 this.saveArticle()
             }
         },

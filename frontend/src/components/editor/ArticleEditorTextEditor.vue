@@ -91,9 +91,9 @@
                     api.patchPost(this.article, this.article.id)
                 }
             },
-            publishArticle: function () {
+            publishArticle: async function () {
                 this.article.published = true
-                this.saveArticle()
+                await this.saveArticle()
                 this.$router.push(`/articles/${this.article.id}`)
             }
         },

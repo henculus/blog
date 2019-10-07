@@ -59,7 +59,7 @@ fn configure_cors() -> Cors {
             ],
         );
 
-    let allowed_methods = vec![Method::Get, Method::Post, Method::Put, Method::Delete, Method::Patch]
+    let allowed_methods = vec![Method::Get, Method::Post, Method::Put, Method::Delete]
         .into_iter()
         .map(From::from)
         .collect();

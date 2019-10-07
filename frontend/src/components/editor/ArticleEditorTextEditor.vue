@@ -93,8 +93,8 @@
             },
             publishArticle: function () {
                 this.article.published = true
-                this.$router.push(`/articles/${this.article.id}`)
                 this.saveArticle()
+                this.$router.push(`/articles/${this.article.id}`)
             }
         },
     }

@@ -1,12 +1,15 @@
 <template>
     <transition name="component-load" mode="out-in">
         <div id="content-wrapper">
-            <input placeholder="Название статьи" class="title" v-model="article.title">
+            <label for="article_title"></label>
+            <input placeholder="Название статьи" class="title" v-model="article.title" id="article_title">
             <div id="content" :class="{ 'disabled': !article.title }">
-                <textarea ref="area"></textarea>
+                <label for="area"></label>
+                <textarea ref="area" id="area"></textarea>
             </div>
             <transition name="component-load" mode="out-in">
-                <button class="publish" v-if="article.title && article.body" @click="publishArticle">Опубликовать</button>
+                <button class="publish" v-if="article.title && article.body" @click="publishArticle">Опубликовать
+                </button>
             </transition>
         </div>
     </transition>
@@ -30,6 +33,7 @@
                     id: '',
                     published: false
                 },
+                is_posted: false,
                 delayedSave: ''
 
             }
@@ -64,8 +68,9 @@
                     initialValue: this.article.body,
                 })
                 this.simplemde.codemirror.on("blur", function () {
-                    // self.saveArticle() Потом сделать так, чтобы пост сразу сохранялся при потере фокуса
-                    self.delayedSaveArticle()
+                    console.log('Textarea on blur')
+                    self.saveArticle() // Потом сделать так, чтобы пост сразу сохранялся при потере фокуса
+                    // self.delayedSaveArticle()
                 })
                 this.simplemde.codemirror.on("change", function () {
                     self.article.body = self.simplemde.value()
@@ -76,18 +81,22 @@
             delayedSaveArticle: function () {
                 clearTimeout(this.delayedSave)
                 this.delayedSave = setTimeout(() => {
-                        this.saveArticle()
+                    this.saveArticle()
                 }, 1000)
             },
             saveArticle: function () {
-                if (!this.article.id) {
+                if (!this.article.id && !this.is_posted) {
+                    this.is_posted = true
                     api.sendPost(this.article).then(
                         response => {
                             this.article.id = response.data.id
+                        },
+                        error => {
+                            this.is_posted = false
+                            console.log('error on sending post: ', error)
                         }
                     )
-                }
-                else {
+                } else {
                     api.patchPost(this.article, this.article.id)
                 }
             },
@@ -139,8 +148,10 @@
         border: none
         padding: 20px !important
         transition: all .2s ease-out
+
         &:hover
             background: #00d777
+
         &:active
             background: #00c362
 

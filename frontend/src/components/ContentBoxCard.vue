@@ -22,7 +22,7 @@
         position: relative
         overflow: hidden
         box-shadow: 0 0 4px rgba(0, 0, 0, 0.5)
-        //Тень карточек, нужно или нет - подумать (Если использовать, то перенести в отдельный файл, сделать переменную sass и импортить)
+
         .image-box
             display: flex
             flex-direction: row

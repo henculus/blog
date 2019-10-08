@@ -41,9 +41,21 @@ const routes = [
         component: UserPublications
     },
     {
-        path: '/editor',
+        path: '/editor/:id?',
         name: "articles-editor",
-        component: ArticlesEditor
+        component: ArticlesEditor,
+        beforeEnter: function (to, from, next) {
+            store.dispatch('AuthorizationStore/CheckAuthorize').then(
+                result => {
+                    console.log(result)
+                    next()
+                },
+                error => {
+                    console.error(error)
+                    next(from)
+                }
+            )
+        }
     }
 ]
 

@@ -70,13 +70,11 @@
                 this.simplemde.codemirror.on("blur", function () {
                     console.log('Textarea on blur')
                     self.saveArticle() // Потом сделать так, чтобы пост сразу сохранялся при потере фокуса
-                    // self.delayedSaveArticle()
                 })
                 this.simplemde.codemirror.on("change", function () {
                     self.article.body = self.simplemde.value()
                     self.delayedSaveArticle()
                 })
-                // Make it as one function
             },
             delayedSaveArticle: function () {
                 clearTimeout(this.delayedSave)

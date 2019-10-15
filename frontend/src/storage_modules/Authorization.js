@@ -127,20 +127,36 @@ export const moduleAuthorization = {
                 })
             }
         },
-        logout: function () {
-            return new Promise((resolve, reject) => {
+        logout: function ({commit, getters}) {
+            if (!getters.isLoading) {
+                commit('START_LOADING')
                 api.logout()
                     .then(response => {
-                            resolve(response)
+                            if (response.status === 200) {
+                                api.getSession().then(
+                                    response => {
+                                        console.error('Error delete session: ', response)
+                                    },
+                                    error => {
+                                        commit('SET_SESSION', {})
+                                        console.log('Успешный выход: ', error)
+                                    }).catch(
+                                    error => {
+                                        console.log('Успешный выход', error)
+                                    }
+                                )
+                            }
                         },
                         error => { //Уже разлогинен
-                            reject(error)
+                            console.error('Сессия уже удалена: ', error)
                         }
                     )
                     .catch(error => {
-                        reject(error)
-                    })
-            })
+                        console.error('Ошибка сервера: ', error)
+                    }).finally(() => {
+                    commit('END_LOADING')
+                })
+            }
         },
         ToggleLoading({commit}) {
             commit('ToggleLoading')

@@ -6,22 +6,25 @@ export const moduleAuthorization = {
         exp: window.localStorage.getItem('exp'),
         sub: window.localStorage.getItem('sub') || '',
         iat: window.localStorage.getItem('iat'),
-        isLoading: false
+        isLoading: false,
+        errorMessage: ''
     },
     mutations: {
-        CheckAuthorize(state, data) {
+        SET_SESSION(state, data) {
             state.exp = data.exp
             state.iat = data.iat
             state.sub = data.sub
         },
-        StartLoading(state){
+        START_LOADING(state) {
             state.isLoading = true
         },
-        EndLoading(state){
+        END_LOADING(state) {
             state.isLoading = false
+        },
+        SET_ERROR_MESSAGE(state, payload) {
+            state.errorMessage = payload
         }
-    }
-    ,
+    },
     actions: {
         CheckAuthorize({commit}) {
             return new Promise((resolve, reject) => {
@@ -29,46 +32,68 @@ export const moduleAuthorization = {
                     .then(response => {
                         if (response.status === 200) {
                             window.localStorage.setItem('sub', response.data.sub)
-                            commit('CheckAuthorize', response.data)
+                            commit('SET_SESSION', response.data)
                             resolve(response.data)
                         }
                     })
                     .catch(error => {
                         if (error.response) {
                             window.localStorage.removeItem('sub')
-                            commit('CheckAuthorize', {})
+                            commit('SET_SESSION', {})
                             reject(error.response.status)
                         } else
                             console.error('Упс, сервер упал')
                     })
             })
         },
-        login: function (undefined, payload) {
-            return new Promise((resolve, reject) => {
-                api.auth(payload)
-                    .then(
-                        response => {
-                            resolve(response)
-                        })
-                    .catch(
-                        error => {
-                            reject(error)
-                        })
-            })
-
-        },
-        registration: function(undefined, payload){
-            return new Promise((resolve, reject)=> {
-                api.registration(payload)
-                    .then(
+        login: function ({commit, dispatch, getters}, payload) {
+            if (!getters.isLoading) {
+                commit('START_LOADING')
+                api.auth(payload).then(
                     response => {
                         if (response.status === 200) {
-                            //TODO Изменить, когда на серве после регистрации будет создаваться сессия
-                            resolve(response)
-                        } else { //Сюда сложно попасть (невозможно)
-                            reject(response)
+                            api.getSession().then(
+                                response => {
+                                    commit('SET_SESSION', response.data)
+                                    dispatch('ModalStore/HideModal', '', {root: true})
+                                },
+                                error => {
+                                    console.log('Error creating session: ', error)
+                                })
                         }
-                    })
+                    },
+                    error => {
+                        commit('SET_ERROR_MESSAGE', 'Ошибка входа')
+                        console.log('Ошибка входа: ', error)
+                        if (error.response) {
+                            if (error.response.status === 404) {
+                                commit('SET_ERROR_MESSAGE', 'Такого пользователя нет')
+                            }
+                            if (error.response.status === 401) {
+                                commit('SET_ERROR_MESSAGE', 'Неверный пароль')
+                            }
+                        } else
+                            commit('SET_ERROR_MESSAGE', 'Ошибка сервера')
+                    }
+                ).catch(
+                    error => {
+                        commit('SET_ERROR_MESSAGE', 'Сервер не доступен')
+                        console.log('Ошибка сервера: ', error)
+                    }
+                ).finally(() => {
+                    commit('END_LOADING')
+                })
+            }
+        },
+        registration: function (undefined, payload) {
+            return new Promise((resolve, reject) => {
+                api.registration(payload)
+                    .then(
+                        response => {
+                            if (response.status === 200) {
+                                resolve(response)
+                            }
+                        })
                     .catch(error => {
                         reject(error)
                     })
@@ -92,15 +117,16 @@ export const moduleAuthorization = {
         ToggleLoading({commit}) {
             commit('ToggleLoading')
         },
-        StartLoading({commit}){
+        StartLoading({commit}) {
             commit('StartLoading')
         },
-        EndLoading({commit}){
+        EndLoading({commit}) {
             commit('EndLoading')
         }
 
     },
     getters: {
-        isAuthorized: state => !!state.sub
+        isAuthorized: state => !!state.sub,
+        isLoading: state => !!state.isLoading
     },
 }

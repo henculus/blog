@@ -17,11 +17,22 @@
             }
         },
         created() {
-            api.getPosts().then(
-                response => {
-                    this.articles = response.data
-                }
-            )
+            this.getPosts()
+        },
+        watch: {
+          '$store.state.AuthorizationStore.sub': function () {
+              this.getPosts()
+              console.log('User data updated')
+          }
+        },
+        methods:{
+            getPosts: function () {
+                api.getPosts().then(
+                    response => {
+                        this.articles = response.data
+                    }
+                )
+            }
         }
     }
 </script>

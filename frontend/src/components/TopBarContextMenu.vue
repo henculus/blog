@@ -19,8 +19,11 @@
             return {}
         },
         methods: {
-            logout: function () {
-                this.$store.dispatch('AuthorizationStore/logout')
+            logout: async function () {
+                await this.$store.dispatch('AuthorizationStore/logout')
+                if (this.$route.name === 'articles-editor') {
+                    this.$router.push({name: 'articles'})
+                }
             }
         }
     }

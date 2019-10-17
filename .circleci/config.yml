@@ -1,0 +1,89 @@
+version: 2
+
+workflows:
+  version: 2
+  main:
+    jobs:
+      - build-backend
+      - build-image-service
+      - build-frontend
+      - migrate-production-database
+      - build-web-image:
+          requires:
+            - build-backend
+            - build-image-service
+            - build-frontend
+      - push-image-to-heroku:
+          requires:
+            - build-web-image
+
+jobs:
+  build-backend:
+    docker:
+      - image: rustlang/rust:nightly
+    steps:
+      - checkout
+      - run:
+          name: Switch Dicrectory
+          command: |
+            cd backend
+      - restore_cache:
+          key: project-cache
+      - run:
+          name: Check Formatting
+          command: |
+            rustfmt --version
+            cargo fmt -- --write-mode=diff
+      - run:
+          name: Nightly Build
+          command:
+            rustup run nightly rustc --version --verbose
+            rustup run nightly cargo --version --verbose
+            rustup run nightly cargo build
+      - run:
+          name: Test
+          command: |
+            rustup run nightly cargo test
+      - save_cache:
+          key: project-cache
+          paths:
+            - "~/.cargo"
+            - "./target"
+  build-image-service:
+    docker:
+      - image: rustlang/rust:nightly
+    steps:
+      - checkout
+      - run:
+          name: Switch Directory
+          command: |
+            cd image-service
+  build-frontend:
+    docker:
+      - image: node
+    steps:
+      - checkout
+      - run:
+          name: Switch Directory
+          command: |
+            cd backend
+  migrate-production-database:
+    docker:
+      - image: rustlang/rust:nightly
+    steps:
+      - checkout
+      - run:
+          name: Switch Directory
+          command: |
+            cd backend
+  build-web-image:
+    docker:
+      - image: docker
+    steps:
+      - checkout
+  push-image-to-heroku:
+    docker:
+      - image: docker
+    steps:
+      - checkout
+

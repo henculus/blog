@@ -23,27 +23,16 @@ jobs:
       - image: rustlang/rust:nightly
     steps:
       - checkout
-      - run:
-          name: Switch Dicrectory
-          command: |
-            cd backend
       - restore_cache:
           key: project-cache
       - run:
-          name: Check Formatting
-          command: |
-            rustfmt --version
-            cargo fmt -- --write-mode=diff
-      - run:
           name: Nightly Build
-          command:
+          command: |
+            cd backend
             rustup run nightly rustc --version --verbose
             rustup run nightly cargo --version --verbose
-            rustup run nightly cargo build
-      - run:
-          name: Test
-          command: |
-            rustup run nightly cargo test
+            rustup run nightly cargo build --release
+
       - save_cache:
           key: project-cache
           paths:

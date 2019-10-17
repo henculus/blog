@@ -3,7 +3,7 @@
         <div class="top-menu">
             <router-link tag="div" id="logo-box" to="/">
                 <!--<img class="logo logo--colorful" src="../assets/rnt_logo.png" alt="Ranetka"/>-->
-                <img class="logo logo--black" src="../assets/TestLogo.jpg" alt="Ranetka"/>
+                <img class="logo logo--black" src="../assets/CaltaiClassic.jpg" alt="Ranetka"/>
             </router-link>
             <nav id="menu-wrapper">
                 <a v-cloak class="menu-item menu-item__link" @click="ShowAuth"
@@ -42,7 +42,7 @@
         },
         methods: {
             ShowAuth: function () {
-                this.$store.dispatch('ModalShownStore/ToggleModalShown', 'ModalAuthorization')
+                this.$store.dispatch('ModalStore/ShowModal', 'ModalAuthorization')
             },
 
         },
@@ -68,7 +68,6 @@
         max-width: $content-width
         display: flex
         flex-direction: row
-        z-index: 1
         top: 0
         justify-content: space-between
         height: $menu_height
@@ -76,7 +75,7 @@
 
 
         #logo-box
-            height: 30px
+            height: 40px
             display: flex
             flex-direction: row
             align-items: center
@@ -97,6 +96,7 @@
                 opacity: 0
 
         #menu-wrapper
+            z-index: 1
             //margin-right: 20px
 
             .menu-item__logo

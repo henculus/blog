@@ -1,5 +1,5 @@
 <template>
-    <router-link :to="{ name: 'article', params: { id: article.id } }" tag="div" class="list-item">
+    <div @click="openArticle" class="list-item">
         <div class="top-image-wrapper">
             <lazy-image class="top-image" :img-padding="30.5623" :low-res-img-path="`https://i.imgur.com/xK5T9H0.jpg`"
                         :high-res-img-path="`https://i.imgur.com/MOhedrY.jpg`"></lazy-image>
@@ -10,7 +10,7 @@
             <div class="author">{{article.author}}</div> <!--TODO сделать ссылку на страницу автора-->
             <!--<div class="article-content"></div>-->
         </div>
-    </router-link>
+    </div>
 </template>
 
 <script>
@@ -21,6 +21,16 @@
         props: {
             article: Object
         },
+        methods: {
+            openArticle: function () {
+                if (this.article.published) {
+                    this.$router.push(`/articles/${this.article.id}`)
+                }
+                else {
+                    this.$router.push(`/editor/${this.article.id}`)
+                }
+            }
+        }
     }
 </script>
 

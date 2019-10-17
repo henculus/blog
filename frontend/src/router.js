@@ -4,6 +4,7 @@ import ArticleComponent from "./components/ArticleComponent"
 import store from "./storage"
 import UserPublications from "./components/UserPublications"
 import ArticleFeed from "./components/ArticleFeed"
+import ArticlesEditor from "./components/editor/ArticlesEditor"
 
 Vue.use(VueRouter)
 
@@ -39,6 +40,23 @@ const routes = [
         name: 'my-publications',
         component: UserPublications
     },
+    {
+        path: '/editor/:id?',
+        name: "articles-editor",
+        component: ArticlesEditor,
+        beforeEnter: function (to, from, next) {
+            store.dispatch('AuthorizationStore/CheckAuthorize').then(
+                result => {
+                    console.log(result)
+                    next()
+                },
+                error => {
+                    console.error(error)
+                    next(from)
+                }
+            )
+        }
+    }
 ]
 
 const router = new VueRouter({
@@ -56,12 +74,12 @@ const router = new VueRouter({
         })
     }
 })
-router.beforeEach((to, from, next) => {
-    if (store.state.ModalShownStore.ModalShown) {
-        store.dispatch('ModalShown/ToggleModalShown')
-        next(false)
-    } else
-        next()
-})
+// router.beforeEach((to, from, next) => {
+//     if (store.state.ModalShownStore.ModalShown) {
+//         store.dispatch('ModalShown/ToggleModalShown')
+//         next(false)
+//     } else
+//         next()
+// })
 
 export default router

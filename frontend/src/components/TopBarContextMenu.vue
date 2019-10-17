@@ -13,7 +13,6 @@
 </template>
 
 <script>
-
     export default {
         name: "TopBarContextMenu",
         data() {
@@ -21,35 +20,7 @@
         },
         methods: {
             logout: function () {
-                this.$store.dispatch('AuthorizationStore/ToggleLoading')
-                this.$store.dispatch('AuthorizationStore/logout').then(
-                    response => {
-                        console.log(response, 'Результат удаления')
-                        this.$store.dispatch('AuthorizationStore/CheckAuthorize').then(
-                            response => {
-                                this.$store.dispatch('AuthorizationStore/ToggleLoading')
-                                console.log(response)
-                            },
-                            error => {
-                                this.$store.dispatch('AuthorizationStore/ToggleLoading')
-                                console.log(error, 'Успешный выход')
-                            }
-                        )
-                    },
-                    error => {
-                        console.log(error, 'Ошибка сервера')
-                        this.$store.dispatch('AuthorizationStore/CheckAuthorize').then(
-                            response => {
-                                console.log(response)
-                                this.$store.dispatch('AuthorizationStore/ToggleLoading')
-                            },
-                            error => {
-                                this.$store.dispatch('AuthorizationStore/ToggleLoading')
-                                console.error(error)
-                            }
-                        )
-                    }
-                )
+                this.$store.dispatch('AuthorizationStore/logout')
             }
         }
     }

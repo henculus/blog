@@ -5,12 +5,15 @@ orbs:
 
 workflows:
   version: 2
-  branches:
-    only:
-      - dev
-      - master
-      - feature-blog-141
   main:
+    triggers:
+      - schedule:
+          filters:
+            branches:
+              only:
+                - dev
+                - master
+                - feature-blog-141
     jobs:
       - build-backend
       - build-image-service

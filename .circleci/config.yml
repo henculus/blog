@@ -24,7 +24,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: project-cache
+          key: backend-cache
       - run:
           name: Nightly Build
           command: |
@@ -32,44 +32,81 @@ jobs:
             rustup run nightly rustc --version --verbose
             rustup run nightly cargo --version --verbose
             rustup run nightly cargo build --release
-
+      - persist_to_workspace:
+          root: ./backend/target/release
+          paths:
+            - backend
       - save_cache:
-          key: project-cache
+          key: backend-cache
           paths:
             - "~/.cargo"
-            - "./target"
+            - "./backend/target"
+
   build-image-service:
     docker:
       - image: rustlang/rust:nightly
     steps:
       - checkout
+      - restore_cache:
+          key: image-service-cache
       - run:
           name: Switch Directory
           command: |
             cd image-service
+            rustup run nightly rustc --version --verbose
+            rustup run nightly cargo --version --verbose
+            rustup run nightly cargo build --release
+      - persist_to_workspace:
+          root: ./image-service/target/release
+          paths:
+            - image-service
+      - save_cache:
+          key: image-service-cache
+          paths:
+            - "~/.cargo"
+            - "./image-service/target"
+
   build-frontend:
     docker:
       - image: node
     steps:
       - checkout
+      - restore_cache:
+          key: npm-cache
       - run:
           name: Switch Directory
           command: |
-            cd backend
+            cd frontend
+            npm install
+            npm run build
+      - persist_to_workspace:
+          root: ./frontend
+          paths:
+            - dist
+      - save_cache:
+          key: npm-cache
+          paths:
+            - "./frontend/node_modules"
+
   migrate-production-database:
     docker:
-      - image: rustlang/rust:nightly
+      - image: christophwurst/diesel-cli
     steps:
       - checkout
       - run:
           name: Switch Directory
+          environment:
+            DATBASE_URL: $HEROKU_DATABASE_URL
           command: |
             cd backend
+            diesel migration run
+
   build-web-image:
     docker:
       - image: docker
     steps:
       - checkout
+
   push-image-to-heroku:
     docker:
       - image: docker

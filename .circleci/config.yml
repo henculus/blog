@@ -36,7 +36,7 @@ jobs:
       - save_cache:
           key: backend-cache
           paths:
-            - "~/.cargo"
+            - "/usr/local/cargo"
             - "./backend/target"
 
   build-image-service:
@@ -60,7 +60,7 @@ jobs:
       - save_cache:
           key: image-service-cache
           paths:
-            - "~/.cargo"
+            - "/usr/local/cargo"
             - "./image-service/target"
 
   build-frontend:

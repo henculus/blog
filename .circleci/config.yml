@@ -5,33 +5,18 @@ orbs:
 
 workflows:
   version: 2
+  branches:
+    only:
+      - dev
+      - master
+      - feature-blog-141
   main:
     jobs:
-      - build-backend:
-          branches:
-            only:
-              - dev
-              - master
-      - build-image-service:
-          branches:
-            only:
-              - dev
-              - master
-      - build-frontend:
-          branches:
-            only:
-              - dev
-              - master
-      - migrate-production-database:
-          branches:
-            only:
-              - dev
-              - master
+      - build-backend
+      - build-image-service
+      - build-frontend
+      - migrate-production-database
       - deploy:
-          branches:
-            only:
-              - dev
-              - master
           requires:
             - build-backend
             - build-image-service

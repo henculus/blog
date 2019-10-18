@@ -8,14 +8,11 @@ workflows:
       - build-image-service
       - build-frontend
       - migrate-production-database
-      - build-web-image:
+      - deploy:
           requires:
             - build-backend
             - build-image-service
             - build-frontend
-      - push-image-to-heroku:
-          requires:
-            - build-web-image
 
 jobs:
   build-backend:
@@ -99,15 +96,17 @@ jobs:
             cd backend
             diesel migration run --database-url=$HEROKU_DATABASE_URL
 
-  build-web-image:
+  deploy:
     docker:
       - image: docker
     steps:
-      - checkout
-
-  push-image-to-heroku:
-    docker:
-      - image: docker
-    steps:
-      - checkout
-
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: |
+          cp frontend/dist dist
+          cp backend/target/release/blog blog
+          cp image-service/target/release/image-service image-service
+          docker build -t web .
+          docker login --username=$HEROKU_REGISTRY_USERNAME --password=$HEROKU_API_KEY $HEROKU_REGISTRY_URL
+          docker tag web registry.heroku.com/henculus-blog/web
+          docker push registry.heroku.com/henculus-blog/web

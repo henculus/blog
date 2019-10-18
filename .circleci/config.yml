@@ -35,7 +35,7 @@ jobs:
       - persist_to_workspace:
           root: ./backend/target/release
           paths:
-            - backend
+            - blog
       - save_cache:
           key: backend-cache
           paths:
@@ -96,7 +96,7 @@ jobs:
       - run:
           name: Switch Directory
           environment:
-            DATBASE_URL: $HEROKU_DATABASE_URL
+            DATABASE_URL: $HEROKU_DATABASE_URL
           command: |
             cd backend
             diesel migration run

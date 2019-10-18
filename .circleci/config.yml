@@ -100,6 +100,7 @@ jobs:
     docker:
       - image: docker
     steps:
+      - checkout
       - attach_workspace:
           at: /tmp/workspace
       - run: |

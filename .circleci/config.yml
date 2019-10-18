@@ -95,12 +95,9 @@ jobs:
       - checkout
       - run:
           name: Migrate database
-          environment:
-            DATABASE_URL: $HEROKU_DATABASE_URL
           command: |
-            echo $DATABASE_URL
             cd backend
-            diesel migration run
+            diesel migration run --database-url=$HEROKU_DATABASE_URL
 
   build-web-image:
     docker:

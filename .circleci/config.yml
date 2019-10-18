@@ -94,10 +94,11 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Switch Directory
+          name: Migrate database
           environment:
             DATABASE_URL: $HEROKU_DATABASE_URL
           command: |
+            echo $DATABASE_URL
             cd backend
             diesel migration run
 

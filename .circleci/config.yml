@@ -103,9 +103,9 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - run: |
-          cp frontend/dist dist
-          cp backend/target/release/blog blog
-          cp image-service/target/release/image-service image-service
+          cp /tmp/workspace/dist dist
+          cp /tmp/workspace/blog blog
+          cp /tmp/workspace/image-service image-service
           docker build -t web .
           docker login --username=$HEROKU_REGISTRY_USERNAME --password=$HEROKU_API_KEY $HEROKU_REGISTRY_URL
           docker tag web registry.heroku.com/henculus-blog/web

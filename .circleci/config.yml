@@ -41,7 +41,7 @@ workflows:
               only:
                 - dev
                 - master
-                - feature-blog-141D
+                - feature-blog-141
           requires:
             - build-backend
             - build-image-service

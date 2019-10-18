@@ -6,20 +6,42 @@ orbs:
 workflows:
   version: 2
   main:
-    triggers:
-      - schedule:
+    jobs:
+      - build-backend:
           filters:
             branches:
               only:
                 - dev
                 - master
                 - feature-blog-141
-    jobs:
-      - build-backend
-      - build-image-service
-      - build-frontend
-      - migrate-production-database
+      - build-image-service:
+          filters:
+            branches:
+              only:
+                - dev
+                - master
+                - feature-blog-141
+      - build-frontend:
+          filters:
+            branches:
+              only:
+                - dev
+                - master
+                - feature-blog-141
+      - migrate-production-database:
+          filters:
+            branches:
+              only:
+                - dev
+                - master
+                - feature-blog-141
       - deploy:
+          filters:
+            branches:
+              only:
+                - dev
+                - master
+                - feature-blog-141D
           requires:
             - build-backend
             - build-image-service

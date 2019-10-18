@@ -103,7 +103,7 @@ jobs:
       - attach_workspace:
           at: /tmp/workspace
       - run: |
-          cp /tmp/workspace/dist dist
+          cp -r /tmp/workspace/dist dist
           cp /tmp/workspace/blog blog
           cp /tmp/workspace/image-service image-service
           docker build -t web .

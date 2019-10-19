@@ -162,4 +162,4 @@ jobs:
     steps:
       - heroku/install
       - run: |
-          heroku container:release
+          heroku container:release web -a henculus-blog

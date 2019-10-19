@@ -1,21 +1,55 @@
-version: 2
+version: 2.1
+
+orbs:
+  heroku: circleci/heroku@0.0.8
 
 workflows:
   version: 2
   main:
     jobs:
-      - build-backend
-      - build-image-service
-      - build-frontend
-      - migrate-production-database
-      - build-web-image:
+      - build-backend:
+          filters:
+            branches:
+              only:
+                - dev
+                - master
+      - build-image-service:
+          filters:
+            branches:
+              only:
+                - dev
+                - master
+      - build-frontend:
+          filters:
+            branches:
+              only:
+                - dev
+                - master
+      - migrate-production-database:
+          filters:
+            branches:
+              only:
+                - dev
+                - master
+      - deploy:
+          filters:
+            branches:
+              only:
+                - dev
+                - master
           requires:
             - build-backend
             - build-image-service
             - build-frontend
-      - push-image-to-heroku:
+      - release:
+          filters:
+            branches:
+              only:
+                - dev
+                - master
           requires:
-            - build-web-image
+            - deploy
+
 
 jobs:
   build-backend:
@@ -23,67 +57,103 @@ jobs:
       - image: rustlang/rust:nightly
     steps:
       - checkout
-      - run:
-          name: Switch Dicrectory
-          command: |
-            cd backend
       - restore_cache:
-          key: project-cache
-      - run:
-          name: Check Formatting
-          command: |
-            rustfmt --version
-            cargo fmt -- --write-mode=diff
+          key: backend-cache-{{ checksum "backend/Cargo.toml" }}
       - run:
           name: Nightly Build
-          command:
+          command: |
+            cd backend
             rustup run nightly rustc --version --verbose
             rustup run nightly cargo --version --verbose
-            rustup run nightly cargo build
-      - run:
-          name: Test
-          command: |
-            rustup run nightly cargo test
-      - save_cache:
-          key: project-cache
+            rustup run nightly cargo build --release
+      - persist_to_workspace:
+          root: ./backend/target/release
           paths:
-            - "~/.cargo"
-            - "./target"
+            - blog
+      - save_cache:
+          key: backend-cache-{{ checksum "backend/Cargo.toml" }}
+          paths:
+            - "/usr/local/cargo"
+            - "./backend/target"
+
   build-image-service:
     docker:
       - image: rustlang/rust:nightly
     steps:
       - checkout
+      - restore_cache:
+          key: image-service-cache-{{ checksum "image-service/Cargo.toml" }}
       - run:
-          name: Switch Directory
+          name: Build image-service
           command: |
             cd image-service
+            rustup run nightly rustc --version --verbose
+            rustup run nightly cargo --version --verbose
+            rustup run nightly cargo build --release
+      - persist_to_workspace:
+          root: ./image-service/target/release
+          paths:
+            - image-service
+      - save_cache:
+          key: image-service-cache-{{ checksum "image-service/Cargo.toml" }}
+          paths:
+            - "/usr/local/cargo"
+            - "./image-service/target"
+
   build-frontend:
     docker:
       - image: node
     steps:
       - checkout
+      - restore_cache:
+          key: npm-cache
       - run:
-          name: Switch Directory
+          name: Build frontend
           command: |
-            cd backend
+            cd frontend
+            npm install
+            npm run build
+      - persist_to_workspace:
+          root: ./frontend
+          paths:
+            - dist
+      - save_cache:
+          key: npm-cache
+          paths:
+            - "./frontend/node_modules"
+
   migrate-production-database:
     docker:
-      - image: rustlang/rust:nightly
+      - image: christophwurst/diesel-cli
     steps:
       - checkout
       - run:
-          name: Switch Directory
+          name: Migrate database
           command: |
             cd backend
-  build-web-image:
-    docker:
-      - image: docker
-    steps:
-      - checkout
-  push-image-to-heroku:
-    docker:
-      - image: docker
-    steps:
-      - checkout
+            diesel migration run --database-url=$HEROKU_DATABASE_URL
 
+  deploy:
+    docker:
+      - image: docker
+    steps:
+      - checkout
+      - setup_remote_docker
+      - heroku/install
+      - attach_workspace:
+          at: /tmp/workspace
+      - run: |
+          cp -r /tmp/workspace/dist dist
+          cp /tmp/workspace/blog blog
+          cp /tmp/workspace/image-service image-service
+          docker build -t web .
+          docker login --username=$HEROKU_REGISTRY_USERNAME --password=$HEROKU_API_KEY $HEROKU_REGISTRY_URL
+          docker tag web registry.heroku.com/henculus-blog/web
+          docker push registry.heroku.com/henculus-blog/web
+
+  release:
+    executor: heroku/default
+    steps:
+      - heroku/install
+      - run: |
+          heroku container:release web -a henculus-blog

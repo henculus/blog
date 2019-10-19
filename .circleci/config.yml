@@ -13,35 +13,30 @@ workflows:
               only:
                 - dev
                 - master
-                - feature-blog-141
       - build-image-service:
           filters:
             branches:
               only:
                 - dev
                 - master
-                - feature-blog-141
       - build-frontend:
           filters:
             branches:
               only:
                 - dev
                 - master
-                - feature-blog-141
       - migrate-production-database:
           filters:
             branches:
               only:
                 - dev
                 - master
-                - feature-blog-141
       - deploy:
           filters:
             branches:
               only:
                 - dev
                 - master
-                - feature-blog-141
           requires:
             - build-backend
             - build-image-service
@@ -52,7 +47,6 @@ workflows:
               only:
                 - dev
                 - master
-                - feature-blog-141
           requires:
             - deploy
 

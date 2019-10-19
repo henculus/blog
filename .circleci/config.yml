@@ -46,6 +46,16 @@ workflows:
             - build-backend
             - build-image-service
             - build-frontend
+      - release:
+          filters:
+            branches:
+              only:
+                - dev
+                - master
+                - feature-blog-141
+          requires:
+            - deploy
+
 
 jobs:
   build-backend:

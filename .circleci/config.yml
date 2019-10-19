@@ -80,7 +80,7 @@ jobs:
       - restore_cache:
           key: image-service-cache
       - run:
-          name: Switch Directory
+          name: Build image-service
           command: |
             cd image-service
             rustup run nightly rustc --version --verbose
@@ -104,7 +104,7 @@ jobs:
       - restore_cache:
           key: npm-cache
       - run:
-          name: Switch Directory
+          name: Build frontend
           command: |
             cd frontend
             npm install
@@ -146,4 +146,10 @@ jobs:
           docker login --username=$HEROKU_REGISTRY_USERNAME --password=$HEROKU_API_KEY $HEROKU_REGISTRY_URL
           docker tag web registry.heroku.com/henculus-blog/web
           docker push registry.heroku.com/henculus-blog/web
+
+  release:
+    executor: heroku/default
+    steps:
+      - heroku/install
+      - run: |
           heroku container:release

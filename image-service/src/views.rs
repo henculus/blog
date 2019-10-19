@@ -73,11 +73,11 @@ pub fn index() -> HttpResponse {
     info!("Sending form page");
     let html = r#"
     <html lang="en">
-        <head><title>Upload Test</title></head>
+        <head><title>Upload test</title></head>
         <body>
             <form action="/image?width=100" method="post" enctype="multipart/form-data">
                 <input type="file" name="file" accept=".jpeg, .jpg"/>
-                <input type="submit" value="Submit"></button>
+                <input type="submit" value="Upload"></button>
             </form>
         </body>
     </html>

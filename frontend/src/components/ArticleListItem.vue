@@ -1,7 +1,7 @@
 <template>
     <div @click="openArticle" class="list-item">
         <div class="top-image-wrapper">
-            <lazy-image class="top-image" :img-padding="30.5623" :low-res-img-path="`https://i.imgur.com/xK5T9H0.jpg`"
+            <lazy-image class="top-image" :img-padding="40.5623" :low-res-img-path="`https://i.imgur.com/xK5T9H0.jpg`"
                         :high-res-img-path="`https://i.imgur.com/MOhedrY.jpg`"></lazy-image>
         </div>
         <div class="article-text-items">
@@ -74,12 +74,12 @@
                 left: 0
 
         .article-text-items
-            padding: 20px
+            padding: 15px 20px
             display: flex
             flex-direction: column
             .title
                 font-size: 2em
-                margin-bottom: 15px
+                margin-bottom: 5px
                 font-weight: normal
                 font-family: $title_font
 
@@ -99,8 +99,13 @@
         box-shadow: 0 0 4px $rnt_green
 
     +media_screensize_mobile
+
         .list-item
             font-size: 16px
+            .article-text-items
+                padding: 20px
+                .title
+                    margin-bottom: 15px
             .top-image-wrapper
                 display: block
                 max-height: 250px

@@ -21,7 +21,7 @@
         methods: {
             logout: async function () {
                 await this.$store.dispatch('AuthorizationStore/logout')
-                if (this.$route.name === 'articles-editor') {
+                if (this.$route.name === 'articles-editor' || this.$route.name === 'my-publications') {
                     this.$router.push({name: 'articles'})
                 }
             }

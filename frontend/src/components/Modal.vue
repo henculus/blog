@@ -50,22 +50,25 @@
         bottom: 0
         width: 100vw
         height: 100vh
+        padding: 10px
         background-color: rgba(0, 0, 0, .8)
         overflow-y: auto
 
         .modal-container
             position: relative
-            margin: $content-padding-mobile
+            // margin: $content-padding-mobile
             border-radius: $block_border_radius
             pointer-events: all
             max-height: 100%
             display: flex
             flex-direction: column
             align-items: center
+            justify-content: center
             transition: $ease_transition02
             background: white
             overflow-y: auto
-            width: 90%
+            width: 100%
+            margin: 0 20px
             min-width: 200px
 
             &:after
@@ -104,6 +107,7 @@
 
     +media_screensize_mobile
         .modal-wrapper
+            padding: 0
             .modal-container
                 width: 400px
 

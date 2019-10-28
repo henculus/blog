@@ -57,4 +57,6 @@
 <style scoped lang="sass">
     @import "../article_style"
     @import "../variables.sass"
+    #top-card-wrapper
+        min-width: 800px
 </style>

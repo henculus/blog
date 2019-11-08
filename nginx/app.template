@@ -1,6 +1,7 @@
 server {
     listen       ${PORT};
     server_name lupusanay.me;
+    client_max_body_size 12m;
 
     if ($http_x_forwarded_proto != "https") {
         return 301 https://$host$request_uri;

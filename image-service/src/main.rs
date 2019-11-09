@@ -25,6 +25,7 @@ fn main() -> std::io::Result<()> {
                     .allowed_origin("https://localhost:8000")
                     .allowed_origin("http://0.0.0.0:8000")
                     .allowed_origin("https://0.0.0.0:8000")
+                    .supports_credentials()
                     .allowed_methods(vec!["GET", "POST", "PATCH", "PUT", "DELETE"])
                     .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
                     .allowed_header(http::header::CONTENT_TYPE))

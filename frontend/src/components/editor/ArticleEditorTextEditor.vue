@@ -24,7 +24,7 @@
 <script>
     import Quill from 'quill'
     import imageCompressor from '../../../quill.imageCompressor.js'
-    import LazyImage from '../../../quill.imageCompressor.js'
+    let EmbedBlot = Quill.import('blots/block/embed')
 
     export default {
         name: "ArticleEditorTextEditor",
@@ -43,6 +43,22 @@
             }
         },
         mounted() {
+            class LazyImage extends EmbedBlot {
+                static create(data) {
+                    const node = super.create()
+                    node.setAttribute('src', data.highResImg)
+                    node.setAttribute('data-low-res', data.lowResImg)
+                    return node
+                }
+                static value(node) {
+                    return {
+                        highResUrl: node.getAttribute('src'),
+                        lowResUrl: node.getAttribute('data-low-res')
+                    }
+                }
+            }
+            LazyImage.blotName = 'lazyImage'
+            LazyImage.tagName = 'img'
             Quill.register('modules/imageCompressor', imageCompressor)
             Quill.register('formats/lazyImage', LazyImage)
             this.options = {

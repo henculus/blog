@@ -23,6 +23,8 @@
 
 <script>
     import Quill from 'quill'
+    import imageCompressor from '../../../quill.imageCompressor.js'
+    import LazyImage from '../../../quill.imageCompressor.js'
 
     export default {
         name: "ArticleEditorTextEditor",
@@ -41,17 +43,18 @@
             }
         },
         mounted() {
+            Quill.register('modules/imageCompressor', imageCompressor)
+            Quill.register('formats/lazyImage', LazyImage)
             this.options = {
-                debug: 'info',
+                debug: 'warn',
                 placeholder: 'Compose an epic...',
                 modules: {
+                    imageCompressor: {
+                        quality: 0.1,
+                        imageType: 'image/*'
+                    },
                     toolbar: {
                         container: '#toolbar',
-                        handlers: {
-                            'image': function (value) {
-                                console.log('IMAGE VALUE:', value)
-                            }
-                        }
                     }
                 },
                 bounds: '#content',

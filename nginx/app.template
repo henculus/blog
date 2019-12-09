@@ -1,6 +1,7 @@
 server {
     listen       ${PORT};
     server_name lupusanay.me;
+    client_max_body_size 12m;
 
     if ($http_x_forwarded_proto != "https") {
         return 301 https://$host$request_uri;
@@ -10,7 +11,7 @@ server {
         try_files $uri $uri/ /index.html =404;
     }
 
-    location /image {
+    location /api/image {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_pass http://localhost:8080/image;

@@ -16,8 +16,8 @@
                     <section class="article-content">
                         <p class="paragraph">{{article.body}}</p>
                     </section>
-                    <lazy-image :img-padding="56.25" :low-res-img-path="`https://i.imgur.com/xK5T9H0.jpg`"
-                                :high-res-img-path="`https://i.imgur.com/MOhedrY.jpg`"></lazy-image>
+                    <lazy-image :img-padding="56.25" :low-res-img-path="`https://i.imgur.com/L5yPU0P.jpg`"
+                                :high-res-img-path="`https://i.imgur.com/uingZZO.jpg`"></lazy-image>
                 </article>
 
             </div>
@@ -57,4 +57,6 @@
 <style scoped lang="sass">
     @import "../article_style"
     @import "../variables.sass"
+    #top-card-wrapper
+        min-width: 800px
 </style>

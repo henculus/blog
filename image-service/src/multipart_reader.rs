@@ -1,21 +1,21 @@
 use crate::error::Error;
 use actix_multipart::{Field, Multipart};
-use futures::future::{ok, FutureResult};
-use futures::{Future, Stream};
+use futures::{StreamExt, TryStreamExt};
 
-pub fn read_buffer(multipart: Multipart) -> impl Future<Item=Vec<u8>, Error=Error> {
-    multipart
-        .map(|field| get_buffer_from_field(field).into_stream())
-        .flatten()
-        .collect()
-        .map(|buf| buf.iter().cloned().flatten().collect())
+pub async fn read_buffer(multipart: Multipart) -> Result<Vec<u8>, Error> {
+//    multipart
+//        .map(async move |field| {
+//            get_buffer_from_field(field?).await
+//        })
+//        .
+//        .await
 }
 
-fn get_buffer_from_field(field: Field) -> impl Future<Item=Vec<u8>, Error=Error> {
+async fn get_buffer_from_field(field: Field) -> Result<Vec<u8>, Error> {
     field
-        .from_err()
         .fold(vec![], |mut acc, bytes| {
             acc.extend(bytes);
-            ok(acc) as FutureResult<Vec<u8>, Error>
+            Ok(acc)
         })
+        .await?
 }

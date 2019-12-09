@@ -1,6 +1,8 @@
+#![feature(async_closure)]
+
 use crate::views::{index, process_image};
-use actix_web::{web, App, HttpServer, http};
 use actix_cors::Cors;
+use actix_web::{http, web, App, HttpServer};
 
 mod error;
 mod img;
@@ -28,13 +30,14 @@ fn main() -> std::io::Result<()> {
                     .supports_credentials()
                     .allowed_methods(vec!["GET", "POST", "PATCH", "PUT", "DELETE"])
                     .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
-                    .allowed_header(http::header::CONTENT_TYPE))
+                    .allowed_header(http::header::CONTENT_TYPE),
+            )
             .service(
                 web::resource("/image")
                     .route(web::post().to_async(process_image))
                     .route(web::get().to(index)),
             )
     })
-        .bind("127.0.0.1:8080")?
-        .run()
+    .bind("127.0.0.1:8080")?
+    .run()
 }

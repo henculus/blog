@@ -2,7 +2,11 @@
     <div>
         <div class="editor-wrapper">
 <!--            <span class="component-name">Редактор</span>-->
-            <text-editor></text-editor>
+            <text-editor
+                    @sendPost="sendPost"
+            >
+
+            </text-editor>
         </div>
     </div>
 </template>

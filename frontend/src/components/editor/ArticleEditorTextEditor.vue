@@ -13,10 +13,12 @@
                 </div>
             </div>
             <transition name="component-load" mode="out-in">
-                <button class="publish" v-if="article.title && article.body">Опубликовать
+                <button class="publish" v-if="article.title && article.body"
+                        @click="$emit('sendPost', { title: article.title, body: JSON.stringify(article.body)})"
+                >
+                    Опубликовать
                 </button>
             </transition>
-            {{delta}}
         </div>
     </transition>
 </template>
@@ -79,7 +81,7 @@
             this.editor = new Quill('#editor', this.options)
             let self = this
             this.editor.on('text-change', function () {
-                self.delta = self.editor.getContents()
+                self.article.body = self.editor.getContents()
             })
         },
         computed: {},

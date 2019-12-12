@@ -19,7 +19,7 @@
                              :key="key">
                             <p class="paragraph"
                                v-if="!element.insert.hasOwnProperty('lazyImage')"
-                               v-html="element.insert.replace(/\n/g, '<br />')"
+                               v-html="element.insert.replace(/\n/g, '<br />').replace(/ /g, '&nbsp;')"
                             >
                             </p>
                             <lazy-image

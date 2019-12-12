@@ -13,21 +13,22 @@
                         <div class="subtitle">{{article.subtitle}}</div>
                         <div class="author">{{article.author}}</div>
                     </section>
-                    <section class="article-content"
+                    <section class="article-content">
+                        <div class="article-content-element"
                              v-for="(element, key) in articleBody.ops"
-                             :key="key"
-                    >
-                        <p class="paragraph"
-                           v-if="!element.insert.hasOwnProperty('lazyImage')"
-                           v-html="element.insert.replace(/\n/g, `<br />`)"
-                        >
-                        </p>
-                        <lazy-image
-                                v-if="element.insert.hasOwnProperty('lazyImage')"
-                                :img-padding="56.25"
-                                :low-res-img-path="element.insert.lazyImage.lowResUrl"
-                                :high-res-img-path="element.insert.lazyImage.highResUrl"
-                        ></lazy-image>
+                             :key="key">
+                            <p class="paragraph"
+                               v-if="!element.insert.hasOwnProperty('lazyImage')"
+                               v-html="element.insert.replace(/\n/g, '<br />')"
+                            >
+                            </p>
+                            <lazy-image
+                                    v-if="element.insert.hasOwnProperty('lazyImage')"
+                                    :img-padding="56.25"
+                                    :low-res-img-path="element.insert.lazyImage.lowResUrl"
+                                    :high-res-img-path="element.insert.lazyImage.highResUrl"
+                            ></lazy-image>
+                        </div>
                     </section>
                 </article>
 

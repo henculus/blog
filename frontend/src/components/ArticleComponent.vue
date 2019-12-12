@@ -19,8 +19,10 @@
                              :key="key">
                             <p class="paragraph"
                                v-if="!element.insert.hasOwnProperty('lazyImage')"
+                               :style="isBold(element) ? 'font-weight: 700' : 'font-weight: 400'"
                                v-html="element.insert.replace(/\n/g, '<br />').replace(/ /g, '&nbsp;')"
                             >
+
                             </p>
                             <lazy-image
                                     v-if="element.insert.hasOwnProperty('lazyImage')"
@@ -57,6 +59,14 @@
         computed: {
             articleBody : function () {
                 return JSON.parse(this.article.body)
+            }
+        },
+        methods: {
+            isBold: function (str_element) {
+                if (str_element.hasOwnProperty('attributes')) {
+                    return !!str_element.attributes.bold === true
+                } else
+                    return false
             }
         },
         mounted: function () {

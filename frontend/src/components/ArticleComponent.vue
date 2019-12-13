@@ -14,7 +14,7 @@
                         <div class="author">{{article.author}}</div>
                     </section>
                     <section class="article-content"
-                             v-if="includeImage"
+                             v-if="isIncludeImage"
                     >
                         <div class="article-content-element"
                              v-for="(element, key) in imageIndices"
@@ -44,7 +44,7 @@
                         </div>
                     </section>
                     <section class="article-content"
-                             v-if="!includeImage"
+                             v-if="!isIncludeImage"
                     >
                         <p class="paragraph"
                                 v-html="deltaToHtml(articleBody.ops)"
@@ -74,28 +74,25 @@
             return {
                 article: {body: {ops: [{insert: {lazyImage: {highResUrl: '', lowResUrl: ''}}}]}},
                 isLoading: true,
-                slicesArr: []
             }
         },
         computed: {
             articleBody: function () {
                 return JSON.parse(this.article.body)
             },
-            includeImage: function () {
-                let bodyOfArticle = JSON.parse(this.article.body)
-                for (let i of bodyOfArticle.ops) {
-                    if (i.insert.hasOwnProperty('lazyImage')) {
+            isIncludeImage: function () {
+                for (let op of this.articleBody.ops) {
+                    if (op.insert.hasOwnProperty('lazyImage')) {
                         return true
                     }
                 }
                 return false
             },
             imageIndices: function () {
-                let bodyOfArticle = JSON.parse(this.article.body)
                 let imageCoords = []
-                for (let i of bodyOfArticle.ops) {
-                    if (i.insert.hasOwnProperty('lazyImage')) {
-                            imageCoords.push(bodyOfArticle.ops.indexOf(i))
+                for (let op of this.articleBody.ops) {
+                    if (op.insert.hasOwnProperty('lazyImage')) {
+                            imageCoords.push(this.articleBody.ops.indexOf(op))
                     }
                 }
                 return imageCoords

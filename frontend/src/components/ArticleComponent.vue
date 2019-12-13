@@ -14,15 +14,15 @@
                         <div class="author">{{article.author}}</div>
                     </section>
                     <section class="article-content"
-                             v-if="isIncludeImage"
+                             v-if="includeImage"
                     >
                         <div class="article-content-element"
-                             v-for="(element, key) in imageCoords"
+                             v-for="(element, key) in imageIndexes"
                              :key="key"
                         >
                                <p class="paragraph"
                                    v-if="element > 0"
-                                   v-html="deltaToHtml(articleBody.ops.slice(imageCoords[key - 1], element))"
+                                   v-html="deltaToHtml(articleBody.ops.slice(imageIndexes[key - 1], element))"
                                 >
                                 </p>
                                 <lazy-image
@@ -31,12 +31,12 @@
                                         :high-res-img-path="articleBody.ops[element].insert.lazyImage.highResUrl"
                                 ></lazy-image>
                                 <p class="paragraph"
-                                   v-if="element === 0 && imageCoords.length === 1"
-                                   v-html="deltaToHtml(articleBody.ops.slice(element + 1, imageCoords[key+1]))"
+                                   v-if="element === 0 && imageIndexes.length === 1"
+                                   v-html="deltaToHtml(articleBody.ops.slice(element + 1, imageIndexes[key+1]))"
                                 >
                                 </p>
                                 <p class="paragraph"
-                                   v-if="element === imageCoords[imageCoords.length - 1]
+                                   v-if="element === imageIndexes[imageIndexes.length - 1]
                                    && element !== articleBody.ops[articleBody.ops.length - 1] && element !== 0"
                                    v-html="deltaToHtml(articleBody.ops.slice(element))"
                                 >
@@ -44,7 +44,7 @@
                         </div>
                     </section>
                     <section class="article-content"
-                             v-if="!isIncludeImage"
+                             v-if="!includeImage"
                     >
                         <p class="paragraph"
                                 v-html="deltaToHtml(articleBody.ops)"
@@ -81,7 +81,7 @@
             articleBody: function () {
                 return JSON.parse(this.article.body)
             },
-            isIncludeImage: function () {
+            includeImage: function () {
                 let bodyOfArticle = JSON.parse(this.article.body)
                 for (let i of bodyOfArticle.ops) {
                     if (i.insert.hasOwnProperty('lazyImage')) {
@@ -90,7 +90,7 @@
                 }
                 return false
             },
-            imageCoords: function () {
+            imageIndexes: function () {
                 let bodyOfArticle = JSON.parse(this.article.body)
                 let imageCoords = []
                 for (let i of bodyOfArticle.ops) {

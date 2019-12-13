@@ -13,24 +13,43 @@
                         <div class="subtitle">{{article.subtitle}}</div>
                         <div class="author">{{article.author}}</div>
                     </section>
-                    <section class="article-content">
+                    <section class="article-content"
+                             v-if="isIncludeImage"
+                    >
                         <div class="article-content-element"
-                             v-for="(element, key) in articleBody.ops"
-                             :key="key">
-                            <p class="paragraph"
-                               v-if="!element.insert.hasOwnProperty('lazyImage')"
-                               :style="isBold(element) ? 'font-weight: 700' : 'font-weight: 400'"
-                               v-html="element.insert.replace(/\n/g, '<br />').replace(/ /g, '&nbsp;')"
-                            >
-
-                            </p>
-                            <lazy-image
-                                    v-if="element.insert.hasOwnProperty('lazyImage')"
-                                    :img-padding="56.25"
-                                    :low-res-img-path="element.insert.lazyImage.lowResUrl"
-                                    :high-res-img-path="element.insert.lazyImage.highResUrl"
-                            ></lazy-image>
+                             v-for="(element, key) in imageCoords"
+                             :key="key"
+                        >
+                               <p class="paragraph"
+                                   v-if="element > 0"
+                                   v-html="deltaToHtml(articleBody.ops.slice(imageCoords[key - 1], element))"
+                                >
+                                </p>
+                                <lazy-image
+                                        :img-padding="56.25"
+                                        :low-res-img-path="articleBody.ops[element].insert.lazyImage.lowResUrl"
+                                        :high-res-img-path="articleBody.ops[element].insert.lazyImage.highResUrl"
+                                ></lazy-image>
+                                <p class="paragraph"
+                                   v-if="element === 0 && imageCoords.length === 1"
+                                   v-html="deltaToHtml(articleBody.ops.slice(element + 1, imageCoords[key+1]))"
+                                >
+                                </p>
+                                <p class="paragraph"
+                                   v-if="element === imageCoords[imageCoords.length - 1]
+                                   && element !== articleBody.ops[articleBody.ops.length - 1] && element !== 0"
+                                   v-html="deltaToHtml(articleBody.ops.slice(element))"
+                                >
+                                </p>
                         </div>
+                    </section>
+                    <section class="article-content"
+                             v-if="!isIncludeImage"
+                    >
+                        <p class="paragraph"
+                                v-html="deltaToHtml(articleBody.ops)"
+                        >
+                        </p>
                     </section>
                 </article>
 
@@ -43,6 +62,7 @@
     import api from "../api"
     import ComponentLoading from "./ComponentLoading"
     import LazyImage from "./LazyImage"
+    import {QuillDeltaToHtmlConverter} from 'quill-delta-to-html'
 
     export default {
         name: "ArticleComponent",
@@ -52,21 +72,39 @@
         },
         data() {
             return {
-                article: {},
+                article: {body: {ops: [{insert: {lazyImage: {highResUrl: '', lowResUrl: ''}}}]}},
                 isLoading: true,
+                slicesArr: []
             }
         },
         computed: {
-            articleBody : function () {
+            articleBody: function () {
                 return JSON.parse(this.article.body)
-            }
+            },
+            isIncludeImage: function () {
+                let bodyOfArticle = JSON.parse(this.article.body)
+                for (let i of bodyOfArticle.ops) {
+                    if (i.insert.hasOwnProperty('lazyImage')) {
+                        return true
+                    }
+                }
+                return false
+            },
+            imageCoords: function () {
+                let bodyOfArticle = JSON.parse(this.article.body)
+                let imageCoords = []
+                for (let i of bodyOfArticle.ops) {
+                    if (i.insert.hasOwnProperty('lazyImage')) {
+                            imageCoords.push(bodyOfArticle.ops.indexOf(i))
+                    }
+                }
+                return imageCoords
+            },
         },
         methods: {
-            isBold: function (str_element) {
-                if (str_element.hasOwnProperty('attributes')) {
-                    return !!str_element.attributes.bold === true
-                } else
-                    return false
+            deltaToHtml: function (ops_arr) {
+                const deltaConverter = new QuillDeltaToHtmlConverter(ops_arr)
+                return deltaConverter.convert()
             }
         },
         mounted: function () {

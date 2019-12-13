@@ -14,7 +14,7 @@
             </div>
             <transition name="component-load" mode="out-in">
                 <button class="publish" v-if="article.title && article.body"
-                        @click="$emit('sendPost', { title: article.title, body: JSON.stringify(article.body)})"
+                        @click="$emit('sendPost', articleObj)"
                 >
                     Опубликовать
                 </button>
@@ -35,6 +35,8 @@
             return {
                 article: {
                     title: '',
+                    subtitle: null,
+                    author: null,
                     body: '',
                     id: '',
                     published: false
@@ -84,8 +86,14 @@
                 self.article.body = self.editor.getContents()
             })
         },
-        computed: {},
-
+        computed: {
+            articleObj: function () {
+                return {
+                    title: this.article.title,
+                    body: JSON.stringify(this.article.body)
+                }
+            }
+        },
 
         methods: {}
     }

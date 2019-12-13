@@ -20,34 +20,36 @@
                              v-for="(element, key) in imageIndices"
                              :key="key"
                         >
-                               <p class="paragraph"
-                                   v-if="element > 0"
-                                   v-html="deltaToHtml(articleBody.ops.slice(imageIndices[key - 1], element))"
-                                >
-                                </p>
-                                <lazy-image
-                                        :img-padding="56.25"
-                                        :low-res-img-path="articleBody.ops[element].insert.lazyImage.lowResUrl"
-                                        :high-res-img-path="articleBody.ops[element].insert.lazyImage.highResUrl"
-                                ></lazy-image>
-                                <p class="paragraph"
-                                   v-if="element === 0 && imageIndices.length === 1"
-                                   v-html="deltaToHtml(articleBody.ops.slice(element + 1, imageIndices[key+1]))"
-                                >
-                                </p>
-                                <p class="paragraph"
-                                   v-if="element === imageIndices[imageIndices.length - 1]
+                            <p class="paragraph"
+                               v-if="element > 0"
+                               v-html="deltaToHtml(articleBody.ops.slice(imageIndices[key - 1], element))"
+                            >
+                            </p>
+                            <lazy-image
+                                    :img-padding="56.25"
+                                    :low-res-img-path="articleBody.ops[element].insert.lazyImage.lowResUrl"
+                                    :high-res-img-path="articleBody.ops[element].insert.lazyImage.highResUrl"
+                            >
+
+                            </lazy-image>
+                            <p class="paragraph"
+                               v-if="element === 0 && imageIndices.length === 1"
+                               v-html="deltaToHtml(articleBody.ops.slice(element + 1, imageIndices[key+1]))"
+                            >
+                            </p>
+                            <p class="paragraph"
+                               v-if="element === imageIndices[imageIndices.length - 1]
                                    && element !== articleBody.ops[articleBody.ops.length - 1] && element !== 0"
-                                   v-html="deltaToHtml(articleBody.ops.slice(element))"
-                                >
-                                </p>
+                               v-html="deltaToHtml(articleBody.ops.slice(element))"
+                            >
+                            </p>
                         </div>
                     </section>
                     <section class="article-content"
                              v-if="!isIncludeImage"
                     >
                         <p class="paragraph"
-                                v-html="deltaToHtml(articleBody.ops)"
+                           v-html="deltaToHtml(articleBody.ops)"
                         >
                         </p>
                     </section>
@@ -81,18 +83,14 @@
                 return JSON.parse(this.article.body)
             },
             isIncludeImage: function () {
-                for (let op of this.articleBody.ops) {
-                    if (op.insert.hasOwnProperty('lazyImage')) {
-                        return true
-                    }
-                }
-                return false
+                return this.articleBody.ops
+                    .some(x => x.insert.hasOwnProperty('lazyImage'))
             },
             imageIndices: function () {
                 let imageCoords = []
                 for (let op of this.articleBody.ops) {
                     if (op.insert.hasOwnProperty('lazyImage')) {
-                            imageCoords.push(this.articleBody.ops.indexOf(op))
+                        imageCoords.push(this.articleBody.ops.indexOf(op))
                     }
                 }
                 return imageCoords

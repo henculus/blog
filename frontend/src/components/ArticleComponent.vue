@@ -17,12 +17,12 @@
                              v-if="includeImage"
                     >
                         <div class="article-content-element"
-                             v-for="(element, key) in imageIndexes"
+                             v-for="(element, key) in imageIndices"
                              :key="key"
                         >
                                <p class="paragraph"
                                    v-if="element > 0"
-                                   v-html="deltaToHtml(articleBody.ops.slice(imageIndexes[key - 1], element))"
+                                   v-html="deltaToHtml(articleBody.ops.slice(imageIndices[key - 1], element))"
                                 >
                                 </p>
                                 <lazy-image
@@ -31,12 +31,12 @@
                                         :high-res-img-path="articleBody.ops[element].insert.lazyImage.highResUrl"
                                 ></lazy-image>
                                 <p class="paragraph"
-                                   v-if="element === 0 && imageIndexes.length === 1"
-                                   v-html="deltaToHtml(articleBody.ops.slice(element + 1, imageIndexes[key+1]))"
+                                   v-if="element === 0 && imageIndices.length === 1"
+                                   v-html="deltaToHtml(articleBody.ops.slice(element + 1, imageIndices[key+1]))"
                                 >
                                 </p>
                                 <p class="paragraph"
-                                   v-if="element === imageIndexes[imageIndexes.length - 1]
+                                   v-if="element === imageIndices[imageIndices.length - 1]
                                    && element !== articleBody.ops[articleBody.ops.length - 1] && element !== 0"
                                    v-html="deltaToHtml(articleBody.ops.slice(element))"
                                 >
@@ -90,7 +90,7 @@
                 }
                 return false
             },
-            imageIndexes: function () {
+            imageIndices: function () {
                 let bodyOfArticle = JSON.parse(this.article.body)
                 let imageCoords = []
                 for (let i of bodyOfArticle.ops) {

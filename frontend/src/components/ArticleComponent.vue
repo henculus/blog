@@ -13,45 +13,24 @@
                         <div class="subtitle">{{article.subtitle}}</div>
                         <div class="author">{{article.author}}</div>
                     </section>
-                    <section class="article-content"
-                             v-if="isIncludeImage"
-                    >
+                    <section class="article-content">
                         <div class="article-content-element"
-                             v-for="(element, key) in imageIndices"
+                             v-for="(element, key) in deltaToNewFormat"
                              :key="key"
                         >
                             <p class="paragraph"
-                               v-if="element > 0"
-                               v-html="deltaToHtml(articleBody.ops.slice(imageIndices[key - 1], element))"
+                               v-if="element"
+                               v-html="deltaToHtml(element)"
                             >
                             </p>
                             <lazy-image
-                                    :img-padding="56.25"
-                                    :low-res-img-path="articleBody.ops[element].insert.lazyImage.lowResUrl"
-                                    :high-res-img-path="articleBody.ops[element].insert.lazyImage.highResUrl"
+                                v-if="element.hasOwnProperty('insert')"
+                                :img-padding="56.25"
+                                :low-res-img-path="element.insert.lazyImage.lowResUrl"
+                                :high-res-img-path="element.insert.lazyImage.highResUrl"
                             >
-
                             </lazy-image>
-                            <p class="paragraph"
-                               v-if="element === 0 && imageIndices.length === 1"
-                               v-html="deltaToHtml(articleBody.ops.slice(element + 1, imageIndices[key+1]))"
-                            >
-                            </p>
-                            <p class="paragraph"
-                               v-if="element === imageIndices[imageIndices.length - 1]
-                                   && element !== articleBody.ops[articleBody.ops.length - 1] && element !== 0"
-                               v-html="deltaToHtml(articleBody.ops.slice(element))"
-                            >
-                            </p>
                         </div>
-                    </section>
-                    <section class="article-content"
-                             v-if="!isIncludeImage"
-                    >
-                        <p class="paragraph"
-                           v-html="deltaToHtml(articleBody.ops)"
-                        >
-                        </p>
                     </section>
                 </article>
 
@@ -82,19 +61,23 @@
             articleBody: function () {
                 return JSON.parse(this.article.body)
             },
-            isIncludeImage: function () {
-                return this.articleBody.ops
-                    .some(x => x.insert.hasOwnProperty('lazyImage'))
-            },
-            imageIndices: function () {
-                let imageCoords = []
+            deltaToNewFormat: function () {
+                let new_format = []
+                let textArr = []
                 for (let op of this.articleBody.ops) {
                     if (op.insert.hasOwnProperty('lazyImage')) {
-                        imageCoords.push(this.articleBody.ops.indexOf(op))
+                        if (textArr.length > 0) {
+                            new_format.push(textArr)
+                            textArr = []
+                        }
+                        new_format.push(op)
+                    } else {
+                        textArr.push(op)
                     }
                 }
-                return imageCoords
-            },
+                new_format.push(textArr)
+                return new_format
+            }
         },
         methods: {
             deltaToHtml: function (ops_arr) {

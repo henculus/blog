@@ -1,10 +1,10 @@
 <template>
     <transition name="component-load" mode="out-in">
-        <component-loading v-if="isLoading"></component-loading>
+        <component-loading v-if="isLoading"/>
         <div v-else id="content-wrapper">
             <div id="top-card-wrapper">
                 <lazy-image :img-padding="25" :low-res-img-path="`https://i.imgur.com/w9sSofn.jpg`"
-                            :high-res-img-path="`https://i.imgur.com/SkWrPcM.jpg`"></lazy-image>
+                            :high-res-img-path="`https://i.imgur.com/SkWrPcM.jpg`"/>
             </div>
             <div id="content">
                 <article class="article">

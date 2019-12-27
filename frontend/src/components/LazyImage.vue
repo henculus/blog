@@ -1,3 +1,4 @@
+<!--suppress HtmlUnknownTarget -->
 <template>
     <intersection-observer>
         <template v-slot="{ displayed }">
@@ -6,11 +7,11 @@
                     <div class="padding-box" :style="{ paddingBottom: imgPadding + '%' }">
                         <div class="image-wrapper">
                             <div class="low-res-img-wrapper" :class="{ hidden: imageLoaded }">
-                                <img class="low-res-img" :src="lowResImgPath"/>
+                                <img class="low-res-img" :src="lowResImgPath" alt="lazy image"/>
                             </div>
                             <img v-if="displayed || cached" class="high-res-img" :src="highResImgPath"
                                  :class="{ visible: imageLoaded, cached: cached, 'ultra-high-res': ultraHighRes }"
-                                 @load="imageLoaded = true"/>
+                                 @load="imageLoaded = true" alt="lazy image"/>
                         </div>
                     </div>
                 </div>
@@ -105,6 +106,7 @@
                     display: block
                     //z-index: 1
                     width: 100%
+                    height: 100%
                     position: absolute
                     top: 0
                     left: 0

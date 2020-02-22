@@ -14,7 +14,7 @@
             </div>
             <transition name="component-load" mode="out-in">
                 <button class="publish" v-if="article.title && article.body"
-                        @click="$emit('sendPost', articleObj)"
+                        @click="$emit('sendPost', articleObj, isEdit, article.id)"
                 >
                     Опубликовать
                 </button>

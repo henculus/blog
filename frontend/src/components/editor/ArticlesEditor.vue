@@ -18,11 +18,18 @@
         name: "ArticlesEditor",
         components: {TextEditor},
         methods: {
-            sendPost: function (data) {
-                api.sendPost(data).then(
-                    response => console.log('Successfully sent post', response),
-                    error => console.error('Error on sending post:', error)
-                )
+            sendPost: function (data, isEdit, id) {
+                if (isEdit) {
+                    api.patchPost(data, id).then(
+                        response => console.log('Post successfully updated', response),
+                        error => console.log('Error on updating post', error)
+                    )
+                } else {
+                    api.sendPost(data).then(
+                        response => console.log('Successfully sent post', response),
+                        error => console.error('Error on sending post:', error)
+                    )
+                }
             }
         }
     }

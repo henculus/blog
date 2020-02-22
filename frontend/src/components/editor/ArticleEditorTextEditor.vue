@@ -14,7 +14,7 @@
             </div>
             <transition name="component-load" mode="out-in">
                 <button class="publish" v-if="article.title && article.body"
-                        @click="$emit('sendPost', articleObj)"
+                        @click="$emit('sendPost', articleObj, isEdit, article.id)"
                 >
                     Опубликовать
                 </button>
@@ -24,6 +24,7 @@
 </template>
 
 <script>
+    import api from "../../api"
     import Quill from 'quill'
     import imageCompressor from '../../../quill.imageCompressor.js'
     let EmbedBlot = Quill.import('blots/block/embed')
@@ -43,7 +44,9 @@
                 },
                 editor: null,
                 options: null,
-                delta: null
+                delta: null,
+                isEdit: false,
+                delta_test: null
             }
         },
         mounted() {
@@ -79,6 +82,18 @@
                 },
                 bounds: '#content',
                 theme: 'snow'
+            }
+
+            if (this.$route.params.id) {
+                this.isEdit = true
+
+                api.getPost(this.$route.params.id).then(
+                    response => {
+                        this.article = response.data
+                        this.delta = JSON.parse(response.data.body)
+                        this.editor.setContents(this.delta, 'api')
+                    }
+                )
             }
             this.editor = new Quill('#editor', this.options)
             let self = this

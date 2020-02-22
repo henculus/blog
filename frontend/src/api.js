@@ -46,7 +46,6 @@ export default {
     },
 
     patchPost(post, id) {
-        console.log(post)
         return axios.patch(`/posts/${id}`, post)
     },
 

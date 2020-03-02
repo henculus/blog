@@ -1,11 +1,11 @@
 use diesel::prelude::*;
 use rocket_contrib::json::{Json, JsonError};
 
+use crate::{Id, ViewResult};
+use crate::Database;
 use crate::post::{NewPostData, Post, PostDataUpdate};
 use crate::schema::posts as posts_schema;
 use crate::user::Token;
-use crate::Database;
-use crate::{Id, ViewResult};
 
 const OFFSET: i64 = 0;
 const LIMIT: i64 = 10;
@@ -13,11 +13,7 @@ const LIMIT: i64 = 10;
 type JsonForm<'a, T> = Result<Json<T>, JsonError<'a>>;
 
 #[post("/posts", format = "json", data = "<post_form>")]
-pub fn new_post(
-    post_form: JsonForm<NewPostData>,
-    conn: Database,
-    token: Token,
-) -> ViewResult<Post> {
+pub fn new_post(post_form: JsonForm<NewPostData>, conn: Database, token: Token) -> ViewResult<Post> {
     use posts_schema::dsl::*;
 
     let post = post_form?.into_inner().validate()?;
@@ -30,26 +26,25 @@ pub fn new_post(
 }
 
 #[get("/posts?<limit>&<offset>", rank = 2)]
-pub fn get_posts(
-    conn: Database,
-    limit: Option<i64>,
-    offset: Option<i64>,
-    token: Option<Token>,
-) -> ViewResult<Vec<Post>> {
-    let query;
+pub fn get_posts(conn: Database, limit: Option<i64>, offset: Option<i64>, token: Option<Token>) -> ViewResult<Vec<Post>> {
+    let query_result;
     match token {
-        Some(t) => query = load_with_offset(posts_schema::table.filter(posts_schema::published.eq(true).or(posts_schema::author.eq(t.username())))),
-        None => query = load_with_offset(posts_schema::table.filter(posts_schema::published.eq(true))),
+        Some(t) => {
+            query_result = posts_schema::table
+                .filter(posts_schema::published.eq(true).or(posts_schema::author.eq(t.username())))
+                .offset(offset.unwrap_or(OFFSET))
+                .limit(limit.unwrap_or(LIMIT))
+                .load::<Post>(&*conn)?;
+        }
+        None => {
+            query_result = posts_schema::table
+                .filter(posts_schema::published.eq(true))
+                .offset(offset.unwrap_or(OFFSET))
+                .limit(limit.unwrap_or(LIMIT))
+                .load::<Post>(&*conn)?;
+        }
     }
-
-    let result = query.load(&conn.0)?;
-
-    Ok(Json(result))
-}
-
-fn load_with_offset<E>(query: E) -> E where E: diesel::QueryDsl {
-    query.offset(OFFSET)
-        .limit(LIMIT)
+    Ok(Json(query_result))
 }
 
 #[get("/posts?<author>&<limit>&<offset>")]
@@ -58,7 +53,7 @@ pub fn get_posts_by_author(
     author: String,
     limit: Option<i64>,
     offset: Option<i64>,
-    token: Option<Token>,
+    token: Option<Token>
 ) -> ViewResult<Vec<Post>> {
     let query = posts_schema::table.filter(posts_schema::author.eq(&author));
     let result;

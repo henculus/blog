@@ -20,17 +20,19 @@ pub async fn upload(buffer: Vec<u8>, image_name: String) -> Result<String, Error
 
     let part = create_part(buffer, image_name).await?;
     let form = Form::new().part("image", part);
-    let mut resp = client
+    let resp = client
         .post(API_URL)
         .header(
             "Authorization",
-            format!("Client_ID {}", get_client_id_from_env()),
+            format!("Client-ID {}", get_client_id_from_env()),
         )
         .multipart(form)
-        .send()?;
+        .send()
+        .await?
+        .error_for_status()?;
 
     info!("Uploading complete");
-    let data: Value = resp.json()?;
+    let data = resp.json::<Value>().await?;
     Ok(data["data"]["link"].to_string())
 }
 

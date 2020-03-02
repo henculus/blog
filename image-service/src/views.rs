@@ -3,6 +3,7 @@ use actix_multipart::Multipart;
 use actix_web::{web::Query, HttpResponse};
 use log::*;
 use serde::{Deserialize, Serialize};
+use futures::future::try_join;
 
 #[derive(Debug, Deserialize)]
 pub struct ProcessImageInfo {
@@ -31,10 +32,15 @@ pub async fn process_image(
     let height = info.height;
 
     let buffer = read_buffer(multipart).await?;
-    let resized = resize(buffer, width, height).await?;
+    let resized = resize(buffer.clone(), width, height).await?;
     let high = upload(buffer, "high_res.jpg".into());
     let low = upload(resized, "low_res.jpg".into());
-    let (high_link, low_ling) = high.join(low).await?;
+    let (high_link, low_ling) = try_join(high, low).await?;
+
+    Ok(HttpResponse::Ok().json(Links {
+        high_resolution: high_link,
+        low_resolution: low_ling
+    }))
     //    read_buffer(multipart)
     //        .and_then(move |buffer| {
     //            resize(buffer.clone(), width, height)

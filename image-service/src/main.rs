@@ -1,4 +1,5 @@
 #![feature(async_closure)]
+#![feature(type_ascription)]
 
 use crate::views::{index, process_image};
 use actix_cors::Cors;
@@ -10,7 +11,8 @@ mod imgur_adapter;
 mod multipart_reader;
 mod views;
 
-fn main() -> std::io::Result<()> {
+#[actix_rt::main]
+async fn main() -> std::io::Result<()> {
     env_logger::init();
 
     HttpServer::new(|| {
@@ -30,14 +32,16 @@ fn main() -> std::io::Result<()> {
                     .supports_credentials()
                     .allowed_methods(vec!["GET", "POST", "PATCH", "PUT", "DELETE"])
                     .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
-                    .allowed_header(http::header::CONTENT_TYPE),
+                    .allowed_header(http::header::CONTENT_TYPE)
+                    .finish(),
             )
             .service(
                 web::resource("/image")
-                    .route(web::post().to_async(process_image))
+                    .route(web::post().to(process_image))
                     .route(web::get().to(index)),
             )
     })
     .bind("127.0.0.1:8080")?
     .run()
+    .await
 }

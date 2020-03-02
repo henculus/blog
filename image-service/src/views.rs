@@ -41,45 +41,6 @@ pub async fn process_image(
         high_resolution: high_link,
         low_resolution: low_ling
     }))
-    //    read_buffer(multipart)
-    //        .and_then(move |buffer| {
-    //            resize(buffer.clone(), width, height)
-    //                .select2(upload(buffer, "high_res.jpg".into()))
-    //                .map_err(|either| either.split().0)
-    //        })
-    //        .and_then(|either| match either {
-    //            Either::A((buffer, upload_future)) => {
-    //                info!("Resizing completed earlier than uploading");
-    //                info!("Continuing uploading and starting uploading of resized image");
-    //
-    //                Either::A(upload_future.join(upload(buffer, "low_rez.jpg".into())))
-    //            }
-    //            Either::B((high_resolution_link, resize_future)) => {
-    //                info!("Uploading completed earlier than resizing");
-    //                info!("Continuing resizing...");
-    //
-    //                Either::B(
-    //                    resize_future
-    //                        .and_then(|buf| {
-    //                            info!("Uploading low resolution image");
-    //                            upload(buf, "low_res.jpg".into())
-    //                        })
-    //                        .join(ok(high_resolution_link)),
-    //                )
-    //            }
-    //        })
-    //        .from_err()
-    //        .and_then(|(high_resolution, low_resolution)| {
-    //            info!(
-    //                "Sending response to the client: high {}; low {}",
-    //                high_resolution, low_resolution
-    //            );
-    //            HttpResponse::Ok().json(Links {
-    //                high_resolution,
-    //                low_resolution,
-    //            })
-    //        })
-    //        .from_err()
 }
 
 pub fn index() -> HttpResponse {

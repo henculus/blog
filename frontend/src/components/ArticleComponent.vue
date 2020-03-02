@@ -1,10 +1,10 @@
 <template>
     <transition name="component-load" mode="out-in">
-        <component-loading v-if="isLoading"></component-loading>
+        <component-loading v-if="isLoading"/>
         <div v-else id="content-wrapper">
             <div id="top-card-wrapper">
                 <lazy-image :img-padding="25" :low-res-img-path="`https://i.imgur.com/w9sSofn.jpg`"
-                            :high-res-img-path="`https://i.imgur.com/SkWrPcM.jpg`"></lazy-image>
+                            :high-res-img-path="`https://i.imgur.com/SkWrPcM.jpg`"/>
             </div>
             <div id="content">
                 <article class="article">
@@ -14,10 +14,24 @@
                         <div class="author">{{article.author}}</div>
                     </section>
                     <section class="article-content">
-                        <p class="paragraph">{{article.body}}</p>
+                        <div class="article-content-element"
+                             v-for="(element, key) in deltaToNewFormat"
+                             :key="key"
+                        >
+                            <p class="paragraph"
+                               v-if="element"
+                               v-html="deltaToHtml(element)"
+                            >
+                            </p>
+                            <lazy-image
+                                v-if="element.hasOwnProperty('insert')"
+                                :img-padding="56.25"
+                                :low-res-img-path="element.insert.lazyImage.lowResUrl"
+                                :high-res-img-path="element.insert.lazyImage.highResUrl"
+                            >
+                            </lazy-image>
+                        </div>
                     </section>
-                    <lazy-image :img-padding="56.25" :low-res-img-path="`https://i.imgur.com/L5yPU0P.jpg`"
-                                :high-res-img-path="`https://i.imgur.com/uingZZO.jpg`"></lazy-image>
                 </article>
 
             </div>
@@ -29,6 +43,7 @@
     import api from "../api"
     import ComponentLoading from "./ComponentLoading"
     import LazyImage from "./LazyImage"
+    import {QuillDeltaToHtmlConverter} from 'quill-delta-to-html'
 
     export default {
         name: "ArticleComponent",
@@ -38,8 +53,36 @@
         },
         data() {
             return {
-                article: {},
+                article: {body: {ops: [{insert: {lazyImage: {highResUrl: '', lowResUrl: ''}}}]}},
                 isLoading: true,
+            }
+        },
+        computed: {
+            articleBody: function () {
+                return JSON.parse(this.article.body)
+            },
+            deltaToNewFormat: function () {
+                let new_format = []
+                let textArr = []
+                for (let op of this.articleBody.ops) {
+                    if (op.insert.hasOwnProperty('lazyImage')) {
+                        if (textArr.length > 0) {
+                            new_format.push(textArr)
+                            textArr = []
+                        }
+                        new_format.push(op)
+                    } else {
+                        textArr.push(op)
+                    }
+                }
+                new_format.push(textArr)
+                return new_format
+            }
+        },
+        methods: {
+            deltaToHtml: function (ops_arr) {
+                const deltaConverter = new QuillDeltaToHtmlConverter(ops_arr)
+                return deltaConverter.convert()
             }
         },
         mounted: function () {

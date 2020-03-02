@@ -8,7 +8,7 @@ function warnAboutOptions(options) {
     if (options.maxWidth && typeof options.maxWidth !== "number") {
         console.warn(
             `[config error] 'maxWidth' is required to be a "number" (in pixels), 
-recieved: ${options.maxWidth}
+received: ${options.maxWidth}
 -> using default 1000`
         )
         options.maxWidth = 1000
@@ -16,7 +16,7 @@ recieved: ${options.maxWidth}
     if (options.maxHeight && typeof options.maxHeight !== "number") {
         console.warn(
             `[config error] 'maxHeight' is required to be a "number" (in pixels), 
-recieved: ${options.maxHeight}
+received: ${options.maxHeight}
 -> using default 1000`
         )
         options.maxHeight = 1000
@@ -24,7 +24,7 @@ recieved: ${options.maxHeight}
     if (options.quality && typeof options.quality !== "number") {
         console.warn(
             `quill.imageCompressor: [config error] 'quality' is required to be a "number", 
-recieved: ${options.quality}
+received: ${options.quality}
 -> using default 0.7`
         )
         options.quality = 0.7
@@ -36,7 +36,7 @@ recieved: ${options.quality}
     ) {
         console.warn(
             `quill.imageCompressor: [config error] 'imageType' is required be in the form of "image/png" or "image/jpeg" etc ..., 
-recieved: ${options.imageType}
+received: ${options.imageType}
 -> using default image/jpeg`
         )
         options.imageType = "image/jpeg"
@@ -48,7 +48,7 @@ class imageCompressor {
         this.quill = quill
         this.range = null
         this.options = options
-        this.debug = options.debug == null || options.debug == true
+        this.debug = options.debug == null || options.debug === true
 
         warnAboutOptions(options)
 
@@ -128,6 +128,7 @@ class imageCompressor {
 }
 
 // Take an image URL, downscale it to the given width, and return a new image URL.
+// eslint-disable-next-line no-unused-vars
 async function downscaleImage(
     dataUrl,
     maxWidth,

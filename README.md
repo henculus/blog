@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/henculus/blog.svg?style=svg)](https://circleci.com/gh/henculus/blog)
+[![CircleCI](https://circleci.com/gh/henculus/blog/tree/dev.svg?style=svg)](https://circleci.com/gh/henculus/blog/tree/dev)
 # Henculus blog
 ## Simple blog/news site on Vue (WIP)
 Main feed

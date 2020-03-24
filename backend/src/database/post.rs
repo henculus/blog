@@ -3,10 +3,11 @@ use crate::database::error::Error;
 use crate::database::Connection;
 use futures::Future;
 
-type Fut = impl Future<Output = Result<Post, Error>>;
+type PostFuture = impl Future<Output = Result<Post, Error>>;
+type PostQuery = impl Fn(Connection) -> PostFuture;
 
-pub async fn retrieve_post(id: Id) -> Box<dyn Fn(Connection) -> Fut> {
-    Box::new(async move |conn| retrieve_post_query(conn, id).await)
+pub fn retrieve_post(id: Id) -> PostQuery {
+    Box::new(move |conn| retrieve_post_query(conn, id))
 }
 
 async fn create_post_query(connection: Connection, post: NewPostInfo) -> Result<Id, Error> {
@@ -25,7 +26,7 @@ async fn remove_post_query(connection: Connection, id: Id) -> Result<(), Error> 
     unimplemented!()
 }
 
-async fn retrieve_post_query(mut connection: Connection, id: Id) -> Result<Post, Error> {
+async fn retrieve_post_query(connection: Connection, id: Id) -> Result<Post, Error> {
     let client = connection
         .query_one("SELECT $1::INT FROM POSTS", &[&id.0])
         .await?;

@@ -1,11 +1,19 @@
 use crate::api::JsonResponse;
 use crate::data::{Id, NewPostInfo, Post, UpdatePostInfo};
+use crate::database::{DatabaseClient, retrieve_post};
 use crate::error::Error;
-use actix_web::{delete, get, patch, post, put, web::Json, web::Path};
+use actix_web::{
+    delete, get, patch, post, put,
+    web::{Data, Json, Path},
+};
 
 #[get("/posts/{post_id}")]
-pub async fn get_post(id: Path<Id>) -> JsonResponse<Post, Error> {
-    unimplemented!()
+pub async fn get_post(client: Data<DatabaseClient>, id: Path<Id>) -> JsonResponse<Post, Error> {
+    let raw_id = id.into_inner();
+    let post = client
+        .execute(retrieve_post(raw_id).await)
+        .await?;
+    Ok(Json(post))
 }
 
 #[get("/posts/")]

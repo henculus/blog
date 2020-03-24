@@ -1,7 +1,6 @@
 use crate::data::Id;
 use crate::data::User;
 use crate::error::Error;
-use actix_web::body::Body;
 use actix_web::{HttpRequest, HttpResponse, Responder};
 use futures::future::Ready;
 use serde::{Deserialize, Serialize};
@@ -20,7 +19,7 @@ pub struct UpdatePostInfo {
     is_published: Option<String>,
 }
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Post {
     id: Id,
     title: String,

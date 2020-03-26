@@ -5,14 +5,14 @@ use actix_web::{HttpRequest, HttpResponse, Responder};
 use futures::future::Ready;
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct NewPostInfo {
     title: String,
     body: String,
     author: Id,
     is_published: bool,
 }
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct UpdatePostInfo {
     title: Option<String>,
     body: Option<String>,

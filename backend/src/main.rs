@@ -1,6 +1,7 @@
 #![feature(fixed_size_array)]
 #![feature(async_closure)]
 #![feature(type_alias_impl_trait)]
+#![feature(trait_alias)]
 
 use std::io;
 

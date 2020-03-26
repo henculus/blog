@@ -21,10 +21,9 @@ impl DatabaseClient {
         Self { pool }
     }
 
-    pub async fn execute<T, O, F>(&self, f: F) -> Result<T, Error>
+    pub async fn execute<T, F>(&self, f: F) -> Result<T, Error>
     where
-        O: Future<Output = Result<T, Error>>,
-        F: Fn(Client) -> O,
+        F: Fn(Client) -> Box<(dyn Future<Output = Result<T, Error>> + Unpin)>,
     {
         let conn = self.pool.get().await?;
         f(conn).await

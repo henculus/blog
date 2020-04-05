@@ -26,10 +26,12 @@ async fn main() -> io::Result<()> {
     config.user = Some("lupusanay".into());
     config.password = Some("qwerty".into());
     config.dbname = Some("blog".into());
+    config.host = Some("localhost".into());
+    config.port = Some(5432);
     let pool = config.create_pool(NoTls).unwrap();
     let client = DatabaseClient::new(pool).await;
 
-    HttpServer::new(move || App::new().app_data(client.clone()).service(get_post))
+    HttpServer::new(move || App::new().data(client.clone()).service(get_post))
         .bind("0.0.0.0:8000")?
         .run()
         .await

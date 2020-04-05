@@ -1,28 +1,43 @@
-use crate::data::{Id, NewPostInfo, Post, UpdatePostInfo};
+use crate::data::{Id, NewPostInfo, Post, UpdatePostInfo, User};
 use crate::database::error::Error;
 use crate::database::Connection;
+use chrono::DateTime as ChronoDate;
+use chrono::Utc;
 use futures::{Future, FutureExt};
-use std::convert::{TryInto, TryFrom};
+use log::*;
+use std::convert::{TryFrom, TryInto};
+use tokio_postgres::types::Date;
 use tokio_postgres::Row;
 
-pub fn retrieve_post(id: Id) -> impl Fn(Connection) -> Box<(dyn Future<Output = Result<Post, Error>> + Unpin)>
-{
+pub fn retrieve_post(
+    id: Id,
+) -> impl Fn(Connection) -> Box<(dyn Future<Output = Result<Post, Error>> + Unpin)> {
     move |conn| Box::new(retrieve_post_query(conn, id).boxed())
 }
 
-pub fn retrieve_posts(page: i32, page_size: i32) -> impl Fn(Connection) -> Box<(dyn Future<Output = Result<Vec<Post>, Error>> + Unpin)> {
+pub fn retrieve_posts(
+    page: i32,
+    page_size: i32,
+) -> impl Fn(Connection) -> Box<(dyn Future<Output = Result<Vec<Post>, Error>> + Unpin)> {
     move |conn| Box::new(retrieve_posts_query(conn, page, page_size).boxed())
 }
 
-pub fn update_post(id: Id, post: UpdatePostInfo) -> impl Fn(Connection) -> Box<(dyn Future<Output = Result<(), Error>> + Unpin)> {
+pub fn update_post(
+    id: Id,
+    post: UpdatePostInfo,
+) -> impl Fn(Connection) -> Box<(dyn Future<Output = Result<(), Error>> + Unpin)> {
     move |conn| Box::new(update_post_query(conn, id, post.clone()).boxed())
 }
 
-pub fn remove_post(id: Id) -> impl Fn(Connection) -> Box<(dyn Future<Output = Result<(), Error>> + Unpin)> {
+pub fn remove_post(
+    id: Id,
+) -> impl Fn(Connection) -> Box<(dyn Future<Output = Result<(), Error>> + Unpin)> {
     move |conn| Box::new(remove_post_query(conn, id).boxed())
 }
 
-pub fn create_post(post: NewPostInfo) -> impl Fn(Connection) -> Box<(dyn Future<Output = Result<Id, Error>> + Unpin)> {
+pub fn create_post(
+    post: NewPostInfo,
+) -> impl Fn(Connection) -> Box<(dyn Future<Output = Result<Id, Error>> + Unpin)> {
     move |conn| Box::new(create_post_query(conn, post.clone()).boxed())
 }
 
@@ -44,8 +59,13 @@ async fn remove_post_query(connection: Connection, id: Id) -> Result<(), Error> 
 
 async fn retrieve_post_query(connection: Connection, id: Id) -> Result<Post, Error> {
     let row = connection
-        .query_one("SELECT $1::INT FROM POSTS", &[&id.0])
+        .query_one("SELECT ID, TITLE, BODY, CREATED_AT, EDITED_AT, AUTHOR, IS_PUBLISHED FROM POSTS WHERE ID=$1::INT", &[&id.0])
         .await?;
+
+    let title: String = row.get(1);
+
+    debug!("{:#?}", title);
+
     let post = row.try_into()?;
     Ok(post)
 }
@@ -58,11 +78,18 @@ async fn retrieve_posts_query(
     unimplemented!()
 }
 
-
 impl TryFrom<Row> for Post {
     type Error = Error;
 
     fn try_from(value: Row) -> Result<Self, Self::Error> {
-        unimplemented!()
+        Ok(Post {
+            id: Id(value.get(0)),
+            title: value.get(1),
+            body: value.get(2),
+            created_at: value.get(3),
+            edited_at: value.get(4),
+            author: Id(value.get(5)),
+            is_published: value.get(6),
+        })
     }
 }

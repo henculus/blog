@@ -2,6 +2,7 @@ use crate::data::Id;
 use crate::data::User;
 use crate::error::Error;
 use actix_web::{HttpRequest, HttpResponse, Responder};
+use chrono::NaiveDate;
 use futures::future::Ready;
 use serde::{Deserialize, Serialize};
 
@@ -21,13 +22,13 @@ pub struct UpdatePostInfo {
 
 #[derive(Deserialize, Serialize, Debug)]
 pub struct Post {
-    id: Id,
-    title: String,
-    body: String,
-    created_at: String,
-    edited_at: String,
-    author: User,
-    is_published: bool,
+    pub id: Id,
+    pub title: String,
+    pub body: String,
+    pub created_at: NaiveDate,
+    pub edited_at: Option<NaiveDate>,
+    pub author: Id,
+    pub is_published: bool,
 }
 
 impl Responder for Post {

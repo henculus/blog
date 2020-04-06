@@ -1,6 +1,6 @@
 use crate::api::JsonResponse;
 use crate::data::{Id, NewPostInfo, Post, UpdatePostInfo};
-use crate::database::{retrieve_post, DatabaseClient};
+use crate::database::{retrieve_post, retrieve_posts, DatabaseClient};
 use crate::error::Error;
 use actix_web::{
     delete, get, patch, post, put,
@@ -14,9 +14,12 @@ pub async fn get_post(client: Data<DatabaseClient>, id: Path<Id>) -> JsonRespons
     Ok(Json(post))
 }
 
-#[get("/posts/")]
-pub async fn get_posts() -> JsonResponse<Vec<Post>, Error> {
-    unimplemented!()
+#[get("/posts")]
+pub async fn get_posts(client: Data<DatabaseClient>) -> JsonResponse<Vec<Post>, Error> {
+    let page = 1;
+    let page_size = 10;
+    let posts = client.execute(retrieve_posts(page, page_size)).await?;
+    Ok(Json(posts))
 }
 
 #[post("/posts/")]

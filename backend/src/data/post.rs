@@ -1,5 +1,4 @@
 use crate::data::Id;
-use crate::data::User;
 use crate::error::Error;
 use actix_web::{HttpRequest, HttpResponse, Responder};
 use chrono::NaiveDate;

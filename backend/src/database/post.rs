@@ -1,12 +1,9 @@
-use crate::data::{Id, NewPostInfo, Post, UpdatePostInfo, User};
+use crate::data::{Id, NewPostInfo, Post, UpdatePostInfo};
 use crate::database::error::Error;
 use crate::database::Connection;
-use chrono::DateTime as ChronoDate;
-use chrono::Utc;
 use futures::{Future, FutureExt};
 use log::*;
 use std::convert::{TryFrom, TryInto};
-use tokio_postgres::types::Date;
 use tokio_postgres::Row;
 
 pub fn retrieve_post(
@@ -75,7 +72,22 @@ async fn retrieve_posts_query(
     page: i32,
     page_size: i32,
 ) -> Result<Vec<Post>, Error> {
-    unimplemented!()
+    let limit = page_size;
+    let offset = page_size * (page - 1);
+
+    let rows = connection
+        .query(
+            "SELECT ID, TITLE, BODY, CREATED_AT, EDITED_AT, AUTHOR, IS_PUBLISHED FROM POSTS LIMIT $1::INT OFFSET $2::INT",
+            &[&limit, &offset],
+        )
+        .await?;
+
+    let mut posts = vec![];
+    for row in rows {
+        let post = row.try_into()?;
+        posts.push(post)
+    }
+    Ok(posts)
 }
 
 impl TryFrom<Row> for Post {

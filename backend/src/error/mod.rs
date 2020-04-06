@@ -1,5 +1,5 @@
 use crate::database::Error as DatabaseError;
-use actix_web::{Error as ActixError, ResponseError};
+use actix_web::ResponseError;
 use std::fmt::Formatter;
 
 #[derive(Debug)]

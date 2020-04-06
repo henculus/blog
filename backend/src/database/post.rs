@@ -82,12 +82,7 @@ async fn retrieve_posts_query(
         )
         .await?;
 
-    let mut posts = vec![];
-    for row in rows {
-        let post = row.try_into()?;
-        posts.push(post)
-    }
-    Ok(posts)
+    rows.into_iter().map(|row| row.try_into()).collect()
 }
 
 impl TryFrom<Row> for Post {

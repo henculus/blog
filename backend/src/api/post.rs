@@ -40,7 +40,7 @@ pub async fn replace_post(client: Data<DatabaseClient>, id: Path<Id>, post_info:
 }
 
 #[patch("/posts/{post_id}/")]
-pub async fn update_post(id: Path<Id>, post_info: Json<UpdatePostInfo>) -> JsonResponse<(), Error> {
+pub async fn update_post(client: Data<DatabaseClient>, id: Path<Id>, post_info: Json<UpdatePostInfo>) -> JsonResponse<(), Error> {
     client.execute(change_post(id.into_inner(), post_info.into_inner())).await?;
     Ok(Json(()))
 }

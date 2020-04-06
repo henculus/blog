@@ -36,6 +36,9 @@ async fn main() -> io::Result<()> {
             .data(client.clone())
             .service(get_post)
             .service(get_posts)
+            .service(add_post)
+            .service(delete_post)
+            .service(update_post)
     })
     .bind("0.0.0.0:8000")?
     .run()

@@ -19,7 +19,7 @@ pub fn retrieve_posts(
     move |conn| Box::new(retrieve_posts_query(conn, page, page_size).boxed())
 }
 
-pub fn update_post(
+pub fn change_post(
     id: Id,
     post: UpdatePostInfo,
 ) -> impl Fn(Connection) -> Box<(dyn Future<Output = Result<(), Error>> + Unpin)> {
